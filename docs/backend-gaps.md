@@ -1,11 +1,12 @@
 # Backend gaps
 
-Gaps between the frontend requirements and `openapi.yaml`. No endpoints are invented; each gap needs a backend decision before the matching adapter is built. Mark affected code with `TODO(backend)`.
+Gaps between the frontend requirements and `openapi.yaml`. No endpoints are invented; each gap needs a backend decision before the matching adapter is replaced. Affected code is marked `TODO(backend)`.
 
-1. **Authentication**: No login, logout, refresh, or current-user endpoint exists. `/login`, the httpOnly session cookie, and role-based routing (client, provider, admin) cannot be implemented against the contract.
-2. **Public provider listing**: The home page is a grid of provider cards, but the contract only lists services (`GET /api/v1/services`). There is no public provider list or provider detail endpoint.
-3. **Provider card fields**: Cards need photo, neighborhood, city, verified badge, and specialties. `ProviderProfile` has no photo, city, or neighborhood, and public service items do not include provider name or verification status.
-4. **Reviews**: Cards show a star rating and review count. No reviews or ratings endpoint or field exists.
-5. **Filters**: The city and neighborhood dropdowns have no matching query parameters on `GET /api/v1/services`, and there is no location or specialty taxonomy endpoint.
-6. **Wallet top-up result page**: `GET /api/v1/payments/zarinpal/callback` returns 204 with no body, so the result page has no data source. Polling `GET /api/v1/payments/{paymentID}` needs the payment ID, which the callback does not supply.
+1. **Authentication**: No login, logout, refresh, or current-user endpoint exists. `/login`, the httpOnly session cookie (read by `apiFetch` with `auth: true`), and role-based routing (client, provider, admin) cannot be completed against the contract.
+2. **Public provider list and profile**: Only `GET /api/v1/services` is public. There is no public provider list or provider detail endpoint. Cards are built per service, so a provider with several services appears several times.
+3. **Provider card fields**: Public service items do not include provider name, specialties, neighborhood, city, photo, rating, or review count. These fields come from `src/lib/api/mock/provider-meta.ts` behind `USE_MOCK_META=true`. With the flag off, the card uses the service name and leaves those fields empty.
+4. **Service filters**: `GET /api/v1/services` accepts only `cursor` and `limit`. Specialty, city, neighborhood, and search filters are missing, and there is no city or specialty taxonomy endpoint.
+5. **Zarinpal callback result**: `GET /api/v1/payments/zarinpal/callback` returns 204 with no body, so the return page has no data source. Polling `GET /api/v1/payments/{paymentID}` needs a payment ID that the callback does not supply.
+6. **Admin provider list**: Admins can change a provider's verification status by ID, but there is no endpoint to list providers.
 7. **Image upload**: Provider photos have no upload or media endpoint.
+8. **Error code catalog**: Problem `code` values are not documented. Persian messages are mapped by HTTP status only (`src/lib/api/problem.ts`). Code-specific messages should be added once the catalog exists.

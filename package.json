@@ -10,16 +10,19 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "gen:api": "openapi-typescript openapi.yaml -o src/lib/api/schema.gen.ts"
   },
   "dependencies": {
     "next": "16.4.2",
     "react": "19.3.0",
     "react-dom": "19.3.0",
+    "server-only": "^0.0.1",
     "zod": "^4.0.0"
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "^4",
+    "openapi-typescript": "^7.0.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
