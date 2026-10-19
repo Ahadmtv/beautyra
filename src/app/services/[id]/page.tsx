@@ -1,17 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
-
 import { BookingPanel } from "@/components/service/BookingPanel";
 import { ProviderAvatar } from "@/components/listing/ProviderAvatar";
 import { Badge } from "@/components/ui/Badge";
 import { Rating } from "@/components/ui/Rating";
 import { env } from "@/config/env";
 import { messages, t } from "@/config/messages.fa";
-import { ApiError } from "@/lib/api/problem";
 import { DEFAULT_PAGE_LIMIT } from "@/lib/api/pagination";
-import { parseServiceId } from "@/lib/api/service-id";
-import { getPublicServiceCards, getPublicServiceDetail, type ServiceDetail } from "@/lib/api/services";
+import { getPublicServiceCards, loadPublicServiceDetailOrNotFound } from "@/lib/api/services";
 import { formatTomanFromRial } from "@/lib/format/money";
 import { buildServiceJsonLd, serializeJsonLd } from "@/lib/seo/json-ld";
 
@@ -26,25 +22,9 @@ export async function generateStaticParams() {
   return page.items.map((card) => ({ id: String(card.id) }));
 }
 
-async function loadService(rawId: string): Promise<ServiceDetail> {
-  const id = parseServiceId(rawId);
-  if (id === null) {
-    notFound();
-  }
-
-  try {
-    return await getPublicServiceDetail(id);
-  } catch (error) {
-    if (error instanceof ApiError && error.status === 404) {
-      notFound();
-    }
-    throw error;
-  }
-}
-
 export async function generateMetadata({ params }: ServicePageProps): Promise<Metadata> {
   const { id } = await params;
-  const { service } = await loadService(id);
+  const { service } = await loadPublicServiceDetailOrNotFound(id);
 
   const title = `${service.name} | ${t("brand.name")}`;
   const description =
@@ -68,7 +48,7 @@ export async function generateMetadata({ params }: ServicePageProps): Promise<Me
 
 export default async function ServiceDetailPage({ params }: ServicePageProps) {
   const { id } = await params;
-  const { service, provider } = await loadService(id);
+  const { service, provider } = await loadPublicServiceDetailOrNotFound(id);
 
   const priceLabel = service.price_irr === 0 ? t("service.free") : formatTomanFromRial(service.price_irr);
   const profileName = provider?.name ?? service.name;

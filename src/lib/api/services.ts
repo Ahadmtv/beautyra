@@ -1,11 +1,14 @@
 import { cacheLife, cacheTag } from "next/cache";
+import { notFound } from "next/navigation";
 
 import { env } from "@/config/env";
 
 import { type DoctorCardView, type ProviderMeta, toDoctorCardView } from "./adapters/doctor-card";
 import { apiFetch } from "./client";
+import { ApiError } from "./problem";
 import { getMockProviderMeta } from "./mock/provider-meta";
 import { buildPageQuery, type CursorPage } from "./pagination";
+import { parseServiceId } from "./service-id";
 import type { Service, ServicePage } from "./types";
 
 const PUBLIC_SERVICES_REVALIDATE_SECONDS = 300;
@@ -44,6 +47,22 @@ export async function getPublicServiceDetail(id: number): Promise<ServiceDetail>
   const service = await apiFetch<Service>(`/api/v1/services/${id}`);
 
   return { service, provider: resolveProviderMeta(service.provider_id) };
+}
+
+export async function loadPublicServiceDetailOrNotFound(rawId: string): Promise<ServiceDetail> {
+  const id = parseServiceId(rawId);
+  if (id === null) {
+    notFound();
+  }
+
+  try {
+    return await getPublicServiceDetail(id);
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) {
+      notFound();
+    }
+    throw error;
+  }
 }
 
 function resolveProviderMeta(providerId: number): ProviderMeta | null {

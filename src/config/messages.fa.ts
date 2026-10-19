@@ -22,6 +22,21 @@ export const messages = {
   "service.price": "هزینه",
   "service.free": "رایگان",
   "service.bookCta": "دریافت نوبت",
+  "booking.title": "رزرو نوبت",
+  "booking.dateHeading": "انتخاب تاریخ",
+  "booking.timeHeading": "انتخاب ساعت",
+  "booking.dateStripLabel": "انتخاب روز",
+  "booking.today": "امروز",
+  "booking.prevWeek": "هفته قبل",
+  "booking.nextWeek": "هفته بعد",
+  "booking.slotLabel": "انتخاب ساعت {time}",
+  "booking.loading": "در حال دریافت ساعت‌های آزاد",
+  "booking.noSlots.title": "نوبت خالی وجود ندارد",
+  "booking.noSlots.nextDay": "رفتن به روز بعد",
+  "booking.error.notFound": "این خدمت یا ارائه‌دهنده دیگر در دسترس نیست.",
+  "booking.error.conflict": "وضعیت نوبت‌های این روز تغییر کرده است. لطفاً روز دیگری را انتخاب کنید.",
+  "booking.note": "زمان‌های نمایش‌داده‌شده مشورتی هستند و تضمین رزرو نیستند. اگر نوبت توسط کاربر دیگری ثبت شود، رزرو ممکن است با خطای ۴۰۹ مواجه شود.",
+  "booking.timeZoneNote": "ساعت‌ها بر اساس منطقه زمانی ارائه‌دهنده نمایش داده می‌شوند.",
   "notFound.title": "صفحه مورد نظر یافت نشد",
   "notFound.body": "این خدمت وجود ندارد یا دیگر در دسترس نیست.",
   "notFound.home": "بازگشت به صفحه اصلی",
@@ -110,6 +125,32 @@ export const SPECIALTY_OPTIONS = [
   { value: "pulmonology", label: "ریه و دستگاه تنفسی" },
   { value: "rheumatology", label: "روماتولوژی" },
   { value: "hematology-oncology", label: "خون و سرطان" },
+] as const;
+
+export const JALALI_MONTH_NAMES = [
+  "فروردین",
+  "اردیبهشت",
+  "خرداد",
+  "تیر",
+  "مرداد",
+  "شهریور",
+  "مهر",
+  "آبان",
+  "آذر",
+  "دی",
+  "بهمن",
+  "اسفند",
+] as const;
+
+// Indexed by Date#getUTCDay(): Sunday is 0. Persian weeks start on Saturday.
+export const WEEKDAY_NAMES_BY_UTC_DAY = [
+  "یکشنبه",
+  "دوشنبه",
+  "سه‌شنبه",
+  "چهارشنبه",
+  "پنجشنبه",
+  "جمعه",
+  "شنبه",
 ] as const;
 
 export type MessageKey = keyof typeof messages;
