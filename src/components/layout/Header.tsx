@@ -1,6 +1,7 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { t } from "@/config/messages.fa";
-import { buttonClassName } from "@/components/ui/Button";
+import { HeaderAccount, LoginLink } from "./HeaderAccount";
 
 export function Header() {
   return (
@@ -10,9 +11,9 @@ export function Header() {
           <span className="text-xl font-extrabold md:text-2xl">{t("brand.name")}</span>
           <span className="text-xs">{t("brand.suffix")}</span>
         </Link>
-        <Link href="/login" className={buttonClassName({ variant: "outline", size: "md", className: "h-9 px-3 md:h-10 md:px-4" })}>
-          {t("header.login")}
-        </Link>
+        <Suspense fallback={<LoginLink />}>
+          <HeaderAccount />
+        </Suspense>
       </div>
     </header>
   );
