@@ -13,12 +13,20 @@ type ApiRequestOptions = {
   auth?: boolean;
   idempotencyKey?: string;
   timeoutMs?: number;
+  cache?: RequestCache;
 };
 
 const DEFAULT_TIMEOUT_MS = 10_000;
 
 // Caching is decided by the caller: under cacheComponents, fetch is uncached unless it runs inside a "use cache" scope.
 export async function apiFetch<T>(path: string, options: ApiRequestOptions = {}): Promise<T> {
+  return (await apiFetchWithStatus<T>(path, options)).data;
+}
+
+export async function apiFetchWithStatus<T>(
+  path: string,
+  options: ApiRequestOptions = {},
+): Promise<{ data: T; status: number }> {
   const {
     method = "GET",
     body,
@@ -26,6 +34,7 @@ export async function apiFetch<T>(path: string, options: ApiRequestOptions = {})
     auth = false,
     idempotencyKey,
     timeoutMs = DEFAULT_TIMEOUT_MS,
+    cache,
   } = options;
 
   const url = new URL(`${env.API_BASE_URL.replace(/\/$/, "")}${path}`);
@@ -57,6 +66,7 @@ export async function apiFetch<T>(path: string, options: ApiRequestOptions = {})
     method,
     headers,
     body: body === undefined ? undefined : JSON.stringify(body),
+    cache,
     signal: AbortSignal.timeout(timeoutMs),
   };
 
@@ -76,9 +86,6 @@ export async function apiFetch<T>(path: string, options: ApiRequestOptions = {})
     throw await parseProblem(response);
   }
 
-  if (response.status === 204) {
-    return undefined as T;
-  }
-
-  return (await response.json()) as T;
+  const data = response.status === 204 ? undefined : ((await response.json()) as T);
+  return { data: data as T, status: response.status };
 }
