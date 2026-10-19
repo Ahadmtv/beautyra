@@ -6,20 +6,18 @@ import { env } from "@/config/env";
 
 import { ApiError, parseProblem } from "./problem";
 
-type CacheOptions = { revalidate: number; tags: string[] };
-
 type ApiRequestOptions = {
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   body?: unknown;
   query?: URLSearchParams;
   auth?: boolean;
   idempotencyKey?: string;
-  cache?: CacheOptions | "no-store";
   timeoutMs?: number;
 };
 
 const DEFAULT_TIMEOUT_MS = 10_000;
 
+// Caching is decided by the caller: under cacheComponents, fetch is uncached unless it runs inside a "use cache" scope.
 export async function apiFetch<T>(path: string, options: ApiRequestOptions = {}): Promise<T> {
   const {
     method = "GET",
@@ -27,7 +25,6 @@ export async function apiFetch<T>(path: string, options: ApiRequestOptions = {})
     query,
     auth = false,
     idempotencyKey,
-    cache = "no-store",
     timeoutMs = DEFAULT_TIMEOUT_MS,
   } = options;
 
@@ -61,7 +58,6 @@ export async function apiFetch<T>(path: string, options: ApiRequestOptions = {})
     headers,
     body: body === undefined ? undefined : JSON.stringify(body),
     signal: AbortSignal.timeout(timeoutMs),
-    ...(cache === "no-store" ? { cache: "no-store" as const } : { next: cache }),
   };
 
   let response: Response;

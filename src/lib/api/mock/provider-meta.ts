@@ -3,8 +3,8 @@ import type { ProviderMeta } from "../adapters/doctor-card";
 // TODO(backend): every field here is mocked. The public contract has no provider name, specialties, location, photo, rating, or review count (see docs/backend-gaps.md).
 const MOCK_PROVIDER_META: readonly ProviderMeta[] = [
   {
-    name: "کلینیک زیبایی نیلوفر",
-    specialties: ["کوتاهی مو", "رنگ مو"],
+    name: "دکتر نیلوفر احمدی",
+    specialties: ["زنان و زایمان", "غدد، رشد و متابولیسم"],
     city: "تهران",
     neighborhood: "ونک",
     avatarUrl: null,
@@ -12,19 +12,19 @@ const MOCK_PROVIDER_META: readonly ProviderMeta[] = [
     reviewCount: 300,
   },
   {
-    name: "آرایشگاه سارا",
-    specialties: ["اصلاح ابرو", "لیفت مژه"],
+    name: "دکتر سارا محمدی",
+    specialties: ["پوست و مو"],
     city: "تهران",
-    neighborhood: "ولنجک",
+    neighborhood: "میرداماد",
     avatarUrl: null,
     rating: 4,
     reviewCount: 120,
   },
   {
-    name: "مرکز ناخن آوا",
-    specialties: ["مانیکور", "پدیکور"],
-    city: "کرج",
-    neighborhood: "مهرشهر",
+    name: "دکتر آوا رضایی",
+    specialties: ["ارتوپدی", "روماتولوژی"],
+    city: "تهران",
+    neighborhood: "سعادت‌آباد",
     avatarUrl: null,
     rating: 4.5,
     reviewCount: 58,

@@ -6,11 +6,14 @@ export const messages = {
   "header.login": "ورود",
   "footer.copyright": "تمام حقوق این سامانه محفوظ است.",
   "home.title": "خدمات و ارائه‌دهندگان",
-  "home.placeholder": "فهرست خدمات به‌زودی نمایش داده می‌شود.",
   "home.specialties": "تخصص‌ها",
+  "home.empty": "نتیجه‌ای یافت نشد",
+  "home.loadError": "فهرست خدمات در حال حاضر در دسترس نیست. لطفاً دوباره تلاش کنید.",
+  "error.title": "خطا در بارگذاری صفحه",
   "common.loading": "در حال بارگذاری",
   "common.close": "بستن",
   "common.loadMore": "نمایش بیشتر",
+  "common.retry": "تلاش مجدد",
   "common.selectPlaceholder": "انتخاب کنید",
   "button.loading": "در حال انجام",
   "badge.verified": "تأیید شده",
@@ -45,9 +48,8 @@ export const messages = {
   "filter.neighborhood": "محله‌ها",
   "filter.cityPlaceholder": "همه شهرها",
   "filter.neighborhoodPlaceholder": "همه محله‌ها",
-  "filter.open": "فیلترها",
-  "filter.apply": "اعمال فیلترها",
   "filter.search": "جستجو",
+  "filter.clear": "پاک کردن فیلترها",
   "filter.searchLabel": "نام خدمت یا ارائه‌دهنده",
   "filter.searchPlaceholder": "مثلاً: کوتاهی مو",
   "devUi.title": "نمایش اجزای رابط کاربری",
@@ -73,6 +75,31 @@ export const messages = {
   "devUi.demoBody": "این یک متن نمونه است.",
   "devUi.toastMessage": "عملیات با موفقیت انجام شد.",
 } as const;
+
+// TODO(backend): replace with specialty taxonomy from the API once it exists (docs/backend-gaps.md, item 4).
+export const SPECIALTY_OPTIONS = [
+  { value: "obstetrics-gynecology", label: "زنان و زایمان" },
+  { value: "orthopedics", label: "ارتوپدی" },
+  { value: "ent", label: "گوش حلق و بینی" },
+  { value: "dermatology", label: "پوست و مو" },
+  { value: "neurology", label: "مغز و اعصاب" },
+  { value: "urology", label: "کلیه و مجاری ادراری (اورولوژی)" },
+  { value: "nephrology", label: "کلیه و فشار خون (نفرولوژیست)" },
+  { value: "gastroenterology", label: "گوارش" },
+  { value: "hepatology-endoscopy", label: "کبد و آندوسکوپی" },
+  { value: "ophthalmology", label: "چشم پزشکی" },
+  { value: "endocrinology", label: "غدد، رشد و متابولیسم" },
+  { value: "dentistry", label: "دندان پزشکی" },
+  { value: "cardiology", label: "قلب و عروق" },
+  { value: "general-surgery", label: "جراحی عمومی" },
+  { value: "internal-medicine", label: "داخلی" },
+  { value: "pediatrics", label: "کودکان و نوزادان (اطفال)" },
+  { value: "radiology", label: "رادیولوژی و سونوگرافی" },
+  { value: "psychiatry-psychology", label: "روانپزشکی و روانشناسی" },
+  { value: "pulmonology", label: "ریه و دستگاه تنفسی" },
+  { value: "rheumatology", label: "روماتولوژی" },
+  { value: "hematology-oncology", label: "خون و سرطان" },
+] as const;
 
 export type MessageKey = keyof typeof messages;
 

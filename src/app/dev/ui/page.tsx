@@ -77,7 +77,7 @@ export default function DevUiPage() {
         <DialogDemo />
         <div className="grid gap-4 md:grid-cols-2">
           <Skeleton className="h-24 w-full" />
-          <EmptyState description={t("home.placeholder")}>
+          <EmptyState description={t("home.empty")}>
             <LoadMoreLink href="/dev/ui?cursor=1" />
           </EmptyState>
         </div>
@@ -85,7 +85,7 @@ export default function DevUiPage() {
 
       <section className="space-y-4">
         <h2 className="text-lg font-semibold">{t("devUi.sectionFilters")}</h2>
-        <FilterBar />
+        <FilterBar filters={{}} />
       </section>
     </main>
   );
