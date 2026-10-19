@@ -8,7 +8,9 @@ import { t } from "@/config/messages.fa";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { toAsciiDigits } from "@/lib/format/digits";
-import { createTopUpAction, initialTopUpState } from "@/lib/payments/actions";
+import { createTopUpAction, type TopUpState } from "@/lib/payments/actions";
+
+const initialTopUpState: TopUpState = { kind: "idle" };
 
 export function TopUpForm({ idempotencyKey }: { idempotencyKey: string }) {
   const [state, formAction] = useActionState(createTopUpAction, initialTopUpState);

@@ -42,7 +42,7 @@ export async function getPublicServiceCards(
 export async function getPublicServiceDetail(id: number): Promise<ServiceDetail> {
   "use cache";
   cacheLife({ revalidate: PUBLIC_SERVICE_DETAIL_REVALIDATE_SECONDS });
-  cacheTag(`service-${id}`);
+  cacheTag("services", `service-${id}`);
 
   const service = await apiFetch<Service>(`/api/v1/services/${id}`);
 

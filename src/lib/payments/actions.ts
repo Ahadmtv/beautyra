@@ -20,8 +20,6 @@ export type TopUpState =
   | { kind: "uncertain"; paymentId: number }
   | { kind: "redirectMissing"; paymentId: number };
 
-export const initialTopUpState: TopUpState = { kind: "idle" };
-
 export async function createTopUpAction(
   _previous: TopUpState,
   formData: FormData,
