@@ -5,7 +5,7 @@
 | Route | Mode | Reason |
 | --- | --- | --- |
 | `/` | Shell prerendered; listing data cached (`"use cache"` + `cacheLife({ revalidate: 300 })` + `cacheTag("services")`) | Public provider and service listing; changes are infrequent and tolerate short staleness. |
-| `/services/[id]` | ISR (`"use cache"` + `cacheLife` + `cacheTag("service:{id}")`) | Public published service detail; per-service tag allows targeted invalidation. |
+| `/services/[id]` | ISR (`"use cache"` + `cacheLife({ revalidate: 600 })` + `cacheTag("service-{id}")`) | Public published service detail; per-service tag allows targeted invalidation. |
 | `/book/[serviceId]` | Dynamic | Shows availability for the signed-in client; slots change with bookings and time-off. |
 | `/wallet` | Dynamic | User-specific balance and transactions; must never be cached. |
 | `/dashboard/*` | Dynamic | User-specific bookings and data. |
@@ -24,5 +24,13 @@ Filters (`city`, `neighborhood`, `specialty`, `q`) and the pagination cursor are
 - `src/app/page.tsx` reads `searchParams` inside a `Suspense` boundary. The header, filter bar, specialty navigation, and skeleton are the prerendered App Shell. The listing streams in after the params are resolved.
 - Because the page reads `searchParams`, Next.js does not store the full HTML of the unfiltered home page as an ISR entry. Only the shell and the cached data are reused. Changing this to a fully static unfiltered page would need a separate route or a different filter mechanism. This has not been verified with `next build` in this environment.
 - The backend has no filter parameters, so filtering applies only to the fetched page. A page can show fewer cards than `limit`, or none, while `next_cursor` still points to more results. The "load more" link stays visible in that case (`docs/backend-gaps.md`, item 4).
+
+## Service detail (`/services/[id]`)
+
+- `getPublicServiceDetail(id)` (`src/lib/api/services.ts`) is a `"use cache"` function with a 600-second revalidation and the `service-{id}` tag. It returns the service and its mock provider metadata, so the provider lookup is cached together with the service.
+- `generateStaticParams` prerenders the first 50 cards from `getPublicServiceCards(undefined, 50)`, which shares the home page's cached response. Other IDs render on first request and are cached (`dynamicParams` defaults to `true`).
+- An invalid ID or a backend 404 calls `notFound()`. Other API errors reach `src/app/error.tsx`.
+- The page reads no request data, so the HTML is cached by the same lifetime as its data.
+- Canonical URL, Persian title and description, and OpenGraph come from `generateMetadata`. The JSON-LD uses the `Service` type, with `Physician` as provider only when the provider name is known. A `Physician` page would need a provider detail route, which does not exist yet.
 
 Browser JavaScript never reads the JWT. Server Components, Server Actions, and Route Handlers call the backend and attach the token from an httpOnly cookie.

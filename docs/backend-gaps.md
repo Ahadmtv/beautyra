@@ -10,3 +10,4 @@ Gaps between the frontend requirements and `openapi.yaml`. No endpoints are inve
 6. **Admin provider list**: Admins can change a provider's verification status by ID, but there is no endpoint to list providers.
 7. **Image upload**: Provider photos have no upload or media endpoint.
 8. **Error code catalog**: Problem `code` values are not documented. Persian messages are mapped by HTTP status only (`src/lib/api/problem.ts`). Code-specific messages should be added once the catalog exists.
+9. **Other services of a provider**: The public API has no endpoint that lists a provider's services, so the service detail page cannot show "other services" from the same provider. The section is omitted rather than faked (`src/app/services/[id]/page.tsx`). Item 2 also applies here.

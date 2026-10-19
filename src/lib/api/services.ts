@@ -6,9 +6,15 @@ import { type DoctorCardView, type ProviderMeta, toDoctorCardView } from "./adap
 import { apiFetch } from "./client";
 import { getMockProviderMeta } from "./mock/provider-meta";
 import { buildPageQuery, type CursorPage } from "./pagination";
-import type { ServicePage } from "./types";
+import type { Service, ServicePage } from "./types";
 
 const PUBLIC_SERVICES_REVALIDATE_SECONDS = 300;
+const PUBLIC_SERVICE_DETAIL_REVALIDATE_SECONDS = 600;
+
+export type ServiceDetail = {
+  service: Service;
+  provider: ProviderMeta | null;
+};
 
 export async function getPublicServiceCards(
   cursor: number | undefined,
@@ -28,6 +34,16 @@ export async function getPublicServiceCards(
     ),
     nextCursor: page.next_cursor,
   };
+}
+
+export async function getPublicServiceDetail(id: number): Promise<ServiceDetail> {
+  "use cache";
+  cacheLife({ revalidate: PUBLIC_SERVICE_DETAIL_REVALIDATE_SECONDS });
+  cacheTag(`service-${id}`);
+
+  const service = await apiFetch<Service>(`/api/v1/services/${id}`);
+
+  return { service, provider: resolveProviderMeta(service.provider_id) };
 }
 
 function resolveProviderMeta(providerId: number): ProviderMeta | null {
