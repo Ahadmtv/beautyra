@@ -6,6 +6,7 @@ import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { env } from "@/config/env";
 import { messages } from "@/config/messages.fa";
+import { ToastProvider } from "@/components/ui/Toast";
 
 const vazirmatn = Vazirmatn({
   subsets: ["arabic", "latin"],
@@ -23,9 +24,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="fa" dir="rtl" className={`${vazirmatn.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
-        <Header />
-        {children}
-        <Footer />
+        <ToastProvider>
+          <Header />
+          {children}
+          <Footer />
+        </ToastProvider>
       </body>
     </html>
   );

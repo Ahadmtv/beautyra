@@ -13,5 +13,6 @@
 | `/admin/*` | Dynamic | Admin-only data and actions; must never be cached. |
 | `/login` | Dynamic | Depends on request state (redirect targets, errors); no caching of auth pages. |
 | `/api/health` | Dynamic | Liveness check should reflect the running server, not a build-time snapshot. |
+| `/dev/ui` | Static, returns 404 in production | Development-only component showcase; `notFound()` is called when `NODE_ENV` is `production`. |
 
 Browser JavaScript never reads the JWT. Server Components, Server Actions, and Route Handlers call the backend and attach the token from an httpOnly cookie.
