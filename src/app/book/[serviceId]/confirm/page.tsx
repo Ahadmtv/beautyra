@@ -1,0 +1,219 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { randomUUID } from "node:crypto";
+import { notFound, redirect } from "next/navigation";
+
+import { BookingConfirmForm } from "@/components/booking/BookingConfirmForm";
+import { t } from "@/config/messages.fa";
+import { getProviderAvailability } from "@/lib/api/availability";
+import { ApiError } from "@/lib/api/problem";
+import { loadPublicServiceDetailOrNotFound } from "@/lib/api/services";
+import type { AvailabilityResponse, WalletBalance } from "@/lib/api/types";
+import { getWalletBalance } from "@/lib/api/wallet";
+import { ROLES } from "@/lib/auth/claims";
+import { redirectOnUnauthorized, requireRole } from "@/lib/auth/session";
+import { formatSlotTime, isIsoDate } from "@/lib/booking/dates";
+import { numberFormatFa } from "@/lib/format/digits";
+import { formatTomanFromRial } from "@/lib/format/money";
+import { describeJalaliDate } from "@/lib/jalali/labels";
+
+type ConfirmPageProps = {
+  params: Promise<{ serviceId: string }>;
+  searchParams: Promise<{ date?: string | string[]; start_at?: string | string[] }>;
+};
+
+export const metadata: Metadata = {
+  title: `${t("booking.confirm.title")} | ${t("brand.name")}`,
+  robots: { index: false, follow: false },
+};
+
+export default async function BookingConfirmPage({ params, searchParams }: ConfirmPageProps) {
+  await requireRole(ROLES);
+
+  const { serviceId } = await params;
+  const { service, provider } = await loadPublicServiceDetailOrNotFound(serviceId);
+  const { date: rawDate, start_at: rawStartAt } = await searchParams;
+  const date = firstValue(rawDate);
+  const startAt = firstValue(rawStartAt);
+  const scheduleHref = `/book/${service.id}`;
+
+  if (date === undefined || !isIsoDate(date) || startAt === undefined || Number.isNaN(Date.parse(startAt))) {
+    redirect(scheduleHref);
+  }
+
+  const availability = await loadAvailabilityOrNotFound(service.provider_id, service.id, date);
+  const wallet = await loadWalletOrRedirect();
+  const slot = availability.slots.find((item) => item.start_at === startAt);
+
+  return (
+    <main className="mx-auto w-full max-w-page flex-1 px-4 py-6 md:py-8">
+      <nav aria-label={t("breadcrumb.label")}>
+        <ol className="flex flex-wrap items-center gap-2 text-sm text-text-muted">
+          <li>
+            <Link href="/" className="hover:text-primary">
+              {t("breadcrumb.home")}
+            </Link>
+          </li>
+          <li aria-hidden="true">/</li>
+          <li>
+            <Link href={`/services/${service.id}`} className="hover:text-primary">
+              {service.name}
+            </Link>
+          </li>
+          <li aria-hidden="true">/</li>
+          <li>
+            <Link href={scheduleHref} className="hover:text-primary">
+              {t("booking.title")}
+            </Link>
+          </li>
+          <li aria-hidden="true">/</li>
+          <li aria-current="page" className="text-text">
+            {t("booking.confirm.title")}
+          </li>
+        </ol>
+      </nav>
+
+      <section className="mt-6 flex flex-col gap-6 rounded-md border border-border bg-white p-4 md:p-6">
+        <h1 className="text-xl font-bold text-text">{t("booking.confirm.title")}</h1>
+
+        {slot === undefined ? (
+          <div role="alert" className="flex flex-col items-start gap-3 rounded-md bg-surface p-4 text-sm text-text">
+            <p>{t("booking.confirm.slotGone")}</p>
+            <Link
+              href={`${scheduleHref}?date=${availability.date}`}
+              className="font-medium text-primary hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            >
+              {t("booking.confirm.backToTime")}
+            </Link>
+          </div>
+        ) : (
+          <ConfirmationDetails
+            serviceId={service.id}
+            serviceName={service.name}
+            providerName={provider?.name ?? null}
+            durationMinutes={service.duration_minutes}
+            priceIrr={service.price_irr}
+            availability={availability}
+            startAt={slot.start_at}
+            wallet={wallet}
+            returnPath={`/book/${service.id}/confirm?date=${availability.date}&start_at=${encodeURIComponent(slot.start_at)}`}
+          />
+        )}
+      </section>
+    </main>
+  );
+}
+
+type ConfirmationDetailsProps = {
+  serviceId: number;
+  serviceName: string;
+  providerName: string | null;
+  durationMinutes: number;
+  priceIrr: number;
+  availability: AvailabilityResponse;
+  startAt: string;
+  wallet: WalletBalance;
+  returnPath: string;
+};
+
+function ConfirmationDetails({
+  serviceId,
+  serviceName,
+  providerName,
+  durationMinutes,
+  priceIrr,
+  availability,
+  startAt,
+  wallet,
+  returnPath,
+}: ConfirmationDetailsProps) {
+  const jalaliDate = describeJalaliDate(availability.date);
+  const time = formatSlotTime(startAt, availability.time_zone);
+  const priceLabel = priceIrr === 0 ? t("service.free") : formatTomanFromRial(priceIrr);
+  const hasEnoughBalance = wallet.available_irr >= priceIrr;
+
+  return (
+    <>
+      <dl className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
+        <div className="flex flex-col gap-1">
+          <dt className="text-text-muted">{t("service.summary")}</dt>
+          <dd className="font-medium text-text">
+            {serviceName}
+            {providerName && <span className="block text-text-muted">{providerName}</span>}
+          </dd>
+        </div>
+        <div className="flex flex-col gap-1">
+          <dt className="text-text-muted">{t("booking.confirm.dateLabel")}</dt>
+          <dd className="font-medium text-text">
+            {jalaliDate.weekday} {jalaliDate.day} {jalaliDate.month} {jalaliDate.year}
+          </dd>
+        </div>
+        <div className="flex flex-col gap-1">
+          <dt className="text-text-muted">{t("booking.confirm.timeLabel")}</dt>
+          <dd className="font-medium text-text">{time}</dd>
+        </div>
+        <div className="flex flex-col gap-1">
+          <dt className="text-text-muted">{t("service.duration")}</dt>
+          <dd className="font-medium text-text">
+            {t("service.durationValue", { minutes: numberFormatFa(durationMinutes) })}
+          </dd>
+        </div>
+        <div className="flex flex-col gap-1">
+          <dt className="text-text-muted">{t("service.price")}</dt>
+          <dd className="font-medium text-text">{priceLabel}</dd>
+        </div>
+        <div className="flex flex-col gap-1">
+          <dt className="text-text-muted">{t("booking.confirm.walletLabel")}</dt>
+          <dd className="font-medium text-text">{formatTomanFromRial(wallet.available_irr)}</dd>
+        </div>
+      </dl>
+
+      {hasEnoughBalance ? (
+        <BookingConfirmForm
+          serviceId={serviceId}
+          date={availability.date}
+          startAt={startAt}
+          idempotencyKey={randomUUID()}
+        />
+      ) : (
+        <div className="flex flex-col items-start gap-3 rounded-md bg-surface p-4 text-sm text-text">
+          <p>{t("booking.error.insufficientBalance")}</p>
+          <Link
+            href={`/wallet/charge?next=${encodeURIComponent(returnPath)}`}
+            className="inline-flex h-10 items-center rounded-md bg-primary px-4 text-sm font-medium text-white hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          >
+            {t("booking.confirm.charge")}
+          </Link>
+        </div>
+      )}
+    </>
+  );
+}
+
+async function loadAvailabilityOrNotFound(
+  providerId: number,
+  serviceId: number,
+  date: string,
+): Promise<AvailabilityResponse> {
+  try {
+    return await getProviderAvailability(providerId, serviceId, date);
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) {
+      notFound();
+    }
+    throw error;
+  }
+}
+
+async function loadWalletOrRedirect(): Promise<WalletBalance> {
+  try {
+    return await getWalletBalance();
+  } catch (error) {
+    redirectOnUnauthorized(error);
+    throw error;
+  }
+}
+
+function firstValue(value: string | string[] | undefined): string | undefined {
+  return Array.isArray(value) ? value[0] : value;
+}
