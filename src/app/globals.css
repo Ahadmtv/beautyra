@@ -3,27 +3,27 @@
 @theme inline {
   --font-sans: var(--font-vazirmatn), Tahoma, "Segoe UI", sans-serif;
 
-  --color-primary: #1bb6cf;
-  --color-primary-hover: #14a1b8;
-  --color-primary-active: #0f8ca0;
-  --color-primary-soft: #e6f8fb;
-  --color-text: #1f2933;
-  --color-text-muted: #5b6b7a;
-  --color-border: #dfe5eb;
-  --color-surface: #f3f6f9;
-  --color-star: #ffb400;
-  --color-verified: #1d9bf0;
+  --color-primary: #0f766e;
+  --color-primary-hover: #0d665f;
+  --color-primary-active: #115e59;
+  --color-primary-soft: #e6f4f1;
+  --color-text: #172b2a;
+  --color-text-muted: #617472;
+  --color-border: #dce7e4;
+  --color-surface: #f4f8f7;
+  --color-star: #e9a827;
+  --color-verified: #1684a7;
   --color-danger: #d92d20;
 
-  --radius-sm: 4px;
-  --radius-md: 8px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
 
-  --container-page: 1000px;
+  --container-page: 1080px;
 }
 
 @layer base {
   body {
-    background: #ffffff;
+    background: #f7faf9;
     color: var(--color-text);
     font-family: var(--font-sans);
   }

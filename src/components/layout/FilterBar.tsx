@@ -15,7 +15,7 @@ export function FilterBar({ filters }: FilterBarProps) {
   const hasActiveFilters = Boolean(filters.city || filters.neighborhood || filters.q);
 
   return (
-    <section aria-label={t("filter.label")} className="border-b border-border bg-white">
+    <section aria-label={t("filter.label")} className="border-b border-border bg-white shadow-sm">
       <form
         method="get"
         action="/"

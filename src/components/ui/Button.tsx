@@ -25,7 +25,7 @@ export function buttonClassName({
   className?: string;
 }): string {
   return [
-    "inline-flex items-center justify-center font-medium transition-colors",
+    "inline-flex items-center justify-center font-medium transition-colors duration-200",
     "disabled:cursor-not-allowed disabled:opacity-50",
     variantClasses[variant],
     sizeClasses[size],

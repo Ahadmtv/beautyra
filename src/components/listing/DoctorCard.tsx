@@ -11,7 +11,7 @@ export function DoctorCard({ card }: { card: DoctorCardView }) {
   return (
     <Link
       href={`/services/${card.id}`}
-      className="flex gap-4 rounded-md border border-border bg-white p-4 transition-colors hover:border-primary"
+      className="flex gap-4 rounded-md border border-border bg-white p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary hover:shadow-md focus-visible:border-primary"
     >
       <ProviderAvatar url={card.avatarUrl} />
       <div className="flex min-w-0 flex-1 flex-col gap-2">
