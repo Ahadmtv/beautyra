@@ -57,6 +57,22 @@ export async function HeaderAccount() {
             {t("provider.nav.profile")}
           </Link>
         )}
+        {session.role === "admin" && (
+          <>
+            <Link
+              href="/admin/providers"
+              className="rounded-sm px-2 py-2 text-sm hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            >
+              {t("admin.nav.providers")}
+            </Link>
+            <Link
+              href="/admin/refunds"
+              className="rounded-sm px-2 py-2 text-sm hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            >
+              {t("admin.nav.refunds")}
+            </Link>
+          </>
+        )}
         <form action={logoutAction}>
           <Button type="submit" variant="ghost" className="w-full justify-start">
             {t("auth.logout")}

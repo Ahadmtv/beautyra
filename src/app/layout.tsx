@@ -18,6 +18,15 @@ export const metadata: Metadata = {
   metadataBase: new URL(env.SITE_URL),
   title: messages["meta.title"],
   description: messages["meta.description"],
+  openGraph: {
+    title: messages["meta.title"],
+    description: messages["meta.description"],
+    siteName: messages["brand.name"],
+    locale: "fa_IR",
+    type: "website",
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: messages["meta.title"] }],
+  },
+  twitter: { card: "summary_large_image", images: ["/opengraph-image"] },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

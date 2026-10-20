@@ -1,5 +1,7 @@
 import { Suspense, type ReactNode } from "react";
 
+import type { Metadata } from "next";
+
 import { FilterBar } from "@/components/layout/FilterBar";
 import { MobileSpecialtyDrawer } from "@/components/listing/MobileSpecialtyDrawer";
 import { ServiceCardsSkeleton } from "@/components/listing/ServiceCardsSkeleton";
@@ -8,6 +10,12 @@ import { SpecialtyNav } from "@/components/listing/SpecialtyNav";
 import { t } from "@/config/messages.fa";
 import { searchParamsFromRecord } from "@/lib/api/pagination";
 import { parseListingFilters } from "@/lib/listing/filters";
+
+export const metadata: Metadata = {
+  title: t("seo.title"),
+  description: t("seo.description"),
+  alternates: { canonical: "/" },
+};
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
