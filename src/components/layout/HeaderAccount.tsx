@@ -80,6 +80,18 @@ export async function HeaderAccount() {
             >
               {t("admin.nav.refunds")}
             </Link>
+            <Link
+              href="/admin/disputes"
+              className="rounded-sm px-2 py-2 text-sm hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            >
+              {t("admin.nav.disputes")}
+            </Link>
+            <Link
+              href="/admin/payouts"
+              className="rounded-sm px-2 py-2 text-sm hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            >
+              {t("admin.nav.payouts")}
+            </Link>
           </>
         )}
         <form action={logoutAction}>

@@ -25,6 +25,9 @@ const transactionLabels: Record<WalletTransaction["kind"], MessageKey> = {
   refund_release: "wallet.transactions.kind.refund_release",
   hold_settle: "wallet.transactions.kind.hold_settle",
   reversal: "wallet.transactions.kind.reversal",
+  payout_reserve: "wallet.transactions.kind.payout_reserve",
+  payout_release: "wallet.transactions.kind.payout_release",
+  payout_paid: "wallet.transactions.kind.payout_paid",
 };
 
 const transactionDateFormatter = new Intl.DateTimeFormat("fa-IR-u-ca-persian-nu-arabext", {
@@ -67,7 +70,13 @@ export default async function WalletPage({ searchParams }: WalletPageProps) {
         <BalanceCard label={t("wallet.balance.available")} value={balance.available_irr} />
         <BalanceCard label={t("wallet.balance.held")} value={balance.held_irr} />
         {session.role === "provider" && (
-          <BalanceCard label={t("wallet.balance.providerEarnings")} value={balance.provider_earnings_irr} />
+          <>
+            <BalanceCard label={t("wallet.balance.providerEarnings")} value={balance.provider_earnings_irr} />
+            <BalanceCard
+              label={t("wallet.balance.providerReserved")}
+              value={balance.provider_payout_reserved_irr}
+            />
+          </>
         )}
       </section>
 

@@ -6,6 +6,7 @@ import { z } from "zod";
 
 import { t } from "@/config/messages.fa";
 import { apiFetchWithStatus } from "@/lib/api/client";
+import { applyAdminPayoutAction, type AdminPayoutAction } from "@/lib/api/payouts";
 import { ApiError, problemMessage } from "@/lib/api/problem";
 import { requireRole, redirectOnUnauthorized } from "@/lib/auth/session";
 import { toAsciiDigits } from "@/lib/format/digits";
@@ -20,6 +21,19 @@ const verificationSchema = z.object({
 const refundSchema = z.object({
   bookingId: z.number().int().safe().positive(),
   idempotencyKey: z.string().trim().min(1).max(128),
+});
+
+const disputeResolutionSchema = z.object({
+  bookingId: z.number().int().safe().positive(),
+  resolution: z.enum(["settle", "cancel"]),
+  note: z.string().trim().max(1000),
+});
+
+const payoutActionSchema = z.object({
+  payoutId: z.number().int().safe().positive(),
+  action: z.enum(["approve", "reject", "processing", "paid", "fail"]),
+  note: z.string().trim().max(1000),
+  externalTransferReference: z.string().trim().max(128),
 });
 
 const actionAttempts = new Map<string, { count: number; resetAt: number }>();
@@ -112,4 +126,89 @@ export async function createAdminRefundAction(
     success: true,
     idempotencyKey: randomUUID(),
   };
+}
+
+export async function resolveDisputeAction(
+  _previous: AdminActionState,
+  formData: FormData,
+): Promise<AdminActionState> {
+  const session = await requireRole("admin");
+  if (isRateLimited(session.userId)) return { message: t("admin.disputes.error") };
+
+  const parsed = disputeResolutionSchema.safeParse({
+    bookingId: readPositiveInteger(formData, "booking_id"),
+    resolution: readString(formData, "resolution"),
+    note: readString(formData, "note"),
+  });
+  if (!parsed.success) return { message: t("admin.disputes.error") };
+
+  try {
+    await apiFetchWithStatus(
+      `/api/v1/admin/bookings/${parsed.data.bookingId}/dispute-resolution`,
+      {
+        method: "POST",
+        body: { resolution: parsed.data.resolution, note: parsed.data.note },
+        auth: true,
+        cache: "no-store",
+      },
+    );
+  } catch (error) {
+    redirectOnUnauthorized(error);
+    if (error instanceof ApiError) {
+      if (error.status === 409) return { message: t("admin.disputes.conflict") };
+      return { message: problemMessage(error) };
+    }
+    throw error;
+  }
+
+  revalidatePath("/admin/disputes");
+  revalidatePath("/dashboard/bookings");
+  revalidatePath("/provider/bookings");
+  revalidatePath("/wallet");
+  return { message: t("admin.disputes.success"), success: true };
+}
+
+export async function adminPayoutAction(
+  _previous: AdminActionState,
+  formData: FormData,
+): Promise<AdminActionState> {
+  const session = await requireRole("admin");
+  if (isRateLimited(session.userId)) return { message: t("admin.payouts.error") };
+
+  const parsed = payoutActionSchema.safeParse({
+    payoutId: readPositiveInteger(formData, "payout_id"),
+    action: readString(formData, "payout_action"),
+    note: readString(formData, "note"),
+    externalTransferReference: readString(formData, "external_transfer_reference"),
+  });
+  if (!parsed.success) return { message: t("admin.payouts.error") };
+  if (parsed.data.action === "paid" && !parsed.data.externalTransferReference) {
+    return { message: t("admin.payouts.referenceRequired") };
+  }
+
+  const action: AdminPayoutAction = parsed.data.action;
+  const body =
+    action === "paid"
+      ? {
+          note: parsed.data.note || undefined,
+          external_transfer_reference: parsed.data.externalTransferReference,
+        }
+      : { note: parsed.data.note || undefined };
+
+  try {
+    await applyAdminPayoutAction(parsed.data.payoutId, action, body);
+  } catch (error) {
+    redirectOnUnauthorized(error);
+    if (error instanceof ApiError) {
+      if (error.status === 409) return { message: t("admin.payouts.conflict") };
+      if (error.status === 400) return { message: t("admin.payouts.error") };
+      return { message: problemMessage(error) };
+    }
+    throw error;
+  }
+
+  revalidatePath("/admin/payouts");
+  revalidatePath("/provider/payouts");
+  revalidatePath("/wallet");
+  return { message: t("admin.payouts.success"), success: true };
 }

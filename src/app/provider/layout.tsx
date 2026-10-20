@@ -10,6 +10,7 @@ const providerNavigation = [
   { href: "/provider/working-hours", label: "provider.nav.workingHours" },
   { href: "/provider/time-off", label: "provider.nav.timeOff" },
   { href: "/provider/bookings", label: "provider.nav.bookings" },
+  { href: "/provider/payouts", label: "provider.nav.payouts" },
 ] as const;
 
 export default async function ProviderLayout({ children }: { children: ReactNode }) {
