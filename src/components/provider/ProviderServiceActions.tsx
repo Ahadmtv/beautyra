@@ -5,9 +5,12 @@ import { useActionState } from "react";
 import { Button } from "@/components/ui/Button";
 import { t } from "@/config/messages.fa";
 import type { Service } from "@/lib/api/types";
-import { mutateProviderServiceAction } from "@/lib/provider/service-actions";
+import {
+  mutateProviderServiceAction,
+  type ProviderServiceActionState,
+} from "@/lib/provider/service-actions";
 
-const initialState = {};
+const initialState: ProviderServiceActionState = {};
 
 export function ProviderServiceActions({ service }: { service: Service }) {
   const [toggleState, toggleAction, togglePending] = useActionState(mutateProviderServiceAction, initialState);

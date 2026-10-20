@@ -5,10 +5,13 @@ import { useActionState, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { t, WEEKDAY_NAMES_BY_UTC_DAY } from "@/config/messages.fa";
 import type { WorkingInterval } from "@/lib/api/types";
-import { saveWorkingHoursAction } from "@/lib/provider/working-hours-actions";
+import {
+  saveWorkingHoursAction,
+  type WorkingHoursActionState,
+} from "@/lib/provider/working-hours-actions";
 import { validateWorkingHours } from "@/lib/provider/working-hours";
 
-const initialState = {};
+const initialState: WorkingHoursActionState = {};
 const saturdayFirstWeek = [
   { weekday: 6, name: WEEKDAY_NAMES_BY_UTC_DAY[6] },
   { weekday: 7, name: WEEKDAY_NAMES_BY_UTC_DAY[0] },

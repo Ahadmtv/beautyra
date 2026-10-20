@@ -8,9 +8,9 @@ import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
 import { t } from "@/config/messages.fa";
 import type { ProviderProfile } from "@/lib/api/types";
-import { saveProfileAction } from "@/lib/provider/profile-actions";
+import { saveProfileAction, type ProfileActionState } from "@/lib/provider/profile-actions";
 
-const initialProfileActionState = {};
+const initialProfileActionState: ProfileActionState = {};
 
 type ProviderProfileFormProps = {
   profile: ProviderProfile | null;

@@ -8,9 +8,12 @@ import { Textarea } from "@/components/ui/Textarea";
 import { t } from "@/config/messages.fa";
 import type { Service } from "@/lib/api/types";
 import { numberFormatFa, toAsciiDigits } from "@/lib/format/digits";
-import { saveProviderServiceAction } from "@/lib/provider/service-actions";
+import {
+  saveProviderServiceAction,
+  type ProviderServiceActionState,
+} from "@/lib/provider/service-actions";
 
-const initialState = {};
+const initialState: ProviderServiceActionState = {};
 
 type ProviderServiceFormProps = {
   service?: Service;

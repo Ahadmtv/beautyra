@@ -7,9 +7,9 @@ import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
 import { t } from "@/config/messages.fa";
-import { createTimeOffAction } from "@/lib/provider/time-off-actions";
+import { createTimeOffAction, type TimeOffActionState } from "@/lib/provider/time-off-actions";
 
-const initialState = {};
+const initialState: TimeOffActionState = {};
 const kindOptions = [
   { value: "time_off", label: t("provider.timeOff.kind.time_off") },
   { value: "blocked", label: t("provider.timeOff.kind.blocked") },

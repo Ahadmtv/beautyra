@@ -5,7 +5,6 @@ import { cookies } from "next/headers";
 import { t } from "@/config/messages.fa";
 import { env } from "@/config/env";
 import { getPayment, processZarinpalCallback } from "@/lib/api/payments";
-import { ApiError } from "@/lib/api/problem";
 import { redirectOnUnauthorized, requireRole } from "@/lib/auth/session";
 import { formatTomanFromRial } from "@/lib/format/money";
 import { numberFormatFa } from "@/lib/format/digits";
@@ -55,38 +54,40 @@ export default async function PaymentResultPage({ searchParams }: PaymentResultP
     }
   }
 
+  let payment: Awaited<ReturnType<typeof getPayment>>;
   try {
-    const payment = await getPayment(paymentId);
-    return (
-      <main className="mx-auto w-full max-w-page flex-1 px-4 py-6 md:py-8">
-        <section className="mx-auto flex max-w-xl flex-col gap-5 rounded-md border border-border bg-white p-5 md:p-7">
-          <h1 className="text-2xl font-bold text-text">{t("wallet.payment.title")}</h1>
-          <p role="status" className="rounded-md bg-surface p-4 text-text">
-            {t(paymentStatusMessages[payment.status])}
-          </p>
-          <dl className="grid gap-4 text-sm sm:grid-cols-2">
-            <div className="flex flex-col gap-1">
-              <dt className="text-text-muted">{t("wallet.payment.amount")}</dt>
-              <dd className="font-medium text-text">{formatTomanFromRial(payment.amount_irr)}</dd>
-            </div>
-            <div className="flex flex-col gap-1">
-              <dt className="text-text-muted">{t("wallet.payment.reference")}</dt>
-              <dd className="font-medium text-text">{numberFormatFa(payment.id)}</dd>
-            </div>
-          </dl>
-          <Link
-            href="/wallet"
-            className="inline-flex min-h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-white hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-          >
-            {t("wallet.payment.back")}
-          </Link>
-        </section>
-      </main>
-    );
+    payment = await getPayment(paymentId);
   } catch (error) {
     redirectOnUnauthorized(error);
     return <PaymentResultMessage message={t("wallet.payment.loadError")} />;
   }
+
+  return (
+    <main className="mx-auto w-full max-w-page flex-1 px-4 py-6 md:py-8">
+      <section className="mx-auto flex max-w-xl flex-col gap-5 rounded-md border border-border bg-white p-5 md:p-7">
+        <h1 className="text-2xl font-bold text-text">{t("wallet.payment.title")}</h1>
+        <p role="status" className="rounded-md bg-surface p-4 text-text">
+          {t(paymentStatusMessages[payment.status])}
+        </p>
+        <dl className="grid gap-4 text-sm sm:grid-cols-2">
+          <div className="flex flex-col gap-1">
+            <dt className="text-text-muted">{t("wallet.payment.amount")}</dt>
+            <dd className="font-medium text-text">{formatTomanFromRial(payment.amount_irr)}</dd>
+          </div>
+          <div className="flex flex-col gap-1">
+            <dt className="text-text-muted">{t("wallet.payment.reference")}</dt>
+            <dd className="font-medium text-text">{numberFormatFa(payment.id)}</dd>
+          </div>
+        </dl>
+        <Link
+          href="/wallet"
+          className="inline-flex min-h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-white hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+        >
+          {t("wallet.payment.back")}
+        </Link>
+      </section>
+    </main>
+  );
 }
 
 function PaymentResultMessage({ message }: { message: string }) {
