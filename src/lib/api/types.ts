@@ -3,6 +3,9 @@ import type { components } from "./schema.gen";
 type Schemas = components["schemas"];
 
 export type Problem = Schemas["Problem"];
+export type AuthRegisterInput = Schemas["AuthRegisterInput"];
+export type OperationResult = Schemas["OperationResult"];
+export type User = Schemas["User"];
 export type ProviderProfile = Schemas["ProviderProfile"];
 export type ProviderProfileInput = Schemas["ProviderProfileInput"];
 export type Service = Schemas["Service"];
@@ -23,3 +26,5 @@ export type BookingCreateInput = Schemas["BookingCreateInput"];
 export type Booking = Schemas["Booking"];
 export type BookingPage = Schemas["BookingPage"];
 export type AvailabilityResponse = Schemas["AvailabilityResponse"];
+export type PayoutRequest = Schemas["PayoutRequest"];
+export type PayoutPage = Schemas["PayoutPage"];

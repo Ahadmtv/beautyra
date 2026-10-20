@@ -4,6 +4,52 @@
  */
 
 export interface paths {
+    "/api/v1/auth/register": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * ثبت‌نام مشتری
+         * @description حساب جدید با نقش پیش‌فرض `client` ساخته می‌شود؛ نقش `provider` یا `admin` در ثبت‌نام عمومی صادر نمی‌شود. پیام خطا برای ایمیل تکراری و ورودی نامعتبر یکسان است تا شمارش حساب ممکن نباشد و این مسیر محدودیت نرخ دارد.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["AuthRegisterInput"];
+                };
+            };
+            responses: {
+                /** @description حساب ایجاد شد */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["OperationResult"];
+                    };
+                };
+                400: components["responses"]["Problem"];
+                401: components["responses"]["Problem"];
+                429: components["responses"]["Problem"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/auth/login": {
         parameters: {
             query?: never;
@@ -15,7 +61,7 @@ export interface paths {
         put?: never;
         /**
          * ورود
-         * @description اعتبارنامه ایمیل و رمز عبور را بررسی می‌کند و یک جفت توکن دسترسی و Refresh برمی‌گرداند. فرم ورود فرانت‌اند توکن‌ها را فقط در کوکی‌های HttpOnly نگه می‌دارد.
+         * @description اعتبارنامه‌ها را بررسی و جفت توکن دسترسی و Refresh برمی‌گرداند. پاسخ برای کاربر ناشناخته و رمز نادرست یکسان است و این مسیر محدودیت نرخ دارد.
          */
         post: {
             parameters: {
@@ -60,8 +106,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * تازه‌سازی توکن دسترسی
-         * @description توکن Refresh را مصرف می‌کند و یک جفت توکن جدید برمی‌گرداند. توکن Refresh قبلی باطل می‌شود و استفاده مجدد از آن خطا می‌دهد.
+         * تایید مجدد و چرخش توکن Refresh
+         * @description توکن Refresh ارائه‌شده در یک تراکنش مصرف، لغو و با توکن تازه جایگزین می‌شود؛ نشست تازه ایمیل و نقش‌های جاری کاربر را حفظ می‌کند. استفاده مجدد از توکن چرخیده‌شده به‌عنوان replay شناسایی می‌شود و همه نشست‌های فعال کاربر لغو می‌شوند.
          */
         post: {
             parameters: {
@@ -76,7 +122,7 @@ export interface paths {
                 };
             };
             responses: {
-                /** @description جفت توکن جدید */
+                /** @description جفت توکن تازه */
                 200: {
                     headers: {
                         [name: string]: unknown;
@@ -107,7 +153,7 @@ export interface paths {
         put?: never;
         /**
          * خروج
-         * @description توکن Refresh را در صورت وجود باطل می‌کند. فرانت‌اند در هر صورت کوکی‌های محلی را پاک می‌کند.
+         * @description توکن Refresh ارائه‌شده را لغو می‌کند. فراخوانی با توکن نامعتبر یا غایب هم پاسخ موفق یکسان می‌دهد و وضعیت نشست را افشا نمی‌کند.
          */
         post: {
             parameters: {
@@ -134,6 +180,46 @@ export interface paths {
                 400: components["responses"]["Problem"];
             };
         };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * نمایه کاربر جاری
+         * @description نمایه کاربر احرازشده را از روی شناسه داخل توکن دسترسی برمی‌گرداند؛ هویت و نقش‌ها از سمت سرور تعیین می‌شوند.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description نمایه کاربر */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["User"];
+                    };
+                };
+                401: components["responses"]["Problem"];
+            };
+        };
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -1210,7 +1296,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/provider/bookings/{bookingID}/complete": {
+    "/api/v1/provider/bookings/{bookingID}/request-completion": {
         parameters: {
             query?: never;
             header?: never;
@@ -1220,8 +1306,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * تکمیل خدمت و تسویه
-         * @description ارائه‌دهنده مالک، رزرو in_progress را به completed می‌برد و قفل کیف پول همان رزرو در همان تراکنش تسویه می‌شود.
+         * درخواست تکمیل خدمت
+         * @description ارائه‌دهنده مالک، رزرو in_progress را به completion_pending می‌برد؛ تسویه در انتظار تأیید مشتری، حل اختلاف یا سپری‌شدن پنجره اختلاف است.
          */
         post: {
             parameters: {
@@ -1234,7 +1320,52 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description رزرو تکمیل‌شده */
+                /** @description رزرو در وضعیت انتظار تکمیل */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Booking"];
+                    };
+                };
+                401: components["responses"]["Problem"];
+                403: components["responses"]["Problem"];
+                404: components["responses"]["Problem"];
+                409: components["responses"]["Problem"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/provider/bookings/{bookingID}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * لغو رزرو توسط ارائه‌دهنده
+         * @description ارائه‌دهنده مالک می‌تواند رزرو confirmed را پیش از زمان آغاز لغو کند؛ قفل فعال کیف پول مشتری در همان تراکنش آزاد می‌شود.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    bookingID: components["parameters"]["BookingID"];
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description رزرو لغوشده */
                 200: {
                     headers: {
                         [name: string]: unknown;
@@ -1300,10 +1431,509 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/bookings/{bookingID}/confirm-completion": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * تأیید تکمیل خدمت توسط مشتری
+         * @description مشتری مالک، رزرو completion_pending را تأیید می‌کند؛ قفل کیف پول در همان تراکنش تسویه می‌شود. درخواست تکراری وضعیت پایانی را بدون تسویه دوم بازپخش می‌کند.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    bookingID: components["parameters"]["BookingID"];
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description رزرو تکمیل‌شده */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Booking"];
+                    };
+                };
+                401: components["responses"]["Problem"];
+                403: components["responses"]["Problem"];
+                404: components["responses"]["Problem"];
+                409: components["responses"]["Problem"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/bookings/{bookingID}/dispute": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * ثبت اختلاف مشتری
+         * @description مشتری مالک، در پنجره اختلاف پیکربندی‌شده پس از درخواست تکمیل، وضعیت رزرو را به disputed می‌برد؛ وجوه تا حل اختلاف روی «قفل» می‌ماند.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    bookingID: components["parameters"]["BookingID"];
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        reason: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description رزرو در وضعیت اختلاف */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Booking"];
+                    };
+                };
+                401: components["responses"]["Problem"];
+                403: components["responses"]["Problem"];
+                404: components["responses"]["Problem"];
+                409: components["responses"]["Problem"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/bookings/{bookingID}/dispute-resolution": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * حل اختلاف توسط مدیر
+         * @description مدیر رزرو disputed را به نفع ارائه‌دهنده (تسویه) یا مشتری (لغو) حل می‌کند؛ اثر مالی و تغییر وضعیت در یک تراکنش بودن و ردیف اختلاف بسته می‌شود.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    bookingID: components["parameters"]["BookingID"];
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        resolution: "settle" | "cancel";
+                        note?: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description رزرو پس از حل اختلاف */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Booking"];
+                    };
+                };
+                401: components["responses"]["Problem"];
+                403: components["responses"]["Problem"];
+                404: components["responses"]["Problem"];
+                409: components["responses"]["Problem"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/provider/payouts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * فهرست درخواست‌های تسویه ارائه‌دهنده
+         * @description درخواست‌های تسویه ارائه‌دهنده احرازشده با صفحه‌بندی cursor-based.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description شناسه آخرین رکورد صفحه قبلی */
+                    cursor?: components["parameters"]["Cursor"];
+                    /** @description تعداد رکورد صفحه، پیش‌فرض 50 و حداکثر 100 */
+                    limit?: components["parameters"]["Limit"];
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description صفحه درخواست‌های تسویه */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PayoutPage"];
+                    };
+                };
+                401: components["responses"]["Problem"];
+                403: components["responses"]["Problem"];
+            };
+        };
+        put?: never;
+        /**
+         * درخواست تسویه ارائه‌دهنده
+         * @description ارائه‌دهنده فعال، بخشی از درآمد قابل‌تسویه خود را درخواست می‌کند؛ مبلغ بلافاصله در دفتر کل رزرو می‌شود و کلید idempotency خروجی را پایدار می‌کند.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description کلید اختیاری idempotency؛ بازپخش همان کلید همان نتیجه terminal را بدون اثر تازه برمی‌گرداند */
+                    "Idempotency-Key"?: components["parameters"]["LayoutIdempotencyKey"];
+                };
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        /**
+                         * Format: int64
+                         * @description مبلغ صحیح ریال؛ کمینه مقدار با PAYOUT_MIN_AMOUNT_IRR پیکربندی می‌شود
+                         */
+                        amount_irr: number;
+                    };
+                };
+            };
+            responses: {
+                /** @description بازپخش درخواست با همان کلید idempotency */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PayoutRequest"];
+                    };
+                };
+                /** @description درخواست تسویه ثبت شد */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PayoutRequest"];
+                    };
+                };
+                400: components["responses"]["Problem"];
+                401: components["responses"]["Problem"];
+                403: components["responses"]["Problem"];
+                409: components["responses"]["Problem"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/payouts/{payoutID}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * تأیید درخواست تسویه (مدیر)
+         * @description مدیر درخواست requested را به approved می‌برد؛ وجوه هنوز رزرو می‌ماند.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    payoutID: components["parameters"]["PayoutID"];
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["PayoutAdminInput"];
+                };
+            };
+            responses: {
+                /** @description درخواست تأییدشده */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PayoutRequest"];
+                    };
+                };
+                401: components["responses"]["Problem"];
+                403: components["responses"]["Problem"];
+                404: components["responses"]["Problem"];
+                409: components["responses"]["Problem"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/payouts/{payoutID}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * رد درخواست تسویه (مدیر)
+         * @description مدیر درخواست requested را رد می‌کند؛ مبلغ رزروشده در همان تراکنش به درآمد ارائه‌دهنده بازمی‌گردد.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    payoutID: components["parameters"]["PayoutID"];
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["PayoutAdminInput"];
+                };
+            };
+            responses: {
+                /** @description درخواست ردشده */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PayoutRequest"];
+                    };
+                };
+                401: components["responses"]["Problem"];
+                403: components["responses"]["Problem"];
+                404: components["responses"]["Problem"];
+                409: components["responses"]["Problem"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/payouts/{payoutID}/processing": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * آغاز پردازش دستی (مدیر)
+         * @description مدیر درخواست approved را به processing می‌برد در حالی که انتقال بیرونی انجام می‌شود.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    payoutID: components["parameters"]["PayoutID"];
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["PayoutAdminInput"];
+                };
+            };
+            responses: {
+                /** @description درخواست در حال پردازش */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PayoutRequest"];
+                    };
+                };
+                401: components["responses"]["Problem"];
+                403: components["responses"]["Problem"];
+                404: components["responses"]["Problem"];
+                409: components["responses"]["Problem"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/payouts/{payoutID}/paid": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * ثبت پرداخت دستی (مدیر)
+         * @description مدیر تأیید می‌کند انتقال بیرونی (شبکه بانکی) کامل شده است؛ ارجاع انتقال نمی‌تواند برهان باشد و مبلغ رزروشده به حساب clearing تسویه منتقل می‌شود.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    payoutID: components["parameters"]["PayoutID"];
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        external_transfer_reference: string;
+                        note?: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description درخواست پرداخت‌شده */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PayoutRequest"];
+                    };
+                };
+                400: components["responses"]["Problem"];
+                401: components["responses"]["Problem"];
+                403: components["responses"]["Problem"];
+                404: components["responses"]["Problem"];
+                409: components["responses"]["Problem"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/payouts/{payoutID}/fail": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * ثبت شکست انتقال (مدیر)
+         * @description مدیر انتقال بیرونی ناموفق را ثبت می‌کند؛ مبلغ رزروشده به درآمد ارائه‌دهنده بازمی‌گردد.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    payoutID: components["parameters"]["PayoutID"];
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["PayoutAdminInput"];
+                };
+            };
+            responses: {
+                /** @description درخواست ناموفق */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PayoutRequest"];
+                    };
+                };
+                401: components["responses"]["Problem"];
+                403: components["responses"]["Problem"];
+                404: components["responses"]["Problem"];
+                409: components["responses"]["Problem"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        AuthRegisterInput: {
+            /** Format: email */
+            email: string;
+            phone?: string;
+            password: string;
+        };
         AuthLoginInput: {
             /** Format: email */
             email: string;
@@ -1318,13 +1948,22 @@ export interface components {
         };
         TokenPair: {
             access_token: string;
-            /** @description توکن Refresh فقط یک بار به کلاینت برگردانده می‌شود و در کوکی HttpOnly جداگانه نگه داشته می‌شود. */
+            /** @description توکن Refresh فقط یک‌بار در همین پاسخ به‌صورت متن‌خام برگردانده می‌شود و در پایگاه داده هش می‌شود. */
             refresh_token: string;
             /**
              * Format: int64
-             * @description عمر توکن دسترسی بر حسب ثانیه
+             * @description عمر توکن دسترسی به ثانیه
              */
             expires_in: number;
+        };
+        User: {
+            /** Format: int64 */
+            id: number;
+            /** Format: email */
+            email: string;
+            phone?: string | null;
+            is_active: boolean;
+            roles: string[];
         };
         Problem: {
             type: string;
@@ -1453,9 +2092,14 @@ export interface components {
             held_irr: number;
             /**
              * Format: int64
-             * @description درآمد قابل‌تسویه داخلی ارائه‌دهنده؛ برداشت بانکی در این مرحله وجود ندارد
+             * @description درآمد قابل‌تسویه داخلی ارائه‌دهنده
              */
             provider_earnings_irr: number;
+            /**
+             * Format: int64
+             * @description سهم درآمد ارائه‌دهنده که در دفتر کل به درخواست تسویه فعال رزرو شده است
+             */
+            provider_payout_reserved_irr: number;
             /** @constant */
             currency: "IRR";
         };
@@ -1464,7 +2108,7 @@ export interface components {
             id: number;
             reference: string;
             /** @enum {string} */
-            kind: "funding" | "hold_place" | "hold_release" | "refund_release" | "hold_settle" | "reversal";
+            kind: "funding" | "hold_place" | "hold_release" | "refund_release" | "hold_settle" | "reversal" | "payout_reserve" | "payout_release" | "payout_paid";
             /** Format: date-time */
             created_at: string;
             /**
@@ -1537,11 +2181,49 @@ export interface components {
             price_irr: number;
             buffer_minutes: number;
             /** @enum {string} */
-            status: "confirmed" | "in_progress" | "completed" | "cancelled" | "expired";
+            status: "confirmed" | "in_progress" | "completion_pending" | "disputed" | "completed" | "cancelled" | "expired";
+            /**
+             * Format: date-time
+             * @description زمان ثبت درخواست تکمیل خدمت توسط ارائه‌دهنده
+             */
+            completion_requested_at?: string | null;
+            /**
+             * Format: date-time
+             * @description زمان نهایی‌شدن وضعیت completed
+             */
+            completed_at?: string | null;
             /** Format: date-time */
             created_at: string;
             /** Format: date-time */
             updated_at: string;
+        };
+        PayoutRequest: {
+            /** Format: int64 */
+            id: number;
+            /** Format: int64 */
+            provider_id: number;
+            /**
+             * Format: int64
+             * @description مبلغ صحیح ریال
+             */
+            amount_irr: number;
+            /** @enum {string} */
+            status: "requested" | "approved" | "processing" | "paid" | "rejected" | "failed";
+            /** @description ارجاع انتقال بیرونی؛ فقط پس از ثبت پرداخت دستی پر می‌شود */
+            external_transfer_reference?: string | null;
+            admin_note: string;
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        PayoutPage: {
+            items: components["schemas"]["PayoutRequest"][];
+            /** Format: int64 */
+            next_cursor?: number | null;
+        };
+        PayoutAdminInput: {
+            note?: string;
         };
         BookingPage: {
             items: components["schemas"]["Booking"][];
@@ -1584,6 +2266,9 @@ export interface components {
         ServiceID: number;
         ProviderID: number;
         BookingID: number;
+        PayoutID: number;
+        /** @description کلید اختیاری idempotency؛ بازپخش همان کلید همان نتیجه terminal را بدون اثر تازه برمی‌گرداند */
+        LayoutIdempotencyKey: string;
     };
     requestBodies: never;
     headers: never;

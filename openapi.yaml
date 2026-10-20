@@ -6,10 +6,33 @@ info:
 servers:
   - url: /
 paths:
+  /api/v1/auth/register:
+    post:
+      summary: ثبت‌نام مشتری
+      description: حساب جدید با نقش پیش‌فرض `client` ساخته می‌شود؛ نقش `provider` یا `admin` در ثبت‌نام عمومی صادر نمی‌شود. پیام خطا برای ایمیل تکراری و ورودی نامعتبر یکسان است تا شمارش حساب ممکن نباشد و این مسیر محدودیت نرخ دارد.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthRegisterInput'
+      responses:
+        '201':
+          description: حساب ایجاد شد
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OperationResult'
+        '400':
+          $ref: '#/components/responses/Problem'
+        '401':
+          $ref: '#/components/responses/Problem'
+        '429':
+          $ref: '#/components/responses/Problem'
   /api/v1/auth/login:
     post:
       summary: ورود
-      description: اعتبارنامه ایمیل و رمز عبور را بررسی می‌کند و یک جفت توکن دسترسی و Refresh برمی‌گرداند. فرم ورود فرانت‌اند توکن‌ها را فقط در کوکی‌های HttpOnly نگه می‌دارد.
+      description: اعتبارنامه‌ها را بررسی و جفت توکن دسترسی و Refresh برمی‌گرداند. پاسخ برای کاربر ناشناخته و رمز نادرست یکسان است و این مسیر محدودیت نرخ دارد.
       requestBody:
         required: true
         content:
@@ -31,8 +54,8 @@ paths:
           $ref: '#/components/responses/Problem'
   /api/v1/auth/refresh:
     post:
-      summary: تازه‌سازی توکن دسترسی
-      description: توکن Refresh را مصرف می‌کند و یک جفت توکن جدید برمی‌گرداند. توکن Refresh قبلی باطل می‌شود و استفاده مجدد از آن خطا می‌دهد.
+      summary: تایید مجدد و چرخش توکن Refresh
+      description: توکن Refresh ارائه‌شده در یک تراکنش مصرف، لغو و با توکن تازه جایگزین می‌شود؛ نشست تازه ایمیل و نقش‌های جاری کاربر را حفظ می‌کند. استفاده مجدد از توکن چرخیده‌شده به‌عنوان replay شناسایی می‌شود و همه نشست‌های فعال کاربر لغو می‌شوند.
       requestBody:
         required: true
         content:
@@ -41,7 +64,7 @@ paths:
               $ref: '#/components/schemas/AuthRefreshInput'
       responses:
         '200':
-          description: جفت توکن جدید
+          description: جفت توکن تازه
           content:
             application/json:
               schema:
@@ -55,7 +78,7 @@ paths:
   /api/v1/auth/logout:
     post:
       summary: خروج
-      description: توکن Refresh را در صورت وجود باطل می‌کند. فرانت‌اند در هر صورت کوکی‌های محلی را پاک می‌کند.
+      description: توکن Refresh ارائه‌شده را لغو می‌کند. فراخوانی با توکن نامعتبر یا غایب هم پاسخ موفق یکسان می‌دهد و وضعیت نشست را افشا نمی‌کند.
       requestBody:
         required: false
         content:
@@ -70,6 +93,21 @@ paths:
               schema:
                 $ref: '#/components/schemas/OperationResult'
         '400':
+          $ref: '#/components/responses/Problem'
+  /api/v1/me:
+    get:
+      summary: نمایه کاربر جاری
+      description: نمایه کاربر احرازشده را از روی شناسه داخل توکن دسترسی برمی‌گرداند؛ هویت و نقش‌ها از سمت سرور تعیین می‌شوند.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: نمایه کاربر
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
           $ref: '#/components/responses/Problem'
   /api/v1/services:
     get:
@@ -670,17 +708,35 @@ paths:
           $ref: '#/components/responses/Problem'
         '403':
           $ref: '#/components/responses/Problem'
-  /api/v1/provider/bookings/{bookingID}/complete:
+  /api/v1/provider/bookings/{bookingID}/request-completion:
     post:
-      summary: تکمیل خدمت و تسویه
-      description: ارائه‌دهنده مالک، رزرو in_progress را به completed می‌برد و قفل کیف پول همان رزرو در همان تراکنش تسویه می‌شود.
+      summary: درخواست تکمیل خدمت
+      description: ارائه‌دهنده مالک، رزرو in_progress را به completion_pending می‌برد؛ تسویه در انتظار تأیید مشتری، حل اختلاف یا سپری‌شدن پنجره اختلاف است.
       security:
         - bearerAuth: []
       parameters:
         - $ref: '#/components/parameters/BookingID'
       responses:
         '200':
-          description: رزرو تکمیل‌شده
+          description: رزرو در وضعیت انتظار تکمیل
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Booking' }
+        '401': { $ref: '#/components/responses/Problem' }
+        '403': { $ref: '#/components/responses/Problem' }
+        '404': { $ref: '#/components/responses/Problem' }
+        '409': { $ref: '#/components/responses/Problem' }
+  /api/v1/provider/bookings/{bookingID}/cancel:
+    post:
+      summary: لغو رزرو توسط ارائه‌دهنده
+      description: ارائه‌دهنده مالک می‌تواند رزرو confirmed را پیش از زمان آغاز لغو کند؛ قفل فعال کیف پول مشتری در همان تراکنش آزاد می‌شود.
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/BookingID'
+      responses:
+        '200':
+          description: رزرو لغوشده
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Booking' }
@@ -711,6 +767,248 @@ paths:
           $ref: '#/components/responses/Problem'
         '409':
           $ref: '#/components/responses/Problem'
+  /api/v1/bookings/{bookingID}/confirm-completion:
+    post:
+      summary: تأیید تکمیل خدمت توسط مشتری
+      description: مشتری مالک، رزرو completion_pending را تأیید می‌کند؛ قفل کیف پول در همان تراکنش تسویه می‌شود. درخواست تکراری وضعیت پایانی را بدون تسویه دوم بازپخش می‌کند.
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/BookingID'
+      responses:
+        '200':
+          description: رزرو تکمیل‌شده
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Booking' }
+        '401': { $ref: '#/components/responses/Problem' }
+        '403': { $ref: '#/components/responses/Problem' }
+        '404': { $ref: '#/components/responses/Problem' }
+        '409': { $ref: '#/components/responses/Problem' }
+  /api/v1/bookings/{bookingID}/dispute:
+    post:
+      summary: ثبت اختلاف مشتری
+      description: مشتری مالک، در پنجره اختلاف پیکربندی‌شده پس از درخواست تکمیل، وضعیت رزرو را به disputed می‌برد؛ وجوه تا حل اختلاف روی «قفل» می‌ماند.
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/BookingID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              additionalProperties: false
+              properties:
+                reason: { type: string, minLength: 1, maxLength: 1000 }
+      responses:
+        '200':
+          description: رزرو در وضعیت اختلاف
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Booking' }
+        '401': { $ref: '#/components/responses/Problem' }
+        '403': { $ref: '#/components/responses/Problem' }
+        '404': { $ref: '#/components/responses/Problem' }
+        '409': { $ref: '#/components/responses/Problem' }
+  /api/v1/admin/bookings/{bookingID}/dispute-resolution:
+    post:
+      summary: حل اختلاف توسط مدیر
+      description: مدیر رزرو disputed را به نفع ارائه‌دهنده (تسویه) یا مشتری (لغو) حل می‌کند؛ اثر مالی و تغییر وضعیت در یک تراکنش بودن و ردیف اختلاف بسته می‌شود.
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/BookingID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [resolution]
+              additionalProperties: false
+              properties:
+                resolution: { type: string, enum: [settle, cancel] }
+                note: { type: string, maxLength: 1000 }
+      responses:
+        '200':
+          description: رزرو پس از حل اختلاف
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Booking' }
+        '401': { $ref: '#/components/responses/Problem' }
+        '403': { $ref: '#/components/responses/Problem' }
+        '404': { $ref: '#/components/responses/Problem' }
+        '409': { $ref: '#/components/responses/Problem' }
+  /api/v1/provider/payouts:
+    post:
+      summary: درخواست تسویه ارائه‌دهنده
+      description: ارائه‌دهنده فعال، بخشی از درآمد قابل‌تسویه خود را درخواست می‌کند؛ مبلغ بلافاصله در دفتر کل رزرو می‌شود و کلید idempotency خروجی را پایدار می‌کند.
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/LayoutIdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [amount_irr]
+              additionalProperties: false
+              properties:
+                amount_irr: { type: integer, format: int64, minimum: 1, description: مبلغ صحیح ریال؛ کمینه مقدار با PAYOUT_MIN_AMOUNT_IRR پیکربندی می‌شود }
+      responses:
+        '201':
+          description: درخواست تسویه ثبت شد
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PayoutRequest' }
+        '200':
+          description: بازپخش درخواست با همان کلید idempotency
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PayoutRequest' }
+        '400': { $ref: '#/components/responses/Problem' }
+        '401': { $ref: '#/components/responses/Problem' }
+        '403': { $ref: '#/components/responses/Problem' }
+        '409': { $ref: '#/components/responses/Problem' }
+    get:
+      summary: فهرست درخواست‌های تسویه ارائه‌دهنده
+      description: درخواست‌های تسویه ارائه‌دهنده احرازشده با صفحه‌بندی cursor-based.
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: صفحه درخواست‌های تسویه
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PayoutPage' }
+        '401': { $ref: '#/components/responses/Problem' }
+        '403': { $ref: '#/components/responses/Problem' }
+  /api/v1/admin/payouts/{payoutID}/approve:
+    post:
+      summary: تأیید درخواست تسویه (مدیر)
+      description: مدیر درخواست requested را به approved می‌برد؛ وجوه هنوز رزرو می‌ماند.
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PayoutID'
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PayoutAdminInput' }
+      responses:
+        '200':
+          description: درخواست تأییدشده
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PayoutRequest' }
+        '401': { $ref: '#/components/responses/Problem' }
+        '403': { $ref: '#/components/responses/Problem' }
+        '404': { $ref: '#/components/responses/Problem' }
+        '409': { $ref: '#/components/responses/Problem' }
+  /api/v1/admin/payouts/{payoutID}/reject:
+    post:
+      summary: رد درخواست تسویه (مدیر)
+      description: مدیر درخواست requested را رد می‌کند؛ مبلغ رزروشده در همان تراکنش به درآمد ارائه‌دهنده بازمی‌گردد.
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PayoutID'
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PayoutAdminInput' }
+      responses:
+        '200':
+          description: درخواست ردشده
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PayoutRequest' }
+        '401': { $ref: '#/components/responses/Problem' }
+        '403': { $ref: '#/components/responses/Problem' }
+        '404': { $ref: '#/components/responses/Problem' }
+        '409': { $ref: '#/components/responses/Problem' }
+  /api/v1/admin/payouts/{payoutID}/processing:
+    post:
+      summary: آغاز پردازش دستی (مدیر)
+      description: مدیر درخواست approved را به processing می‌برد در حالی که انتقال بیرونی انجام می‌شود.
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PayoutID'
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PayoutAdminInput' }
+      responses:
+        '200':
+          description: درخواست در حال پردازش
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PayoutRequest' }
+        '401': { $ref: '#/components/responses/Problem' }
+        '403': { $ref: '#/components/responses/Problem' }
+        '404': { $ref: '#/components/responses/Problem' }
+        '409': { $ref: '#/components/responses/Problem' }
+  /api/v1/admin/payouts/{payoutID}/paid:
+    post:
+      summary: ثبت پرداخت دستی (مدیر)
+      description: مدیر تأیید می‌کند انتقال بیرونی (شبکه بانکی) کامل شده است؛ ارجاع انتقال نمی‌تواند برهان باشد و مبلغ رزروشده به حساب clearing تسویه منتقل می‌شود.
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PayoutID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [external_transfer_reference]
+              additionalProperties: false
+              properties:
+                external_transfer_reference: { type: string, minLength: 1, maxLength: 128 }
+                note: { type: string, maxLength: 1000 }
+      responses:
+        '200':
+          description: درخواست پرداخت‌شده
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PayoutRequest' }
+        '400': { $ref: '#/components/responses/Problem' }
+        '401': { $ref: '#/components/responses/Problem' }
+        '403': { $ref: '#/components/responses/Problem' }
+        '404': { $ref: '#/components/responses/Problem' }
+        '409': { $ref: '#/components/responses/Problem' }
+  /api/v1/admin/payouts/{payoutID}/fail:
+    post:
+      summary: ثبت شکست انتقال (مدیر)
+      description: مدیر انتقال بیرونی ناموفق را ثبت می‌کند؛ مبلغ رزروشده به درآمد ارائه‌دهنده بازمی‌گردد.
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PayoutID'
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PayoutAdminInput' }
+      responses:
+        '200':
+          description: درخواست ناموفق
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PayoutRequest' }
+        '401': { $ref: '#/components/responses/Problem' }
+        '403': { $ref: '#/components/responses/Problem' }
+        '404': { $ref: '#/components/responses/Problem' }
+        '409': { $ref: '#/components/responses/Problem' }
 components:
   securitySchemes:
     bearerAuth:
@@ -761,6 +1059,22 @@ components:
         type: integer
         format: int64
         minimum: 1
+    PayoutID:
+      name: payoutID
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+    LayoutIdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: false
+      description: کلید اختیاری idempotency؛ بازپخش همان کلید همان نتیجه terminal را بدون اثر تازه برمی‌گرداند
+      schema:
+        type: string
+        maxLength: 128
   responses:
     Problem:
       description: خطای پایدار API
@@ -769,6 +1083,13 @@ components:
           schema:
             $ref: '#/components/schemas/Problem'
   schemas:
+    AuthRegisterInput:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string, format: email, maxLength: 254 }
+        phone: { type: string }
+        password: { type: string, minLength: 8 }
     AuthLoginInput:
       type: object
       required: [email, password]
@@ -792,8 +1113,19 @@ components:
         access_token: { type: string }
         refresh_token:
           type: string
-          description: توکن Refresh فقط یک بار به کلاینت برگردانده می‌شود و در کوکی HttpOnly جداگانه نگه داشته می‌شود.
-        expires_in: { type: integer, format: int64, description: عمر توکن دسترسی بر حسب ثانیه }
+          description: توکن Refresh فقط یک‌بار در همین پاسخ به‌صورت متن‌خام برگردانده می‌شود و در پایگاه داده هش می‌شود.
+        expires_in: { type: integer, format: int64, description: عمر توکن دسترسی به ثانیه }
+    User:
+      type: object
+      required: [id, email, is_active, roles]
+      properties:
+        id: { type: integer, format: int64 }
+        email: { type: string, format: email }
+        phone: { type: [string, 'null'] }
+        is_active: { type: boolean }
+        roles:
+          type: array
+          items: { type: string }
     Problem:
       type: object
       required: [type, title, status, code, request_id]
@@ -926,11 +1258,12 @@ components:
           format: int64
     WalletBalance:
       type: object
-      required: [available_irr, held_irr, provider_earnings_irr, currency]
+      required: [available_irr, held_irr, provider_earnings_irr, provider_payout_reserved_irr, currency]
       properties:
         available_irr: { type: integer, format: int64, minimum: 0, description: مانده قابل‌استفاده صحیح ریال }
         held_irr: { type: integer, format: int64, minimum: 0, description: مبلغ قفل‌شده صحیح ریال }
-        provider_earnings_irr: { type: integer, format: int64, minimum: 0, description: درآمد قابل‌تسویه داخلی ارائه‌دهنده؛ برداشت بانکی در این مرحله وجود ندارد }
+        provider_earnings_irr: { type: integer, format: int64, minimum: 0, description: درآمد قابل‌تسویه داخلی ارائه‌دهنده }
+        provider_payout_reserved_irr: { type: integer, format: int64, minimum: 0, description: سهم درآمد ارائه‌دهنده که در دفتر کل به درخواست تسویه فعال رزرو شده است }
         currency: { type: string, const: IRR }
     WalletTransaction:
       type: object
@@ -938,7 +1271,7 @@ components:
       properties:
         id: { type: integer, format: int64 }
         reference: { type: string }
-        kind: { type: string, enum: [funding, hold_place, hold_release, refund_release, hold_settle, reversal] }
+        kind: { type: string, enum: [funding, hold_place, hold_release, refund_release, hold_settle, reversal, payout_reserve, payout_release, payout_paid] }
         created_at: { type: string, format: date-time }
         amount_irr: { type: integer, format: int64, minimum: 1, description: بزرگ‌ترین مبلغ ثبت‌شده در حساب‌های متعلق به این کاربر برای سند موردنظر }
     WalletTransactionPage:
@@ -994,9 +1327,43 @@ components:
         buffer_minutes: { type: integer, minimum: 0, maximum: 1440 }
         status:
           type: string
-          enum: [confirmed, in_progress, completed, cancelled, expired]
+          enum: [confirmed, in_progress, completion_pending, disputed, completed, cancelled, expired]
+        completion_requested_at:
+          type: [string, 'null']
+          format: date-time
+          description: زمان ثبت درخواست تکمیل خدمت توسط ارائه‌دهنده
+        completed_at:
+          type: [string, 'null']
+          format: date-time
+          description: زمان نهایی‌شدن وضعیت completed
         created_at: { type: string, format: date-time }
         updated_at: { type: string, format: date-time }
+    PayoutRequest:
+      type: object
+      required: [id, provider_id, amount_irr, status, admin_note, created_at, updated_at]
+      properties:
+        id: { type: integer, format: int64 }
+        provider_id: { type: integer, format: int64 }
+        amount_irr: { type: integer, format: int64, minimum: 1, description: مبلغ صحیح ریال }
+        status: { type: string, enum: [requested, approved, processing, paid, rejected, failed] }
+        external_transfer_reference:
+          type: [string, 'null']
+          maxLength: 128
+          description: ارجاع انتقال بیرونی؛ فقط پس از ثبت پرداخت دستی پر می‌شود
+        admin_note: { type: string }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    PayoutPage:
+      type: object
+      required: [items]
+      properties:
+        items: { type: array, items: { $ref: '#/components/schemas/PayoutRequest' } }
+        next_cursor: { type: [integer, 'null'], format: int64 }
+    PayoutAdminInput:
+      type: object
+      additionalProperties: false
+      properties:
+        note: { type: string, maxLength: 1000 }
     BookingPage:
       type: object
       required: [items, next_cursor]
