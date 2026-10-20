@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
+import { Box, Paper, Stack, Typography } from "@mui/material";
 
 import { env } from "@/config/env";
 import { t } from "@/config/messages.fa";
@@ -41,16 +42,41 @@ async function RegisterPageContent({ searchParams }: RegisterPageProps) {
 
   return (
     <main className="mx-auto w-full max-w-page px-4 py-10 md:py-16">
-      <div className="mx-auto flex max-w-sm flex-col gap-6">
-        <h1 className="text-2xl font-bold text-text">{t("auth.register.title")}</h1>
-        <RegisterForm next={nextPath} />
-        <Link
-          href={loginHref}
-          className="text-center text-sm font-medium text-primary hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-        >
-          {t("auth.register.loginLink")}
-        </Link>
-      </div>
+      <Paper
+        elevation={0}
+        sx={{
+          mx: "auto",
+          maxWidth: 440,
+          p: { xs: 3, sm: 4 },
+          border: "1px solid #e3ece9",
+          borderRadius: 4,
+          backgroundColor: "#fff",
+          boxShadow: "0 20px 60px rgba(23, 43, 42, 0.08)",
+        }}
+      >
+        <Stack spacing={3}>
+          <Box>
+            <Box sx={{ mb: 1.5, display: "grid", width: 44, height: 44, placeItems: "center", borderRadius: 3, bgcolor: "#e6f4f1", color: "#0f766e" }}>
+              <svg aria-hidden="true" viewBox="0 0 24 24" className="size-6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 5v14m-7-7h14" />
+              </svg>
+            </Box>
+            <Typography component="h1" variant="h5" sx={{ mb: 0.75, fontFamily: "inherit", fontWeight: 800, color: "#172b2a" }}>
+              {t("auth.register.title")}
+            </Typography>
+            <Typography sx={{ fontFamily: "inherit", fontSize: 14, lineHeight: 1.8, color: "#617472" }}>
+              {t("auth.register.description")}
+            </Typography>
+          </Box>
+          <RegisterForm next={nextPath} />
+          <Link
+            href={loginHref}
+            className="text-center text-sm font-semibold text-primary hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          >
+            {t("auth.register.loginLink")}
+          </Link>
+        </Stack>
+      </Paper>
     </main>
   );
 }

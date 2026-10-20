@@ -14,7 +14,7 @@ export function BookingPanel({ serviceId, durationMinutes, priceLabel }: Booking
   return (
     <aside
       aria-label={t("service.summary")}
-      className="fixed inset-x-0 bottom-0 z-10 border-t border-border bg-white p-4 md:sticky md:top-24 md:inset-auto md:rounded-md md:border"
+      className="fixed inset-x-0 bottom-0 z-10 border-t border-border bg-white p-4 shadow-[0_-8px_30px_rgba(23,43,42,0.08)] md:sticky md:top-24 md:inset-auto md:rounded-md md:border md:shadow-md"
     >
       <div className="mx-auto flex max-w-page items-center justify-between gap-4 md:flex-col md:items-stretch md:gap-5">
         <dl className="flex gap-6 md:flex-col md:gap-4">

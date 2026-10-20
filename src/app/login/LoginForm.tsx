@@ -4,6 +4,8 @@ import { useActionState } from "react";
 
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { PasswordInput } from "@/components/ui/PasswordInput";
+import Alert from "@mui/material/Alert";
 import { t } from "@/config/messages.fa";
 import { loginAction, type LoginState } from "@/lib/auth/actions";
 
@@ -26,11 +28,10 @@ export function LoginForm({ next, mode }: { next: string; mode: "real" | "mock" 
             dir="ltr"
             error={state.errors?.email}
           />
-          <Input
+          <PasswordInput
             id="password"
             name="password"
             label={t("auth.password.label")}
-            type="password"
             autoComplete="current-password"
             dir="ltr"
             error={state.errors?.password}
@@ -60,9 +61,9 @@ export function LoginForm({ next, mode }: { next: string; mode: "real" | "mock" 
         </>
       )}
       {state.errors?.form && (
-        <p role="alert" className="text-sm text-danger">
+        <Alert severity="error" role="alert" sx={{ borderRadius: 2, fontFamily: "inherit", "& .MuiAlert-message": { fontFamily: "inherit" } }}>
           {state.errors.form}
-        </p>
+        </Alert>
       )}
       <Button type="submit" loading={pending} className="w-full">
         {t("auth.login.submit")}

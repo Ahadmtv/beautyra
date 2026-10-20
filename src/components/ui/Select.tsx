@@ -1,4 +1,5 @@
 import type { SelectHTMLAttributes } from "react";
+import { FormControl, FormHelperText, InputLabel, NativeSelect, OutlinedInput } from "@mui/material";
 
 type SelectOption = { value: string; label: string };
 
@@ -10,34 +11,35 @@ type SelectProps = SelectHTMLAttributes<HTMLSelectElement> & {
   error?: string;
 };
 
-export function Select({
-  id,
-  label,
-  options,
-  placeholder,
-  error,
-  className,
-  ...rest
-}: SelectProps) {
+export function Select({ id, label, options, placeholder, error, className, required, ...rest }: SelectProps) {
   const messageId = `${id}-message`;
 
   return (
-    <div className="flex flex-col gap-1.5">
-      <label htmlFor={id} className="text-sm font-medium text-text">
-        {label}
-      </label>
-      <select
-        id={id}
-        aria-invalid={error ? true : undefined}
-        aria-describedby={error ? messageId : undefined}
-        className={[
-          "h-10 rounded-md border bg-white ps-3 pe-8 text-sm text-text",
-          error ? "border-danger" : "border-border",
-          className,
-        ]
-          .filter(Boolean)
-          .join(" ")}
+    <FormControl
+      fullWidth
+      required={required}
+      error={Boolean(error)}
+      className={className}
+      sx={{
+        fontFamily: "inherit",
+        "& .MuiInputLabel-root": { fontFamily: "inherit" },
+        "& .MuiNativeSelect-select": { fontFamily: "inherit", minHeight: "1.25rem" },
+        "& .MuiOutlinedInput-root": {
+          borderRadius: 2,
+          backgroundColor: "#fff",
+          "& .MuiOutlinedInput-notchedOutline": { borderColor: error ? "#d92d20" : "#dce7e4" },
+          "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: error ? "#d92d20" : "#0f766e" },
+          "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderWidth: 2, borderColor: error ? "#d92d20" : "#0f766e" },
+        },
+        "& .MuiInputLabel-root.Mui-focused": { color: error ? "#d92d20" : "#0f766e" },
+        "& .MuiFormHelperText-root": { mx: 0, minHeight: 20, color: error ? "#d92d20" : "#617472", fontFamily: "inherit" },
+      }}
+    >
+      <InputLabel htmlFor={id}>{label}</InputLabel>
+      <NativeSelect
         {...rest}
+        input={<OutlinedInput label={label} />}
+        inputProps={{ id, "aria-describedby": error ? messageId : undefined }}
       >
         {placeholder && <option value="">{placeholder}</option>}
         {options.map((option) => (
@@ -45,12 +47,8 @@ export function Select({
             {option.label}
           </option>
         ))}
-      </select>
-      {error && (
-        <p id={messageId} className="text-sm text-danger">
-          {error}
-        </p>
-      )}
-    </div>
+      </NativeSelect>
+      <FormHelperText id={messageId}>{error ?? " "}</FormHelperText>
+    </FormControl>
   );
 }

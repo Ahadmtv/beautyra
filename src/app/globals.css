@@ -23,7 +23,7 @@
 
 @layer base {
   body {
-    background: #f7faf9;
+    background: radial-gradient(ellipse at 50% 0%, rgb(15 118 110 / 6%), transparent 48%), #f7faf9;
     color: var(--color-text);
     font-family: var(--font-sans);
   }

@@ -1,6 +1,7 @@
 import { Suspense, type ReactNode } from "react";
 
 import type { Metadata } from "next";
+import { Box, Paper, Stack, Typography } from "@mui/material";
 
 import { FilterBar } from "@/components/layout/FilterBar";
 import { CategoryNav } from "@/components/listing/CategoryNav";
@@ -53,21 +54,32 @@ function HomeLayout({ params, listing }: { params: URLSearchParams; listing: Rea
   return (
     <>
       <FilterBar filters={filters} />
-      <main className="mx-auto w-full max-w-page flex-1 px-4 py-6 md:py-8">
-        <h1 className="sr-only">{t("home.title")}</h1>
-        <div className="flex flex-col gap-6 md:grid md:grid-cols-[14rem_1fr] md:gap-8">
-          <aside className="flex flex-col gap-4">
-            <MobileCategoryDrawer>{categoryNav}</MobileCategoryDrawer>
-            <div className="hidden md:block">
-              <h2 className="mb-3 text-base font-semibold text-text">{t("home.categories")}</h2>
-              {categoryNav}
-            </div>
-          </aside>
-          <section aria-label={t("home.title")} className="min-w-0">
-            {listing}
-          </section>
-        </div>
-      </main>
+      <Box component="main" sx={{ width: "100%", maxWidth: 1080, flex: 1, mx: "auto", px: { xs: 2, sm: 3 }, py: { xs: 3, md: 5 } }}>
+        <Stack spacing={3}>
+          <Box>
+            <Typography component="h1" variant="h4" sx={{ fontFamily: "inherit", fontSize: { xs: 24, md: 30 }, fontWeight: 800, letterSpacing: "-0.03em", color: "#172b2a" }}>
+              {t("home.title")}
+            </Typography>
+            <Typography sx={{ mt: 0.75, fontFamily: "inherit", fontSize: 14, color: "#617472" }}>
+              {t("home.description")}
+            </Typography>
+          </Box>
+          <Box sx={{ display: "grid", gridTemplateColumns: { xs: "minmax(0, 1fr)", md: "240px minmax(0, 1fr)" }, alignItems: "start", gap: { xs: 2, md: 3 } }}>
+            <Box component="aside" sx={{ minWidth: 0, position: { md: "sticky" }, top: { md: 24 } }}>
+              <MobileCategoryDrawer>{categoryNav}</MobileCategoryDrawer>
+              <Paper elevation={0} sx={{ display: { xs: "none", md: "block" }, p: 2, border: "1px solid #dce7e4", borderRadius: 3, backgroundColor: "#fff" }}>
+                <Typography component="h2" sx={{ mb: 1.5, fontFamily: "inherit", fontSize: 15, fontWeight: 750, color: "#172b2a" }}>
+                  {t("home.categories")}
+                </Typography>
+                {categoryNav}
+              </Paper>
+            </Box>
+            <Box component="section" aria-label={t("home.title")} sx={{ minWidth: 0 }}>
+              {listing}
+            </Box>
+          </Box>
+        </Stack>
+      </Box>
     </>
   );
 }

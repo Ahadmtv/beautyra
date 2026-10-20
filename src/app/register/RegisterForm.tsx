@@ -4,6 +4,8 @@ import { useActionState } from "react";
 
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { PasswordInput } from "@/components/ui/PasswordInput";
+import Alert from "@mui/material/Alert";
 import { t } from "@/config/messages.fa";
 import { registerAction } from "@/lib/auth/actions";
 import type { RegisterState } from "@/lib/auth/register";
@@ -37,11 +39,10 @@ export function RegisterForm({ next }: { next: string }) {
         dir="ltr"
         error={state.errors?.phone}
       />
-      <Input
+      <PasswordInput
         id="password"
         name="password"
         label={t("auth.password.label")}
-        type="password"
         autoComplete="new-password"
         dir="ltr"
         minLength={8}
@@ -49,9 +50,9 @@ export function RegisterForm({ next }: { next: string }) {
         error={state.errors?.password}
       />
       {state.errors?.form && (
-        <p role="alert" className="text-sm text-danger">
+        <Alert severity="error" role="alert" sx={{ borderRadius: 2, fontFamily: "inherit", "& .MuiAlert-message": { fontFamily: "inherit" } }}>
           {state.errors.form}
-        </p>
+        </Alert>
       )}
       <Button type="submit" loading={pending} className="w-full">
         {t("auth.register.submit")}

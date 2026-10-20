@@ -41,11 +41,11 @@ export function DateStrip({ basePath, days, selectedDate, today, previousDate, n
                 aria-current={isSelected ? "date" : undefined}
                 aria-label={`${label.weekday} ${label.day} ${label.month} ${label.year}`}
                 className={[
-                  "flex flex-col items-center gap-0.5 rounded-md border px-1 py-2 text-center transition-colors",
+                  "flex flex-col items-center gap-0.5 rounded-md border px-1 py-2 text-center transition-all duration-200",
                   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
                   isSelected
                     ? "border-primary bg-primary text-white"
-                    : "border-border bg-white text-text hover:border-primary",
+                    : "border-border bg-white text-text shadow-sm hover:-translate-y-0.5 hover:border-primary hover:shadow",
                 ].join(" ")}
               >
                 <span className="text-xs">{label.weekday}</span>

@@ -1,10 +1,10 @@
 import Link from "next/link";
 
-import { CITY_OPTIONS, NEIGHBORHOOD_OPTIONS } from "@/config/filter-options";
+import { Box, Paper, Stack } from "@mui/material";
+
 import { t } from "@/config/messages.fa";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { Select } from "@/components/ui/Select";
 import type { ListingFilters } from "@/lib/listing/filters";
 
 type FilterBarProps = {
@@ -15,36 +15,27 @@ export function FilterBar({ filters }: FilterBarProps) {
   const hasActiveFilters = Boolean(filters.city || filters.neighborhood || filters.q);
 
   return (
-    <section aria-label={t("filter.label")} className="border-b border-border bg-white shadow-sm">
-      <form
+    <Box component="section" aria-label={t("filter.label")} sx={{ borderBottom: "1px solid #e3ece9", bgcolor: "rgba(255,255,255,0.8)" }}>
+      <Paper
+        component="form"
         method="get"
         action="/"
         role="search"
-        className="mx-auto flex w-full max-w-page flex-col gap-3 px-4 py-4 md:flex-row md:items-end"
+        elevation={0}
+        sx={{
+          display: "grid",
+          gridTemplateColumns: { xs: "minmax(0, 1fr)", md: "minmax(0, 1fr) auto" },
+          alignItems: "end",
+          gap: 1.5,
+          width: "100%",
+          maxWidth: 1080,
+          mx: "auto",
+          px: { xs: 2, sm: 3 },
+          py: { xs: 2, md: 2.5 },
+          bgcolor: "transparent",
+        }}
       >
-        <div className="md:w-44">
-          <Select
-            name="city"
-            id="filter-city"
-            label={t("filter.city")}
-            options={CITY_OPTIONS}
-            placeholder={t("filter.cityPlaceholder")}
-            defaultValue={filters.city ?? ""}
-            className="w-full"
-          />
-        </div>
-        <div className="md:w-44">
-          <Select
-            name="neighborhood"
-            id="filter-neighborhood"
-            label={t("filter.neighborhood")}
-            options={NEIGHBORHOOD_OPTIONS}
-            placeholder={t("filter.neighborhoodPlaceholder")}
-            defaultValue={filters.neighborhood ?? ""}
-            className="w-full"
-          />
-        </div>
-        <div className="md:flex-1">
+        <Box sx={{ minWidth: 0 }}>
           <Input
             name="q"
             id="filter-query"
@@ -52,29 +43,25 @@ export function FilterBar({ filters }: FilterBarProps) {
             label={t("filter.searchLabel")}
             placeholder={t("filter.searchPlaceholder")}
             defaultValue={filters.q ?? ""}
+            reserveHelperText={false}
             className="w-full"
           />
-        </div>
-        <div className="flex items-center gap-3">
-          <Button
-            type="submit"
-            variant="outline"
-            size="icon"
-            aria-label={t("filter.search")}
-            className="w-full md:w-10 md:shrink-0"
-          >
+        </Box>
+        <Stack direction="row" alignItems="center" gap={1.5} sx={{ minWidth: 0 }}>
+          <Button type="submit" variant="primary" className="w-full md:w-auto">
             <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               <circle cx="11" cy="11" r="7" />
               <path d="M20 20l-3.5-3.5" />
             </svg>
+            {t("filter.search")}
           </Button>
           {hasActiveFilters && (
-            <Link href="/" scroll={false} className="shrink-0 text-sm font-medium text-primary underline-offset-4 hover:underline">
+            <Link href="/" scroll={false} className="shrink-0 text-sm font-semibold text-primary underline-offset-4 hover:underline">
               {t("filter.clear")}
             </Link>
           )}
-        </div>
-      </form>
-    </section>
+        </Stack>
+      </Paper>
+    </Box>
   );
 }
