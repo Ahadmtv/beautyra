@@ -12,7 +12,13 @@ import { createTopUpAction, type TopUpState } from "@/lib/payments/actions";
 
 const initialTopUpState: TopUpState = { kind: "idle" };
 
-export function TopUpForm({ idempotencyKey }: { idempotencyKey: string }) {
+export function TopUpForm({
+  idempotencyKey,
+  returnTo,
+}: {
+  idempotencyKey: string;
+  returnTo?: string;
+}) {
   const [state, formAction] = useActionState(createTopUpAction, initialTopUpState);
   const [amount, setAmount] = useState("");
   const [clientError, setClientError] = useState<string | undefined>();
@@ -44,6 +50,7 @@ export function TopUpForm({ idempotencyKey }: { idempotencyKey: string }) {
       }}
     >
       <input type="hidden" name="idempotency_key" value={idempotencyKey} />
+      {returnTo && <input type="hidden" name="return_to" value={returnTo} />}
       <Input
         id="amount_irr"
         name="amount_irr"

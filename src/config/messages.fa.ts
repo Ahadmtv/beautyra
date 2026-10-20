@@ -11,6 +11,7 @@ export const messages = {
   "home.loadError": "فهرست خدمات در حال حاضر در دسترس نیست. لطفاً دوباره تلاش کنید.",
   "error.title": "خطا در بارگذاری صفحه",
   "common.loading": "در حال بارگذاری",
+  "common.back": "بازگشت",
   "common.close": "بستن",
   "common.loadMore": "نمایش بیشتر",
   "common.retry": "تلاش مجدد",

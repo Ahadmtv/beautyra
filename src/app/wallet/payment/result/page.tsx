@@ -8,7 +8,8 @@ import { getPayment, processZarinpalCallback } from "@/lib/api/payments";
 import { redirectOnUnauthorized, requireRole } from "@/lib/auth/session";
 import { formatTomanFromRial } from "@/lib/format/money";
 import { numberFormatFa } from "@/lib/format/digits";
-import { PAYMENT_ID_COOKIE } from "@/lib/payments/constants";
+import { PAYMENT_ID_COOKIE, PAYMENT_RETURN_COOKIE } from "@/lib/payments/constants";
+import { PAYMENT_RETURN_FALLBACK, resolvePaymentReturnPath } from "@/lib/payments/navigation";
 
 export const metadata: Metadata = {
   title: `${t("wallet.payment.title")} | ${t("brand.name")}`,
@@ -30,10 +31,21 @@ type PaymentResultProps = {
 export default async function PaymentResultPage({ searchParams }: PaymentResultProps) {
   await requireRole("client");
 
-  const rawId = (await cookies()).get(PAYMENT_ID_COOKIE)?.value;
+  const cookieStore = await cookies();
+  const rawId = cookieStore.get(PAYMENT_ID_COOKIE)?.value;
+  const returnTo = resolvePaymentReturnPath(cookieStore.get(PAYMENT_RETURN_COOKIE)?.value);
+  const backLabel =
+    returnTo === PAYMENT_RETURN_FALLBACK ? t("wallet.payment.back") : t("common.back");
+
   const paymentId = rawId && /^\d+$/.test(rawId) ? Number(rawId) : NaN;
   if (!Number.isSafeInteger(paymentId) || paymentId < 1) {
-    return <PaymentResultMessage message={t("wallet.payment.missing")} />;
+    return (
+      <PaymentResultMessage
+        message={t("wallet.payment.missing")}
+        returnTo={returnTo}
+        backLabel={backLabel}
+      />
+    );
   }
 
   const params = await searchParams;
@@ -59,7 +71,13 @@ export default async function PaymentResultPage({ searchParams }: PaymentResultP
     payment = await getPayment(paymentId);
   } catch (error) {
     redirectOnUnauthorized(error);
-    return <PaymentResultMessage message={t("wallet.payment.loadError")} />;
+    return (
+      <PaymentResultMessage
+        message={t("wallet.payment.loadError")}
+        returnTo={returnTo}
+        backLabel={backLabel}
+      />
+    );
   }
 
   return (
@@ -80,17 +98,25 @@ export default async function PaymentResultPage({ searchParams }: PaymentResultP
           </div>
         </dl>
         <Link
-          href="/wallet"
+          href={returnTo}
           className="inline-flex min-h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-white hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
         >
-          {t("wallet.payment.back")}
+          {backLabel}
         </Link>
       </section>
     </main>
   );
 }
 
-function PaymentResultMessage({ message }: { message: string }) {
+function PaymentResultMessage({
+  message,
+  returnTo,
+  backLabel,
+}: {
+  message: string;
+  returnTo: string;
+  backLabel: string;
+}) {
   return (
     <main className="mx-auto w-full max-w-page flex-1 px-4 py-6 md:py-8">
       <section className="mx-auto flex max-w-xl flex-col gap-5 rounded-md border border-border bg-white p-5 md:p-7">
@@ -99,10 +125,10 @@ function PaymentResultMessage({ message }: { message: string }) {
           {message}
         </p>
         <Link
-          href="/wallet"
+          href={returnTo}
           className="inline-flex min-h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-white hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
         >
-          {t("wallet.payment.back")}
+          {backLabel}
         </Link>
       </section>
     </main>

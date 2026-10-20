@@ -16,6 +16,7 @@ import { formatSlotTime, isIsoDate } from "@/lib/booking/dates";
 import { numberFormatFa } from "@/lib/format/digits";
 import { formatTomanFromRial } from "@/lib/format/money";
 import { describeJalaliDate } from "@/lib/jalali/labels";
+import { walletChargeHref } from "@/lib/payments/navigation";
 
 type ConfirmPageProps = {
   params: Promise<{ serviceId: string }>;
@@ -179,7 +180,7 @@ function ConfirmationDetails({
         <div className="flex flex-col items-start gap-3 rounded-md bg-surface p-4 text-sm text-text">
           <p>{t("booking.error.insufficientBalance")}</p>
           <Link
-            href={`/wallet/charge?next=${encodeURIComponent(returnPath)}`}
+            href={walletChargeHref(returnPath)}
             className="inline-flex h-10 items-center rounded-md bg-primary px-4 text-sm font-medium text-white hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           >
             {t("booking.confirm.charge")}

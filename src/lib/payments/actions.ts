@@ -9,7 +9,9 @@ import { createZarinpalPayment } from "@/lib/api/payments";
 import { ApiError, problemMessage } from "@/lib/api/problem";
 import { requireRole, redirectOnUnauthorized } from "@/lib/auth/session";
 import { toAsciiDigits } from "@/lib/format/digits";
-import { PAYMENT_ID_COOKIE } from "./constants";
+import { PAYMENT_ID_COOKIE, PAYMENT_RETURN_COOKIE } from "./constants";
+import { resolvePaymentReturnPath } from "./navigation";
+import { resolvePaymentStart } from "./start-result";
 
 const paymentInputSchema = z.coerce.number().int().safe().min(10_000);
 
@@ -46,28 +48,34 @@ export async function createTopUpAction(
     throw error;
   }
 
-  const { payment } = response.data;
+  const outcome = resolvePaymentStart(response.status, response.data);
   const cookieStore = await cookies();
-  cookieStore.set(PAYMENT_ID_COOKIE, String(payment.id), {
+  cookieStore.set(PAYMENT_ID_COOKIE, String(response.data.payment.id), {
     httpOnly: true,
     secure: true,
     sameSite: "lax",
     path: "/wallet/payment",
     maxAge: 600,
   });
+  cookieStore.set(
+    PAYMENT_RETURN_COOKIE,
+    resolvePaymentReturnPath(formData.get("return_to")),
+    {
+      httpOnly: true,
+      secure: true,
+      sameSite: "lax",
+      path: "/wallet",
+      maxAge: 600,
+    },
+  );
 
-  if (response.status === 201) {
-    if (!response.data.redirect_url) {
-      return { kind: "redirectMissing", paymentId: payment.id };
-    }
-    redirect(response.data.redirect_url);
+  if (outcome.kind === "redirect") {
+    redirect(outcome.url);
   }
-
-  if (response.status === 202) {
-    return { kind: "uncertain", paymentId: payment.id };
+  if (outcome.kind === "uncertain" || outcome.kind === "redirectMissing") {
+    return outcome;
   }
-
-  if (response.status === 200) {
+  if (outcome.kind === "result") {
     redirect("/wallet/payment/result");
   }
 

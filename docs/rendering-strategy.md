@@ -8,6 +8,8 @@
 | `/services/[id]` | ISR (`"use cache"` + `cacheLife({ revalidate: 600 })` + `cacheTag("service-{id}")`) | Public published service detail; per-service tag allows targeted invalidation. |
 | `/book/[serviceId]` | Dynamic | Shows availability for the signed-in client; slots change with bookings and time-off. |
 | `/wallet` | Dynamic | User-specific balance and transactions; must never be cached. |
+| `/wallet/charge` | Dynamic | Client-only top-up page that preserves a validated return path. |
+| `/wallet/payment/result` | Dynamic | Reads the payment cookies and verifies status through the backend. |
 | `/dashboard/*` | Dynamic | User-specific bookings and data. |
 | `/provider/*` | Dynamic | Provider-only data authorized by the session cookie. |
 | `/admin/*` | Dynamic | Admin-only data and actions; must never be cached. |

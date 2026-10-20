@@ -76,9 +76,8 @@ The frontend does not invent missing endpoints. Tracked contract gaps in `docs/b
 8. Listing other services for a provider.
 9. Provider time zone on public service/provider data and bookings.
 10. Distinguishing booking conflicts from insufficient wallet funds.
-11. The wallet charge destination page and complete payment-return integration.
-12. Server-side booking status filtering across cursor pages.
-13. Exact cancellation eligibility/cutoff details.
-14. `24:00` as an exclusive working-hours close time to represent overnight intervals precisely.
+11. Server-side booking status filtering across cursor pages.
+12. Exact cancellation eligibility/cutoff details.
+13. `24:00` as an exclusive working-hours close time to represent overnight intervals precisely.
 
 See `docs/backend-gaps.md` for current adapter behavior and relevant source files.
