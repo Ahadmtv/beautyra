@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 
+import { AdminLoading } from "@/components/admin/AdminLoading";
 import { ProviderVerificationForm } from "@/components/admin/ProviderVerificationForm";
 import { t } from "@/config/messages.fa";
 import { requireRole } from "@/lib/auth/session";
@@ -7,7 +9,15 @@ import { requireRole } from "@/lib/auth/session";
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
 // TODO(backend): replace manual provider ID entry when an admin provider-list endpoint exists.
-export default async function AdminProvidersPage() {
+export default function AdminProvidersPage() {
+  return (
+    <Suspense fallback={<AdminLoading />}>
+      <AdminProvidersContent />
+    </Suspense>
+  );
+}
+
+async function AdminProvidersContent() {
   await requireRole("admin");
 
   return (

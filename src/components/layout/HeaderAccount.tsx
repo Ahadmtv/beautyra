@@ -1,5 +1,5 @@
 import Link from "next/link";
-
+import { connection } from "next/server";
 import { Button, buttonClassName } from "@/components/ui/Button";
 import { t, type MessageKey } from "@/config/messages.fa";
 import type { Role } from "@/lib/auth/claims";
@@ -24,6 +24,8 @@ export function LoginLink() {
 }
 
 export async function HeaderAccount() {
+  await connection();
+
   const session = await getSession();
   if (!session) {
     return <LoginLink />;
@@ -34,7 +36,8 @@ export async function HeaderAccount() {
       <summary
         className={buttonClassName({
           variant: "outline",
-          className: "h-9 cursor-pointer list-none px-3 md:h-10 md:px-4 [&::-webkit-details-marker]:hidden",
+          className:
+            "h-9 cursor-pointer list-none px-3 md:h-10 md:px-4 [&::-webkit-details-marker]:hidden",
         })}
       >
         {t("auth.account.menu")}

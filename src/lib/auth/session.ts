@@ -2,6 +2,7 @@ import "server-only";
 
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 
 import { env } from "@/config/env";
 import { ApiError } from "@/lib/api/problem";
@@ -15,6 +16,7 @@ export async function getSessionToken(): Promise<string | undefined> {
 }
 
 export async function getSession(): Promise<Session | null> {
+  await connection();
   const token = await getSessionToken();
   if (!token) {
     return null;

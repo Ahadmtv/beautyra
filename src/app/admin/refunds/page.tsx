@@ -1,13 +1,23 @@
 import type { Metadata } from "next";
 import { randomUUID } from "node:crypto";
+import { Suspense } from "react";
 
+import { AdminLoading } from "@/components/admin/AdminLoading";
 import { AdminRefundForm } from "@/components/admin/AdminRefundForm";
 import { t } from "@/config/messages.fa";
 import { requireRole } from "@/lib/auth/session";
 
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
-export default async function AdminRefundsPage() {
+export default function AdminRefundsPage() {
+  return (
+    <Suspense fallback={<AdminLoading />}>
+      <AdminRefundsContent />
+    </Suspense>
+  );
+}
+
+async function AdminRefundsContent() {
   await requireRole("admin");
 
   return (

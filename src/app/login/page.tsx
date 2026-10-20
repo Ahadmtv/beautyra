@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
 
 import { env } from "@/config/env";
@@ -16,7 +17,15 @@ type LoginPageProps = {
   searchParams: Promise<{ next?: string; expired?: string }>;
 };
 
-export default async function LoginPage({ searchParams }: LoginPageProps) {
+export default function LoginPage(props: LoginPageProps) {
+  return (
+    <Suspense fallback={<LoginPageFallback />}>
+      <LoginPageContent {...props} />
+    </Suspense>
+  );
+}
+
+async function LoginPageContent({ searchParams }: LoginPageProps) {
   const { next, expired } = await searchParams;
   const nextPath = sanitizeNextPath(next);
 
@@ -28,15 +37,30 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
     <main className="mx-auto w-full max-w-page px-4 py-10 md:py-16">
       <div className="mx-auto flex max-w-sm flex-col gap-6">
         <h1 className="text-2xl font-bold text-text">{t("auth.login.title")}</h1>
+
         {expired === "1" && (
           <p role="status" className="rounded-md bg-primary-soft p-3 text-sm text-text">
             {t("auth.sessionExpired")}
           </p>
         )}
+
         {env.AUTH_PROVIDER === "mock" && (
-          <p className="rounded-md border border-border p-3 text-sm text-text-muted">{t("auth.mockHint")}</p>
+          <p className="rounded-md border border-border p-3 text-sm text-text-muted">
+            {t("auth.mockHint")}
+          </p>
         )}
+
         <LoginForm next={nextPath} />
+      </div>
+    </main>
+  );
+}
+
+function LoginPageFallback() {
+  return (
+    <main className="mx-auto w-full max-w-page px-4 py-10 md:py-16">
+      <div className="mx-auto max-w-sm">
+        <p className="text-sm text-text-muted">{t("auth.login.title")}</p>
       </div>
     </main>
   );
