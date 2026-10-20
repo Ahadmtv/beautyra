@@ -957,14 +957,14 @@ export interface paths {
         };
         /**
          * callback بازگشت کاربر از Zarinpal
-         * @description authority رکورد محلی را تعیین می‌کند؛ status فقط داده بازگشت است. موجودی فقط پس از Verify server-to-server و تطبیق با مبلغ و authority محلی تغییر می‌کند.
+         * @description پارامترهای Authority و Status مطابق callback واقعی Zarinpal هستند و نام‌های lowercase نیز برای سازگاری پذیرفته می‌شوند. authority رکورد محلی را تعیین می‌کند؛ status فقط داده بازگشت است. موجودی فقط پس از Verify server-to-server و تطبیق با مبلغ و authority محلی تغییر می‌کند.
          */
         get: {
             parameters: {
                 query: {
-                    authority: string;
+                    Authority: string;
                     /** @description مقدار بازگشتی gateway؛ برای اعتباردهی به آن اعتماد نمی‌شود */
-                    status?: string;
+                    Status?: string;
                 };
                 header?: never;
                 path?: never;
