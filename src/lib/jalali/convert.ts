@@ -27,7 +27,7 @@ function jalaliYearInfo(jalaliYear: number): { gregorianYear: number; march: num
 
   const gregorianYear = jalaliYear + 621;
   let leapJ = -14;
-  let cycleStart = firstBreak;
+  let cycleStart: number = firstBreak;
   let cycleLength = 0;
 
   for (let i = 1; i < JALALI_CYCLE_BREAKS.length; i += 1) {
@@ -38,7 +38,7 @@ function jalaliYearInfo(jalaliYear: number): { gregorianYear: number; march: num
     cycleStart = cycleEnd;
   }
 
-  let yearsIntoCycle = jalaliYear - cycleStart;
+  const yearsIntoCycle = jalaliYear - cycleStart;
   leapJ += div(yearsIntoCycle, 33) * 8 + div(mod(yearsIntoCycle, 33) + 3, 4);
   if (mod(cycleLength, 33) === 4 && cycleLength - yearsIntoCycle === 4) {
     leapJ += 1;
@@ -56,7 +56,7 @@ function gregorianToJdn({ year, month, day }: CalendarDate): number {
     div(153 * mod(month + 9, 12) + 2, 5) +
     day -
     34840408;
-  jdn = jdn - div(div(year + 100 + div(month - 8, 6), 100) * 3, 4) + 752;
+  jdn = jdn - div(div(year + 100100 + div(month - 8, 6), 100) * 3, 4) + 752;
   return jdn;
 }
 

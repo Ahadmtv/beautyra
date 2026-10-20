@@ -33,7 +33,9 @@ export function parseLimit(params: URLSearchParams): number {
   if (raw === null || !/^\d+$/.test(raw)) {
     return DEFAULT_PAGE_LIMIT;
   }
-  return Math.min(Math.max(Number(raw), 1), MAX_PAGE_LIMIT);
+  const limit = Number(raw);
+  if (!Number.isSafeInteger(limit) || limit < 1) return DEFAULT_PAGE_LIMIT;
+  return Math.min(limit, MAX_PAGE_LIMIT);
 }
 
 export function buildPageQuery(cursor: number | undefined, limit: number): URLSearchParams {

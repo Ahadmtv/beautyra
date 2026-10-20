@@ -3,6 +3,8 @@ import { numberFormatFa } from "../format/digits";
 import { weekdayIndexOfIsoDate } from "../booking/dates";
 import { gregorianToJalali } from "./convert";
 
+const faYearFormatter = new Intl.NumberFormat("fa-IR-u-nu-arabext", { useGrouping: false });
+
 export type JalaliDateLabel = {
   weekday: string;
   day: string;
@@ -18,6 +20,6 @@ export function describeJalaliDate(isoDate: string): JalaliDateLabel {
     weekday: WEEKDAY_NAMES_BY_UTC_DAY[weekdayIndexOfIsoDate(isoDate)],
     day: numberFormatFa(jalali.day),
     month: JALALI_MONTH_NAMES[jalali.month - 1],
-    year: numberFormatFa(jalali.year),
+    year: faYearFormatter.format(jalali.year),
   };
 }
