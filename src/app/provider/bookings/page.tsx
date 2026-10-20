@@ -44,11 +44,12 @@ export default async function ProviderBookingsPage({ searchParams }: ProviderBoo
               const localDate = todayInTimeZone(timeZone, new Date(booking.starts_at));
               const date = describeJalaliDate(localDate);
               const time = formatSlotTime(booking.starts_at, timeZone);
-              const available: ("start" | "complete")[] = booking.status === "confirmed"
-                ? ["start"]
-                : booking.status === "in_progress"
-                  ? ["complete"]
-                  : [];
+              const available: ("start" | "request_completion" | "cancel")[] =
+                booking.status === "confirmed"
+                  ? ["start", "cancel"]
+                  : booking.status === "in_progress"
+                    ? ["request_completion"]
+                    : [];
 
               return (
                 <li key={booking.id} className="flex flex-col gap-4 rounded-md border border-border bg-white p-4">

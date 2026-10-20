@@ -116,8 +116,16 @@ export function startProviderBooking(bookingId: number): Promise<Booking> {
   });
 }
 
-export function completeProviderBooking(bookingId: number): Promise<Booking> {
-  return apiFetch<Booking>(`/api/v1/provider/bookings/${bookingId}/complete`, {
+export function requestProviderCompletion(bookingId: number): Promise<Booking> {
+  return apiFetch<Booking>(`/api/v1/provider/bookings/${bookingId}/request-completion`, {
+    method: "POST",
+    auth: true,
+    cache: "no-store",
+  });
+}
+
+export function cancelProviderBooking(bookingId: number): Promise<Booking> {
+  return apiFetch<Booking>(`/api/v1/provider/bookings/${bookingId}/cancel`, {
     method: "POST",
     auth: true,
     cache: "no-store",

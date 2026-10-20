@@ -5,12 +5,16 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { t } from "@/config/messages.fa";
-import { completeProviderBooking, startProviderBooking } from "@/lib/api/provider";
+import {
+  cancelProviderBooking,
+  requestProviderCompletion,
+  startProviderBooking,
+} from "@/lib/api/provider";
 import { ApiError, problemMessage } from "@/lib/api/problem";
 import { parseServiceId } from "@/lib/api/service-id";
 import { redirectOnUnauthorized, requireRole } from "@/lib/auth/session";
 
-const transitionSchema = z.enum(["start", "complete"]);
+const transitionSchema = z.enum(["start", "request_completion", "cancel"]);
 
 export type ProviderBookingActionState = {
   message?: string;
@@ -32,8 +36,10 @@ export async function transitionProviderBookingAction(
   try {
     if (transition.data === "start") {
       await startProviderBooking(bookingId);
+    } else if (transition.data === "request_completion") {
+      await requestProviderCompletion(bookingId);
     } else {
-      await completeProviderBooking(bookingId);
+      await cancelProviderBooking(bookingId);
     }
   } catch (error) {
     redirectOnUnauthorized(error);
@@ -45,6 +51,6 @@ export async function transitionProviderBookingAction(
   }
 
   revalidatePath("/provider/bookings");
-  if (transition.data === "complete") revalidatePath("/wallet");
+  if (transition.data !== "start") revalidatePath("/wallet");
   redirect("/provider/bookings");
 }

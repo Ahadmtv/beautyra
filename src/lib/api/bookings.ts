@@ -31,3 +31,20 @@ export function cancelBooking(bookingId: number): Promise<Booking> {
     cache: "no-store",
   });
 }
+
+export function confirmBookingCompletion(bookingId: number): Promise<Booking> {
+  return apiFetch<Booking>(`/api/v1/bookings/${bookingId}/confirm-completion`, {
+    method: "POST",
+    auth: true,
+    cache: "no-store",
+  });
+}
+
+export function disputeBooking(bookingId: number, reason: string): Promise<Booking> {
+  return apiFetch<Booking>(`/api/v1/bookings/${bookingId}/dispute`, {
+    method: "POST",
+    body: { reason },
+    auth: true,
+    cache: "no-store",
+  });
+}

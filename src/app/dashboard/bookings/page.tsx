@@ -23,6 +23,8 @@ export const metadata: Metadata = {
 const statusOptions = [
   { value: "confirmed", label: t("dashboard.bookings.status.confirmed") },
   { value: "in_progress", label: t("dashboard.bookings.status.in_progress") },
+  { value: "completion_pending", label: t("dashboard.bookings.status.completion_pending") },
+  { value: "disputed", label: t("dashboard.bookings.status.disputed") },
   { value: "completed", label: t("dashboard.bookings.status.completed") },
   { value: "cancelled", label: t("dashboard.bookings.status.cancelled") },
   { value: "expired", label: t("dashboard.bookings.status.expired") },
