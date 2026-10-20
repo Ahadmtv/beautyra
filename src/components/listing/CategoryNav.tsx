@@ -1,20 +1,22 @@
 import Link from "next/link";
 
-import { SPECIALTY_OPTIONS, t } from "@/config/messages.fa";
+import { SERVICE_CATEGORY_OPTIONS, t } from "@/config/messages.fa";
 import { buildListingHref, parseListingFilters } from "@/lib/listing/filters";
 
-export function SpecialtyNav({ params }: { params: URLSearchParams }) {
-  const activeSpecialty = parseListingFilters(params).specialty;
+const NAV_OPTIONS = SERVICE_CATEGORY_OPTIONS.filter((option) => option.value !== "other");
+
+export function CategoryNav({ params }: { params: URLSearchParams }) {
+  const activeCategory = parseListingFilters(params).category;
 
   return (
-    <nav aria-label={t("home.specialties")}>
+    <nav aria-label={t("home.categories")}>
       <ul className="flex list-disc flex-col gap-2.5 ps-5 text-sm text-text">
-        {SPECIALTY_OPTIONS.map((option) => {
-          const isActive = option.value === activeSpecialty;
+        {NAV_OPTIONS.map((option) => {
+          const isActive = option.value === activeCategory;
           return (
             <li key={option.value}>
               <Link
-                href={buildListingHref(params, { specialty: isActive ? null : option.value })}
+                href={buildListingHref(params, { category: isActive ? null : option.value })}
                 aria-current={isActive ? "true" : undefined}
                 scroll={false}
                 className={[

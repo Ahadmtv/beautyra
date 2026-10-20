@@ -24,13 +24,13 @@
 
 ## Home page (`/`) with filters
 
-Filters (`city`, `neighborhood`, `specialty`, `q`) and the pagination cursor are URL search params, so every filtered or paged URL is shareable and rendered on the server.
+Filters (`category`, `city`, `neighborhood`, `q`) and the pagination cursor are URL search params, so every filtered or paged URL is shareable and rendered on the server.
 
-- The backend call lives in `getPublicServiceCards(cursor, limit)` (`src/lib/api/services.ts`). It is a `"use cache"` function with a 300-second revalidation and the `services` tag. The cache key is the `(cursor, limit)` pair, so the unfiltered first page and every filtered URL share one cached backend response.
-- Filtering runs in memory on that cached page (`src/lib/listing/filters.ts`). It does not change the backend request, so filtered URLs never bypass the cache.
-- `src/app/page.tsx` reads `searchParams` inside a `Suspense` boundary. The header, filter bar, specialty navigation, and skeleton are the prerendered App Shell. The listing streams in after the params are resolved.
-- Because the page reads `searchParams`, Next.js does not store the full HTML of the unfiltered home page as an ISR entry. Only the shell and the cached data are reused. Changing this to a fully static unfiltered page would need a separate route or a different filter mechanism. This has not been verified with `next build` in this environment.
-- The backend has no filter parameters, so filtering applies only to the fetched page. A page can show fewer cards than `limit`, or none, while `next_cursor` still points to more results. The "load more" link stays visible in that case (`docs/backend-gaps.md`, item 4).
+- The backend call lives in `getPublicServiceCards(cursor, limit, category)` (`src/lib/api/services.ts`). It is a `"use cache"` function with a 300-second revalidation and the `services` tag. The cache key includes the cursor, limit, and category, so each beauty category has its own cached backend page.
+- Category filtering runs in PostgreSQL through `GET /api/v1/services?category=`. City, neighborhood, and free-text filtering still run in memory on the cached page (`src/lib/listing/filters.ts`).
+- `src/app/page.tsx` reads `searchParams` inside a `Suspense` boundary. The header, filter bar, category navigation, and skeleton are the prerendered App Shell. The listing streams in after the params are resolved.
+- Because the page reads `searchParams`, Next.js does not store the full HTML of the unfiltered home page as an ISR entry. Only the shell and the cached data are reused.
+- The remaining filters apply only to the fetched page. A page can show fewer cards than `limit`, or none, while `next_cursor` still points to more results. The "load more" link stays visible in that case (`docs/backend-gaps.md`, item 4).
 
 ## Service detail (`/services/[id]`)
 
@@ -38,6 +38,6 @@ Filters (`city`, `neighborhood`, `specialty`, `q`) and the pagination cursor are
 - `generateStaticParams` prerenders the first 50 cards from `getPublicServiceCards(undefined, 50)`, which shares the home page's cached response. Other IDs render on first request and are cached (`dynamicParams` defaults to `true`).
 - An invalid ID or a backend 404 calls `notFound()`. Other API errors reach `src/app/error.tsx`.
 - The page reads no request data, so the HTML is cached by the same lifetime as its data.
-- Canonical URL, Persian title and description, and OpenGraph come from `generateMetadata`. The JSON-LD uses the `Service` type, with `Physician` as provider only when the provider name is known. A `Physician` page would need a provider detail route, which does not exist yet.
+- Canonical URL, Persian title and description, and OpenGraph come from `generateMetadata`. The JSON-LD uses the `Service` type, with `BeautySalon` as provider when the mock provider name is known. A provider detail page would need a public provider route, which does not exist yet.
 
 Browser JavaScript never reads the JWT. Server Components, Server Actions, and Route Handlers call the backend and attach the access token from an httpOnly cookie. The refresh token lives in a separate httpOnly cookie and is used only by `/auth/refresh` and the logout action.

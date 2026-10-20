@@ -4,7 +4,7 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
-import { t } from "@/config/messages.fa";
+import { isServiceCategory, t, type ServiceCategory } from "@/config/messages.fa";
 import {
   createProviderService,
   deactivateProviderService,
@@ -21,9 +21,15 @@ const integerSchema = z
   .transform(Number)
   .refine(Number.isSafeInteger);
 
+const serviceCategorySchema = z
+  .string()
+  .refine(isServiceCategory)
+  .transform((value) => value as ServiceCategory);
+
 const serviceFieldsSchema = z.object({
   name: z.string().trim().min(1).max(160),
   description: z.string(),
+  category: serviceCategorySchema,
   duration_minutes: integerSchema.refine((value) => value >= 1 && value <= 1440),
   price_irr: integerSchema.refine((value) => value >= 0),
   buffer_minutes: integerSchema.refine((value) => value >= 0 && value <= 1440),
@@ -42,6 +48,7 @@ export async function saveProviderServiceAction(
   const result = serviceFieldsSchema.safeParse({
     name: readString(formData, "name"),
     description: readString(formData, "description"),
+    category: readString(formData, "category"),
     duration_minutes: toAsciiDigits(readString(formData, "duration_minutes")),
     price_irr: toAsciiDigits(readString(formData, "price_irr")),
     buffer_minutes: toAsciiDigits(readString(formData, "buffer_minutes")),

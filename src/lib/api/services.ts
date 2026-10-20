@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 
 import { env } from "@/config/env";
 
-import { type DoctorCardView, type ProviderMeta, toDoctorCardView } from "./adapters/doctor-card";
+import { type ProviderCardView, type ProviderMeta, toProviderCardView } from "./adapters/provider-card";
 import { apiFetch } from "./client";
 import { ApiError } from "./problem";
 import { getMockProviderMeta } from "./mock/provider-meta";
@@ -22,18 +22,21 @@ export type ServiceDetail = {
 export async function getPublicServiceCards(
   cursor: number | undefined,
   limit: number,
-): Promise<CursorPage<DoctorCardView>> {
+  category?: string,
+): Promise<CursorPage<ProviderCardView>> {
   "use cache";
   cacheLife({ revalidate: PUBLIC_SERVICES_REVALIDATE_SECONDS });
   cacheTag("services");
 
-  const page = await apiFetch<ServicePage>("/api/v1/services", {
-    query: buildPageQuery(cursor, limit),
-  });
+  const query = buildPageQuery(cursor, limit);
+  if (category) {
+    query.set("category", category);
+  }
+  const page = await apiFetch<ServicePage>("/api/v1/services", { query });
 
   return {
     items: page.items.map((service) =>
-      toDoctorCardView(service, resolveProviderMeta(service.provider_id)),
+      toProviderCardView(service, resolveProviderMeta(service.provider_id)),
     ),
     nextCursor: page.next_cursor,
   };

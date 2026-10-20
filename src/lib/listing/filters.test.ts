@@ -1,13 +1,14 @@
 import { describe, expect, it } from "vitest";
 
-import type { DoctorCardView } from "@/lib/api/adapters/doctor-card";
+import type { ProviderCardView } from "@/lib/api/adapters/provider-card";
 
-import { buildListingHref, filterDoctorCards, matchesFilters, parseListingFilters } from "./filters";
+import { buildListingHref, filterProviderCards, matchesFilters, parseListingFilters } from "./filters";
 
-const card: DoctorCardView = {
+const card: ProviderCardView = {
   id: 1,
-  name: "دکتر سارا محمدی",
-  specialties: ["پوست و مو"],
+  name: "سالن زیبایی سارا",
+  category: "skin-care",
+  categoryLabel: "مراقبت پوست",
   city: "تهران",
   neighborhood: "میرداماد",
   avatarUrl: null,
@@ -18,14 +19,19 @@ const card: DoctorCardView = {
 
 describe("parseListingFilters", () => {
   it("keeps only known option values", () => {
-    const params = new URLSearchParams("specialty=dermatology&city=unknown&neighborhood=vanak");
+    const params = new URLSearchParams("category=skin-care&city=unknown&neighborhood=vanak");
 
     expect(parseListingFilters(params)).toEqual({
-      specialty: "dermatology",
+      category: "skin-care",
       city: undefined,
       neighborhood: "vanak",
       q: undefined,
     });
+  });
+
+  it("rejects former medical specialty values", () => {
+    expect(parseListingFilters(new URLSearchParams("category=dermatology")).category).toBeUndefined();
+    expect(parseListingFilters(new URLSearchParams("specialty=dermatology")).category).toBeUndefined();
   });
 
   it("trims and bounds the search query", () => {
@@ -40,9 +46,9 @@ describe("parseListingFilters", () => {
 });
 
 describe("matchesFilters", () => {
-  it("matches the specialty by its Persian label", () => {
-    expect(matchesFilters(card, { specialty: "dermatology" })).toBe(true);
-    expect(matchesFilters(card, { specialty: "cardiology" })).toBe(false);
+  it("matches the beauty category by its stable value", () => {
+    expect(matchesFilters(card, { category: "skin-care" })).toBe(true);
+    expect(matchesFilters(card, { category: "makeup" })).toBe(false);
   });
 
   it("matches city and neighborhood by their Persian labels", () => {
@@ -51,9 +57,9 @@ describe("matchesFilters", () => {
     expect(matchesFilters(card, { neighborhood: "vanak" })).toBe(false);
   });
 
-  it("matches the query against the name and specialties", () => {
+  it("matches the query against the name and category label", () => {
     expect(matchesFilters(card, { q: "سارا" })).toBe(true);
-    expect(matchesFilters(card, { q: "پوست" })).toBe(true);
+    expect(matchesFilters(card, { q: "مراقبت" })).toBe(true);
     expect(matchesFilters(card, { q: "ارتوپدی" })).toBe(false);
   });
 
@@ -62,11 +68,16 @@ describe("matchesFilters", () => {
   });
 });
 
-describe("filterDoctorCards", () => {
+describe("filterProviderCards", () => {
   it("keeps only cards that satisfy every filter", () => {
-    const other: DoctorCardView = { ...card, id: 2, specialties: ["ارتوپدی"] };
+    const other: ProviderCardView = {
+      ...card,
+      id: 2,
+      category: "nails",
+      categoryLabel: "ناخن",
+    };
 
-    expect(filterDoctorCards([card, other], { specialty: "orthopedics" })).toEqual([other]);
+    expect(filterProviderCards([card, other], { category: "nails" })).toEqual([other]);
   });
 });
 
@@ -78,14 +89,14 @@ describe("buildListingHref", () => {
   it("drops the cursor and applies changes", () => {
     const current = new URLSearchParams("city=tehran&cursor=50");
 
-    expect(buildListingHref(current, { specialty: "dermatology" })).toBe(
-      "/?city=tehran&specialty=dermatology",
+    expect(buildListingHref(current, { category: "skin-care" })).toBe(
+      "/?city=tehran&category=skin-care",
     );
   });
 
   it("removes a parameter when its value is null", () => {
-    const current = new URLSearchParams("specialty=dermatology&city=tehran");
+    const current = new URLSearchParams("category=skin-care&city=tehran");
 
-    expect(buildListingHref(current, { specialty: null })).toBe("/?city=tehran");
+    expect(buildListingHref(current, { category: null })).toBe("/?city=tehran");
   });
 });

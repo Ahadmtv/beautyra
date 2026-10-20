@@ -235,7 +235,7 @@ export interface paths {
         };
         /**
          * فهرست خدمات فعال و تأییدشده
-         * @description فهرست عمومی خدمات فعال متعلق به نمایه‌های فعال و تأییدشده را با صفحه‌بندی cursor-based برمی‌گرداند.
+         * @description فهرست عمومی خدمات زیبایی فعال متعلق به نمایه‌های فعال و تأییدشده را با صفحه‌بندی cursor-based برمی‌گرداند. با پارامتر `category` می‌توان نتیجه را به یک دسته‌بندی خدمت زیبایی محدود کرد.
          */
         get: {
             parameters: {
@@ -244,6 +244,8 @@ export interface paths {
                     cursor?: components["parameters"]["Cursor"];
                     /** @description تعداد رکورد صفحه، پیش‌فرض 50 و حداکثر 100 */
                     limit?: components["parameters"]["Limit"];
+                    /** @description دسته‌بندی خدمت زیبایی؛ مقدار نامعتبر با خطای ۴۰۰ رد می‌شود. */
+                    category?: components["schemas"]["ServiceCategory"];
                 };
                 header?: never;
                 path?: never;
@@ -2007,6 +2009,11 @@ export interface components {
             time_zone: string;
             is_active: boolean;
         };
+        /**
+         * @description دسته‌بندی خدمات زیبایی و مراقبت شخصی. مقدار `other` برای خدمات بازبینی‌نشده یا قدیمی نگه داشته می‌شود و نباید به‌عنوان یک دسته‌بندی تبلیغاتی جدید استفاده شود.
+         * @enum {string}
+         */
+        ServiceCategory: "haircut" | "hair-color" | "hair-care" | "makeup" | "eyebrow-lash" | "nails" | "skin-care" | "waxing" | "massage" | "spa" | "bridal" | "barbering" | "other";
         Service: {
             /** Format: int64 */
             id: number;
@@ -2014,6 +2021,7 @@ export interface components {
             provider_id: number;
             name: string;
             description: string;
+            category: components["schemas"]["ServiceCategory"];
             duration_minutes: number;
             /**
              * Format: int64
@@ -2026,6 +2034,8 @@ export interface components {
         ServiceInput: {
             name: string;
             description?: string;
+            /** @description در صورت ارسال‌نشدن، خدمت با دسته‌بندی `other` ثبت می‌شود. */
+            category?: components["schemas"]["ServiceCategory"];
             duration_minutes: number;
             /** Format: int64 */
             price_irr: number;
@@ -2037,6 +2047,7 @@ export interface components {
         ServicePatch: {
             name?: string;
             description?: string;
+            category?: components["schemas"]["ServiceCategory"];
             duration_minutes?: number;
             /** Format: int64 */
             price_irr?: number;

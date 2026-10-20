@@ -1,6 +1,6 @@
 # Beautyra
 
-Persian RTL appointment-booking frontend built with Next.js App Router, TypeScript, and Tailwind CSS. All backend requests run on the server; the session JWT is stored in an httpOnly cookie and is never passed to browser JavaScript.
+Persian RTL beauty and personal-care appointment-booking frontend built with Next.js App Router, TypeScript, and Tailwind CSS. All backend requests run on the server; the session JWT is stored in an httpOnly cookie and is never passed to browser JavaScript.
 
 ## Setup
 
@@ -68,8 +68,8 @@ The frontend does not invent missing endpoints. Tracked contract gaps in `docs/b
 
 1. Authentication, refresh/logout, and documented JWT claims.
 2. Public provider list/profile and verified provider details.
-3. Provider card data (name, specialty, location, photo, rating, reviews) and image upload.
-4. Server-side search/filtering plus city and specialty taxonomies.
+3. Provider card data (name, location, photo, rating, reviews) and image upload.
+4. Server-side city, neighborhood, and search filtering plus city/neighborhood taxonomies; service categories are already supported by the API.
 5. A documented payment-provider callback/return agreement.
 6. Admin provider listing; verification is currently ID-driven.
 7. A documented problem-code catalog.

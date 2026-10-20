@@ -14,7 +14,7 @@ export function buildServiceJsonLd(input: ServiceJsonLdInput): Record<string, un
     description: input.description,
     url: input.url,
     ...(input.providerName
-      ? { provider: { "@type": "Physician", name: input.providerName } }
+      ? { provider: { "@type": "BeautySalon", name: input.providerName } }
       : {}),
     offers: {
       "@type": "Offer",

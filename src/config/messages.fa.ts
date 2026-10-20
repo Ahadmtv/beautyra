@@ -1,12 +1,12 @@
 export const messages = {
-  "meta.title": "بیوتیرا | رزرو نوبت خدمات",
-  "meta.description": "رزرو آنلاین نوبت خدمات نزد ارائه‌دهندگان تأییدشده",
+  "meta.title": "بیوتیرا | رزرو آنلاین خدمات زیبایی",
+  "meta.description": "رزرو آنلاین کوتاهی مو، رنگ، ناخن، میکاپ و خدمات زیبایی نزد سالن‌ها و ارائه‌دهندگان تأییدشده",
   "brand.name": "بیوتیرا",
   "brand.suffix": "نوبت‌دهی",
   "header.login": "ورود",
   "footer.copyright": "تمام حقوق این سامانه محفوظ است.",
-  "home.title": "خدمات و ارائه‌دهندگان",
-  "home.specialties": "تخصص‌ها",
+  "home.title": "خدمات زیبایی و ارائه‌دهندگان",
+  "home.categories": "دسته‌بندی خدمات",
   "home.empty": "نتیجه‌ای یافت نشد",
   "home.loadError": "فهرست خدمات در حال حاضر در دسترس نیست. لطفاً دوباره تلاش کنید.",
   "error.title": "خطا در بارگذاری صفحه",
@@ -169,6 +169,9 @@ export const messages = {
   "provider.services.edit": "ویرایش خدمت",
   "provider.services.name": "نام خدمت",
   "provider.services.description": "توضیحات خدمت",
+  "provider.services.category": "دسته‌بندی خدمت",
+  "provider.services.categoryPlaceholder": "یک دسته‌بندی انتخاب کنید",
+  "provider.services.categoryError": "دسته‌بندی خدمت را انتخاب کنید.",
   "provider.services.duration": "مدت خدمت به دقیقه",
   "provider.services.price": "مبلغ به ریال",
   "provider.services.buffer": "فاصله پس از خدمت به دقیقه",
@@ -395,34 +398,38 @@ export const messages = {
   "admin.payouts.status.paid": "پرداخت‌شده",
   "admin.payouts.status.rejected": "ردشده",
   "admin.payouts.status.failed": "ناموفق",
-  "seo.title": "بیوتیرا | رزرو نوبت خدمات",
-  "seo.description": "ارائه‌دهنده خدمات موردنظر را پیدا کنید و نوبت خود را آنلاین رزرو کنید.",
+  "seo.title": "بیوتیرا | رزرو آنلاین خدمات زیبایی",
+  "seo.description": "کوتاهی مو، رنگ و مش، ناخن، میکاپ، ابرو و مژه و خدمات مراقبت شخصی را از سالن‌ها و ارائه‌دهندگان تأییدشده پیدا کنید و آنلاین نوبت بگیرید.",
 } as const;
 
-// TODO(backend): replace with specialty taxonomy from the API once it exists (docs/backend-gaps.md, item 4).
-export const SPECIALTY_OPTIONS = [
-  { value: "obstetrics-gynecology", label: "زنان و زایمان" },
-  { value: "orthopedics", label: "ارتوپدی" },
-  { value: "ent", label: "گوش حلق و بینی" },
-  { value: "dermatology", label: "پوست و مو" },
-  { value: "neurology", label: "مغز و اعصاب" },
-  { value: "urology", label: "کلیه و مجاری ادراری (اورولوژی)" },
-  { value: "nephrology", label: "کلیه و فشار خون (نفرولوژیست)" },
-  { value: "gastroenterology", label: "گوارش" },
-  { value: "hepatology-endoscopy", label: "کبد و آندوسکوپی" },
-  { value: "ophthalmology", label: "چشم پزشکی" },
-  { value: "endocrinology", label: "غدد، رشد و متابولیسم" },
-  { value: "dentistry", label: "دندان پزشکی" },
-  { value: "cardiology", label: "قلب و عروق" },
-  { value: "general-surgery", label: "جراحی عمومی" },
-  { value: "internal-medicine", label: "داخلی" },
-  { value: "pediatrics", label: "کودکان و نوزادان (اطفال)" },
-  { value: "radiology", label: "رادیولوژی و سونوگرافی" },
-  { value: "psychiatry-psychology", label: "روانپزشکی و روانشناسی" },
-  { value: "pulmonology", label: "ریه و دستگاه تنفسی" },
-  { value: "rheumatology", label: "روماتولوژی" },
-  { value: "hematology-oncology", label: "خون و سرطان" },
+// Values must stay aligned with ServiceCategory in api/openapi.yaml and
+// internal/catalog/services.go. "other" is reserved for legacy or unreviewed
+// services and is not shown in public category navigation.
+export const SERVICE_CATEGORY_OPTIONS = [
+  { value: "haircut", label: "کوتاهی مو" },
+  { value: "hair-color", label: "رنگ و مش" },
+  { value: "hair-care", label: "مراقبت و احیای مو" },
+  { value: "makeup", label: "میکاپ" },
+  { value: "eyebrow-lash", label: "ابرو و مژه" },
+  { value: "nails", label: "ناخن" },
+  { value: "skin-care", label: "مراقبت پوست" },
+  { value: "waxing", label: "اپیلاسیون و وکس" },
+  { value: "massage", label: "ماساژ" },
+  { value: "spa", label: "اسپا" },
+  { value: "bridal", label: "آرایش عروس" },
+  { value: "barbering", label: "آرایش و اصلاح مردانه" },
+  { value: "other", label: "سایر خدمات" },
 ] as const;
+
+export type ServiceCategory = (typeof SERVICE_CATEGORY_OPTIONS)[number]["value"];
+
+export function isServiceCategory(value: string): value is ServiceCategory {
+  return SERVICE_CATEGORY_OPTIONS.some((option) => option.value === value);
+}
+
+export function serviceCategoryLabel(value: string): string {
+  return SERVICE_CATEGORY_OPTIONS.find((option) => option.value === value)?.label ?? value;
+}
 
 export const JALALI_MONTH_NAMES = [
   "فروردین",

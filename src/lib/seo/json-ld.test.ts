@@ -6,14 +6,14 @@ describe("buildServiceJsonLd", () => {
   it("includes the provider only when its name is known", () => {
     const base = {
       url: "https://example.com/services/1",
-      name: "ویزیت",
+      name: "کوتاهی مو",
       description: "",
       priceIrr: 500_000,
     };
 
-    expect(buildServiceJsonLd({ ...base, providerName: "دکتر نمونه" })).toMatchObject({
+    expect(buildServiceJsonLd({ ...base, providerName: "سالن زیبایی نمونه" })).toMatchObject({
       "@type": "Service",
-      provider: { "@type": "Physician", name: "دکتر نمونه" },
+      provider: { "@type": "BeautySalon", name: "سالن زیبایی نمونه" },
       offers: { price: 500_000, priceCurrency: "IRR" },
     });
     expect(buildServiceJsonLd({ ...base, providerName: null })).not.toHaveProperty("provider");

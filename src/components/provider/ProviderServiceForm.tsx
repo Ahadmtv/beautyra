@@ -4,8 +4,9 @@ import { useActionState, useState } from "react";
 
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
-import { t } from "@/config/messages.fa";
+import { SERVICE_CATEGORY_OPTIONS, t } from "@/config/messages.fa";
 import type { Service } from "@/lib/api/types";
 import { numberFormatFa, toAsciiDigits } from "@/lib/format/digits";
 import {
@@ -63,6 +64,15 @@ export function ProviderServiceForm({ service, submitLabel }: ProviderServiceFor
         defaultValue={service?.name ?? ""}
         minLength={1}
         maxLength={160}
+        required
+      />
+      <Select
+        id={`service-category-${service?.id ?? "new"}`}
+        name="category"
+        label={t("provider.services.category")}
+        options={SERVICE_CATEGORY_OPTIONS}
+        placeholder={t("provider.services.categoryPlaceholder")}
+        defaultValue={service?.category ?? ""}
         required
       />
       <Textarea

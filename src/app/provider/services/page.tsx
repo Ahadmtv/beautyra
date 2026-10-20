@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { ProviderServiceActions } from "@/components/provider/ProviderServiceActions";
 import { ProviderServiceForm } from "@/components/provider/ProviderServiceForm";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { t } from "@/config/messages.fa";
+import { serviceCategoryLabel, t } from "@/config/messages.fa";
 import { getProviderServices } from "@/lib/api/provider";
 import type { ServicePage } from "@/lib/api/types";
 import { redirectOnUnauthorized } from "@/lib/auth/session";
@@ -49,10 +49,11 @@ export default async function ProviderServicesPage({ searchParams }: ProviderSer
           <EmptyState title={t("provider.services.empty")} />
         ) : (
           <div className="overflow-x-auto rounded-md border border-border">
-            <table className="w-full min-w-[760px] border-collapse bg-white text-start text-sm">
+            <table className="w-full min-w-[880px] border-collapse bg-white text-start text-sm">
               <thead className="bg-surface text-text-muted">
                 <tr>
                   <th scope="col" className="p-3 font-medium">{t("provider.services.name")}</th>
+                  <th scope="col" className="p-3 font-medium">{t("provider.services.category")}</th>
                   <th scope="col" className="p-3 font-medium">{t("provider.services.duration")}</th>
                   <th scope="col" className="p-3 font-medium">{t("provider.services.price")}</th>
                   <th scope="col" className="p-3 font-medium">{t("provider.services.status.active")}</th>
@@ -63,6 +64,7 @@ export default async function ProviderServicesPage({ searchParams }: ProviderSer
                 {page.items.map((service) => (
                   <tr key={service.id}>
                     <td className="p-3 font-medium text-text">{service.name}</td>
+                    <td className="p-3">{serviceCategoryLabel(service.category)}</td>
                     <td className="p-3">{numberFormatFa(service.duration_minutes)}</td>
                     <td className="p-3">{formatTomanFromRial(service.price_irr)}</td>
                     <td className="p-3">{t(service.is_active ? "provider.services.status.active" : "provider.services.status.inactive")}</td>

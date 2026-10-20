@@ -5,7 +5,7 @@ import { ProviderAvatar } from "@/components/listing/ProviderAvatar";
 import { Badge } from "@/components/ui/Badge";
 import { Rating } from "@/components/ui/Rating";
 import { env } from "@/config/env";
-import { messages, t } from "@/config/messages.fa";
+import { messages, serviceCategoryLabel, t } from "@/config/messages.fa";
 import { DEFAULT_PAGE_LIMIT } from "@/lib/api/pagination";
 import { getPublicServiceCards, loadPublicServiceDetailOrNotFound } from "@/lib/api/services";
 import { formatTomanFromRial } from "@/lib/format/money";
@@ -90,15 +90,6 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
                   <h1 className="min-w-0 text-xl font-bold text-text">{profileName}</h1>
                   <Badge tone="verified">{t("badge.verified")}</Badge>
                 </div>
-                {provider && provider.specialties.length > 0 && (
-                  <ul className="flex flex-col gap-1.5">
-                    {provider.specialties.map((specialty) => (
-                      <li key={specialty} className="truncate rounded-sm bg-surface px-2 py-1 text-xs text-text">
-                        {specialty}
-                      </li>
-                    ))}
-                  </ul>
-                )}
                 {provider && (
                   <div className="mt-auto flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-sm text-text-muted">
                     <span>{provider.neighborhood}</span>
@@ -112,9 +103,14 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
               aria-labelledby="service-heading"
               className="flex flex-col gap-4 rounded-md border border-border bg-white p-4 md:p-6"
             >
-              <h2 id="service-heading" className="text-lg font-bold text-text">
-                {service.name}
-              </h2>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="rounded-sm bg-surface px-2 py-1 text-xs text-text">
+                  {serviceCategoryLabel(service.category)}
+                </span>
+                <h2 id="service-heading" className="text-lg font-bold text-text">
+                  {service.name}
+                </h2>
+              </div>
               {service.description && (
                 <p className="leading-7 whitespace-pre-line text-text">{service.description}</p>
               )}

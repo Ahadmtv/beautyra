@@ -1,11 +1,11 @@
 import { CITY_OPTIONS, NEIGHBORHOOD_OPTIONS } from "@/config/filter-options";
-import { SPECIALTY_OPTIONS } from "@/config/messages.fa";
-import type { DoctorCardView } from "@/lib/api/adapters/doctor-card";
+import { SERVICE_CATEGORY_OPTIONS } from "@/config/messages.fa";
+import type { ProviderCardView } from "@/lib/api/adapters/provider-card";
 
 type Option = { readonly value: string; readonly label: string };
 
 export type ListingFilters = {
-  specialty?: string;
+  category?: string;
   city?: string;
   neighborhood?: string;
   q?: string;
@@ -23,15 +23,15 @@ function labelFor(options: readonly Option[], value: string): string {
 
 export function parseListingFilters(params: URLSearchParams): ListingFilters {
   return {
-    specialty: knownValue(SPECIALTY_OPTIONS, params.get("specialty")),
+    category: knownValue(SERVICE_CATEGORY_OPTIONS, params.get("category")),
     city: knownValue(CITY_OPTIONS, params.get("city")),
     neighborhood: knownValue(NEIGHBORHOOD_OPTIONS, params.get("neighborhood")),
     q: params.get("q")?.trim().slice(0, MAX_QUERY_LENGTH) || undefined,
   };
 }
 
-export function matchesFilters(card: DoctorCardView, filters: ListingFilters): boolean {
-  if (filters.specialty && !card.specialties.includes(labelFor(SPECIALTY_OPTIONS, filters.specialty))) {
+export function matchesFilters(card: ProviderCardView, filters: ListingFilters): boolean {
+  if (filters.category && card.category !== filters.category) {
     return false;
   }
   if (filters.city && card.city !== labelFor(CITY_OPTIONS, filters.city)) {
@@ -41,7 +41,7 @@ export function matchesFilters(card: DoctorCardView, filters: ListingFilters): b
     return false;
   }
   if (filters.q) {
-    const haystack = [card.name, ...card.specialties].join(" ").toLocaleLowerCase("fa-IR");
+    const haystack = [card.name, card.categoryLabel].join(" ").toLocaleLowerCase("fa-IR");
     if (!haystack.includes(filters.q.toLocaleLowerCase("fa-IR"))) {
       return false;
     }
@@ -49,10 +49,10 @@ export function matchesFilters(card: DoctorCardView, filters: ListingFilters): b
   return true;
 }
 
-export function filterDoctorCards(
-  cards: readonly DoctorCardView[],
+export function filterProviderCards(
+  cards: readonly ProviderCardView[],
   filters: ListingFilters,
-): DoctorCardView[] {
+): ProviderCardView[] {
   return cards.filter((card) => matchesFilters(card, filters));
 }
 

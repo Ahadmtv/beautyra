@@ -1,13 +1,13 @@
 import Link from "next/link";
 
 import { t } from "@/config/messages.fa";
-import type { DoctorCardView } from "@/lib/api/adapters/doctor-card";
+import type { ProviderCardView } from "@/lib/api/adapters/provider-card";
 import { Badge } from "@/components/ui/Badge";
 import { Rating } from "@/components/ui/Rating";
 
 import { ProviderAvatar } from "./ProviderAvatar";
 
-export function DoctorCard({ card }: { card: DoctorCardView }) {
+export function ProviderCard({ card }: { card: ProviderCardView }) {
   return (
     <Link
       href={`/services/${card.id}`}
@@ -19,13 +19,11 @@ export function DoctorCard({ card }: { card: DoctorCardView }) {
           <h3 className="min-w-0 truncate font-bold text-text">{card.name}</h3>
           {card.verified && <Badge tone="verified">{t("badge.verified")}</Badge>}
         </div>
-        {card.specialties.length > 0 && (
+        {card.categoryLabel && (
           <ul className="flex flex-col gap-1.5">
-            {card.specialties.slice(0, 2).map((specialty) => (
-              <li key={specialty} className="truncate rounded-sm bg-surface px-2 py-1 text-xs text-text">
-                {specialty}
-              </li>
-            ))}
+            <li className="truncate rounded-sm bg-surface px-2 py-1 text-xs text-text">
+              {card.categoryLabel}
+            </li>
           </ul>
         )}
         <div className="mt-auto flex flex-wrap items-center justify-between gap-x-3 gap-y-1 pt-1 text-sm text-text-muted">

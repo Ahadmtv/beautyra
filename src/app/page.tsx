@@ -3,10 +3,10 @@ import { Suspense, type ReactNode } from "react";
 import type { Metadata } from "next";
 
 import { FilterBar } from "@/components/layout/FilterBar";
-import { MobileSpecialtyDrawer } from "@/components/listing/MobileSpecialtyDrawer";
+import { CategoryNav } from "@/components/listing/CategoryNav";
+import { MobileCategoryDrawer } from "@/components/listing/MobileCategoryDrawer";
 import { ServiceCardsSkeleton } from "@/components/listing/ServiceCardsSkeleton";
 import { ServiceListing } from "@/components/listing/ServiceListing";
-import { SpecialtyNav } from "@/components/listing/SpecialtyNav";
 import { t } from "@/config/messages.fa";
 import { searchParamsFromRecord } from "@/lib/api/pagination";
 import { parseListingFilters } from "@/lib/listing/filters";
@@ -48,7 +48,7 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
 
 function HomeLayout({ params, listing }: { params: URLSearchParams; listing: ReactNode }) {
   const filters = parseListingFilters(params);
-  const specialtyNav = <SpecialtyNav params={params} />;
+  const categoryNav = <CategoryNav params={params} />;
 
   return (
     <>
@@ -57,10 +57,10 @@ function HomeLayout({ params, listing }: { params: URLSearchParams; listing: Rea
         <h1 className="sr-only">{t("home.title")}</h1>
         <div className="flex flex-col gap-6 md:grid md:grid-cols-[14rem_1fr] md:gap-8">
           <aside className="flex flex-col gap-4">
-            <MobileSpecialtyDrawer>{specialtyNav}</MobileSpecialtyDrawer>
+            <MobileCategoryDrawer>{categoryNav}</MobileCategoryDrawer>
             <div className="hidden md:block">
-              <h2 className="mb-3 text-base font-semibold text-text">{t("home.specialties")}</h2>
-              {specialtyNav}
+              <h2 className="mb-3 text-base font-semibold text-text">{t("home.categories")}</h2>
+              {categoryNav}
             </div>
           </aside>
           <section aria-label={t("home.title")} className="min-w-0">

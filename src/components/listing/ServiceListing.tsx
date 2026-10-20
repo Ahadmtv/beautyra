@@ -3,14 +3,16 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { LoadMoreLink } from "@/components/ui/LoadMoreLink";
 import { getPublicServiceCards } from "@/lib/api/services";
 import { DEFAULT_PAGE_LIMIT, nextPageHref, parseCursor } from "@/lib/api/pagination";
-import { filterDoctorCards, parseListingFilters } from "@/lib/listing/filters";
+import { filterProviderCards, parseListingFilters } from "@/lib/listing/filters";
 
-import { DoctorCard } from "./DoctorCard";
+import { ProviderCard } from "./ProviderCard";
 
 export async function ServiceListing({ params }: { params: URLSearchParams }) {
-  const page = await getPublicServiceCards(parseCursor(params), DEFAULT_PAGE_LIMIT);
-  // TODO(backend): filter on the server once the services endpoint accepts filters (docs/backend-gaps.md, item 4).
-  const cards = filterDoctorCards(page.items, parseListingFilters(params));
+  const filters = parseListingFilters(params);
+  const page = await getPublicServiceCards(parseCursor(params), DEFAULT_PAGE_LIMIT, filters.category);
+  // The API filters by category. City, neighborhood, and free-text search still
+  // apply to the fetched page until the remaining filters are supported.
+  const cards = filterProviderCards(page.items, filters);
   const nextHref = nextPageHref("/", params, page.nextCursor);
 
   return (
@@ -21,7 +23,7 @@ export async function ServiceListing({ params }: { params: URLSearchParams }) {
         <ul className="grid gap-4 sm:grid-cols-2">
           {cards.map((card) => (
             <li key={card.id}>
-              <DoctorCard card={card} />
+              <ProviderCard card={card} />
             </li>
           ))}
         </ul>
