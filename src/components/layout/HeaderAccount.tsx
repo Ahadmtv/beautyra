@@ -44,6 +44,12 @@ export async function HeaderAccount() {
       </summary>
       <div className="absolute end-0 top-full z-10 mt-2 flex w-48 flex-col gap-2 rounded-md border border-border bg-white p-3 text-text shadow-sm">
         <p className="text-sm text-text-muted">{t(roleLabelKeys[session.role])}</p>
+        <Link
+          href="/account"
+          className="rounded-sm px-2 py-2 text-sm hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+        >
+          {t("auth.account.open")}
+        </Link>
         {session.role === "client" && (
           <Link
             href="/dashboard/bookings"

@@ -12,7 +12,7 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Set `API_BASE_URL` and `SITE_URL` to the deployment's backend and frontend origins. `AUTH_PROVIDER=real` is the default and authenticates against `POST /api/v1/auth/login` with email and password. Access and refresh tokens are stored in separate httpOnly cookies; `/auth/refresh` rotates the refresh token before redirecting back to the protected page. `AUTH_PROVIDER=mock` remains available for UI-only development, but its unsigned tokens are rejected by the backend, so protected API calls require `real`. Do not use mock authentication in production. `USE_MOCK_META=true` enables placeholder provider card details until the API exposes those fields.
+Set `API_BASE_URL` and `SITE_URL` to the deployment's backend and frontend origins. `AUTH_PROVIDER=real` is the default: registration uses `POST /api/v1/auth/register` (which creates a `client` account and then redirects to login), and login uses `POST /api/v1/auth/login` with email and password. Access and refresh tokens are stored in separate httpOnly cookies; `/auth/refresh` rotates the refresh token before redirecting back to the protected page. `/account` reads the authenticated profile from `GET /api/v1/me`. `AUTH_PROVIDER=mock` remains available for UI-only development, but its unsigned tokens are rejected by the backend, so protected API calls require `real`. Do not use mock authentication in production. `USE_MOCK_META=true` enables placeholder provider card details until the API exposes those fields.
 
 ## Commands
 

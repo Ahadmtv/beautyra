@@ -5,13 +5,16 @@ import { z } from "zod";
 
 import { env } from "@/config/env";
 import { t } from "@/config/messages.fa";
+import { registerUser } from "@/lib/api/auth";
 import { ApiError } from "@/lib/api/problem";
 import { toAsciiDigits } from "@/lib/format/digits";
 
+import { loginErrorState } from "./login-errors";
 import { getAuthProvider } from "./provider";
 import { sanitizeNextPath } from "./redirect";
+import { parseRegisterForm, registerErrorState, type RegisterState } from "./register";
 import { clearSessionCookies, getRefreshToken, setSessionCookies } from "./session";
-import { InvalidCredentialsError, type LoginInput } from "./types";
+import type { LoginInput } from "./types";
 
 export type LoginState = {
   errors?: {
@@ -83,17 +86,35 @@ export async function loginAction(_previous: LoginState, formData: FormData): Pr
   try {
     result = await getAuthProvider().login(parsed.input);
   } catch (error) {
-    if (error instanceof InvalidCredentialsError) {
-      return { errors: { form: t("auth.invalidCredentials") } };
-    }
-    if (error instanceof ApiError && (error.status === 400 || error.status === 401)) {
-      return { errors: { form: t("auth.invalidCredentials") } };
-    }
-    throw error;
+    return loginErrorState(error);
   }
 
   await setSessionCookies(result);
   redirect(sanitizeNextPath(readField(formData, "next")));
+}
+
+export async function registerAction(
+  _previous: RegisterState,
+  formData: FormData,
+): Promise<RegisterState> {
+  const parsed = parseRegisterForm(formData);
+  if ("errors" in parsed) {
+    return { errors: parsed.errors };
+  }
+
+  try {
+    await registerUser(parsed.input);
+  } catch (error) {
+    if (error instanceof ApiError) {
+      return registerErrorState(error);
+    }
+    return { errors: { form: t("auth.register.invalid") } };
+  }
+
+  const next = sanitizeNextPath(readField(formData, "next"));
+  const query = new URLSearchParams({ registered: "1" });
+  if (next !== "/") query.set("next", next);
+  redirect(`/login?${query.toString()}`);
 }
 
 export async function logoutAction(): Promise<void> {

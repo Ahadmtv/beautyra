@@ -12,6 +12,9 @@
 | `/provider/*` | Dynamic | Provider-only data authorized by the session cookie. |
 | `/admin/*` | Dynamic | Admin-only data and actions; must never be cached. |
 | `/login` | Dynamic | Depends on request state (redirect targets, errors); no caching of auth pages. |
+| `/register` | Dynamic | Reads `next`, checks the current session, and never caches an authentication form. |
+| `/account` | Dynamic | Reads the session and the current user from `GET /api/v1/me`; never cached. |
+| `/forbidden` | Static | Shows the role-authorization error page. |
 | `/auth/refresh` | Dynamic | Reads the httpOnly refresh cookie and rotates it; must never be cached. |
 | `/auth/expired` | Dynamic | Clears session cookies and redirects with the requested `next` path. |
 | `/api/health` | Dynamic | Liveness check should reflect the running server, not a build-time snapshot. |

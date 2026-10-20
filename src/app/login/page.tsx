@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 
@@ -14,7 +15,7 @@ export const metadata: Metadata = {
 };
 
 type LoginPageProps = {
-  searchParams: Promise<{ next?: string; expired?: string }>;
+  searchParams: Promise<{ next?: string; expired?: string; registered?: string }>;
 };
 
 export default function LoginPage(props: LoginPageProps) {
@@ -26,7 +27,7 @@ export default function LoginPage(props: LoginPageProps) {
 }
 
 async function LoginPageContent({ searchParams }: LoginPageProps) {
-  const { next, expired } = await searchParams;
+  const { next, expired, registered } = await searchParams;
   const nextPath = sanitizeNextPath(next);
 
   if (await getSession()) {
@@ -44,6 +45,12 @@ async function LoginPageContent({ searchParams }: LoginPageProps) {
           </p>
         )}
 
+        {registered === "1" && (
+          <p role="status" className="rounded-md bg-primary-soft p-3 text-sm text-text">
+            {t("auth.register.success")}
+          </p>
+        )}
+
         {env.AUTH_PROVIDER === "mock" && (
           <p className="rounded-md border border-border p-3 text-sm text-text-muted">
             {t("auth.mockHint")}
@@ -51,6 +58,17 @@ async function LoginPageContent({ searchParams }: LoginPageProps) {
         )}
 
         <LoginForm next={nextPath} mode={env.AUTH_PROVIDER} />
+
+        {env.AUTH_PROVIDER === "real" && (
+          <Link
+            href={
+              nextPath === "/" ? "/register" : `/register?next=${encodeURIComponent(nextPath)}`
+            }
+            className="text-center text-sm font-medium text-primary hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          >
+            {t("auth.register.link")}
+          </Link>
+        )}
       </div>
     </main>
   );
