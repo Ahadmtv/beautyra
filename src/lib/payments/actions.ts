@@ -9,6 +9,7 @@ import { createZarinpalPayment } from "@/lib/api/payments";
 import { ApiError, problemMessage } from "@/lib/api/problem";
 import { requireRole, redirectOnUnauthorized } from "@/lib/auth/session";
 import { toAsciiDigits } from "@/lib/format/digits";
+import { startBookingPayment } from "./booking";
 import { PAYMENT_ID_COOKIE, PAYMENT_RETURN_COOKIE } from "./constants";
 import { resolvePaymentReturnPath } from "./navigation";
 import { resolvePaymentStart } from "./start-result";
@@ -20,6 +21,37 @@ export type TopUpState =
   | { kind: "error"; message: string }
   | { kind: "uncertain"; paymentId: number }
   | { kind: "redirectMissing"; paymentId: number };
+
+export type BookingPaymentState =
+  | { kind: "idle" }
+  | { kind: "error"; message: string };
+
+const bookingPaymentInputSchema = z.object({
+  booking_id: z.coerce.number().int().positive(),
+  idempotency_key: z.string().min(1).max(128),
+});
+
+export async function retryBookingPaymentAction(
+  _previous: BookingPaymentState,
+  formData: FormData,
+): Promise<BookingPaymentState> {
+  await requireRole("client");
+  const parsed = bookingPaymentInputSchema.safeParse({
+    booking_id: formData.get("booking_id"),
+    idempotency_key: formData.get("idempotency_key"),
+  });
+  if (!parsed.success) {
+    return { kind: "error", message: t("api.error.generic") };
+  }
+  const result = await startBookingPayment(parsed.data.booking_id, parsed.data.idempotency_key);
+  if (result.kind === "error") {
+    return result;
+  }
+  if (result.outcome.kind === "redirect") {
+    redirect(result.outcome.url);
+  }
+  redirect("/wallet/payment/result");
+}
 
 export async function createTopUpAction(
   _previous: TopUpState,

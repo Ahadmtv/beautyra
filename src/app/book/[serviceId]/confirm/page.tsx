@@ -8,15 +8,13 @@ import { t } from "@/config/messages.fa";
 import { getProviderAvailability } from "@/lib/api/availability";
 import { ApiError } from "@/lib/api/problem";
 import { loadPublicServiceDetailOrNotFound } from "@/lib/api/services";
-import type { AvailabilityResponse, WalletBalance } from "@/lib/api/types";
-import { getWalletBalance } from "@/lib/api/wallet";
+import type { AvailabilityResponse } from "@/lib/api/types";
 import { ROLES } from "@/lib/auth/claims";
-import { redirectOnUnauthorized, requireRole } from "@/lib/auth/session";
+import { requireRole } from "@/lib/auth/session";
 import { formatSlotTime, isIsoDate } from "@/lib/booking/dates";
 import { numberFormatFa } from "@/lib/format/digits";
 import { formatTomanFromRial } from "@/lib/format/money";
 import { describeJalaliDate } from "@/lib/jalali/labels";
-import { walletChargeHref } from "@/lib/payments/navigation";
 
 type ConfirmPageProps = {
   params: Promise<{ serviceId: string }>;
@@ -43,7 +41,6 @@ export default async function BookingConfirmPage({ params, searchParams }: Confi
   }
 
   const availability = await loadAvailabilityOrNotFound(service.provider_id, service.id, date);
-  const wallet = await loadWalletOrRedirect();
   const slot = availability.slots.find((item) => item.start_at === startAt);
 
   return (
@@ -96,8 +93,6 @@ export default async function BookingConfirmPage({ params, searchParams }: Confi
             priceIrr={service.price_irr}
             availability={availability}
             startAt={slot.start_at}
-            wallet={wallet}
-            returnPath={`/book/${service.id}/confirm?date=${availability.date}&start_at=${encodeURIComponent(slot.start_at)}`}
           />
         )}
       </section>
@@ -113,8 +108,6 @@ type ConfirmationDetailsProps = {
   priceIrr: number;
   availability: AvailabilityResponse;
   startAt: string;
-  wallet: WalletBalance;
-  returnPath: string;
 };
 
 function ConfirmationDetails({
@@ -125,13 +118,10 @@ function ConfirmationDetails({
   priceIrr,
   availability,
   startAt,
-  wallet,
-  returnPath,
 }: ConfirmationDetailsProps) {
   const jalaliDate = describeJalaliDate(availability.date);
   const time = formatSlotTime(startAt, availability.time_zone);
   const priceLabel = priceIrr === 0 ? t("service.free") : formatTomanFromRial(priceIrr);
-  const hasEnoughBalance = wallet.available_irr >= priceIrr;
 
   return (
     <>
@@ -163,30 +153,15 @@ function ConfirmationDetails({
           <dt className="text-text-muted">{t("service.price")}</dt>
           <dd className="font-medium text-text">{priceLabel}</dd>
         </div>
-        <div className="flex flex-col gap-1">
-          <dt className="text-text-muted">{t("booking.confirm.walletLabel")}</dt>
-          <dd className="font-medium text-text">{formatTomanFromRial(wallet.available_irr)}</dd>
-        </div>
       </dl>
 
-      {hasEnoughBalance ? (
-        <BookingConfirmForm
-          serviceId={serviceId}
-          date={availability.date}
-          startAt={startAt}
-          idempotencyKey={randomUUID()}
-        />
-      ) : (
-        <div className="flex flex-col items-start gap-3 rounded-md bg-surface p-4 text-sm text-text">
-          <p>{t("booking.error.insufficientBalance")}</p>
-          <Link
-            href={walletChargeHref(returnPath)}
-            className="inline-flex h-10 items-center rounded-md bg-primary px-4 text-sm font-medium text-white hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-          >
-            {t("booking.confirm.charge")}
-          </Link>
-        </div>
-      )}
+      <BookingConfirmForm
+        serviceId={serviceId}
+        date={availability.date}
+        startAt={startAt}
+        idempotencyKey={randomUUID()}
+        paymentIdempotencyKey={randomUUID()}
+      />
     </>
   );
 }
@@ -202,15 +177,6 @@ async function loadAvailabilityOrNotFound(
     if (error instanceof ApiError && error.status === 404) {
       notFound();
     }
-    throw error;
-  }
-}
-
-async function loadWalletOrRedirect(): Promise<WalletBalance> {
-  try {
-    return await getWalletBalance();
-  } catch (error) {
-    redirectOnUnauthorized(error);
     throw error;
   }
 }

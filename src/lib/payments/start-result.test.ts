@@ -8,6 +8,7 @@ const response: PaymentCreateResponse = {
   payment: {
     id: 7,
     amount_irr: 10_000,
+    purpose: "wallet_topup",
     status: "pending",
     created_at: "2026-10-20T10:00:00Z",
     updated_at: "2026-10-20T10:00:00Z",

@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { randomUUID } from "node:crypto";
 import { notFound } from "next/navigation";
 
 import { BookingCompletionActions } from "@/components/dashboard/BookingCompletionActions";
+import { BookingPaymentForm } from "@/components/dashboard/BookingPaymentForm";
 import { BookingStatusBadge } from "@/components/dashboard/BookingStatusBadge";
 import { CancelBookingForm } from "@/components/dashboard/CancelBookingForm";
 import { DEFAULT_PROVIDER_TIME_ZONE } from "@/config/booking";
@@ -74,6 +76,12 @@ export default async function CustomerBookingDetailPage({ params }: BookingDetai
         </dl>
         <p className="text-xs text-text-muted">{t("dashboard.booking.timeZoneNote")}</p>
 
+        {booking.status === "pending_payment" && (
+          <div className="flex flex-col items-start gap-3 rounded-md bg-surface p-4 text-sm text-text">
+            <p>{t("dashboard.booking.pendingPaymentNote")}</p>
+            <BookingPaymentForm bookingId={booking.id} idempotencyKey={randomUUID()} />
+          </div>
+        )}
         {booking.status === "confirmed" && <CancelBookingForm bookingId={booking.id} />}
         {booking.status === "completion_pending" && (
           <BookingCompletionActions bookingId={booking.id} />

@@ -890,8 +890,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * ایجاد درخواست شارژ کیف پول با Zarinpal
-         * @description فقط مشتری احرازشده می‌تواند پرداخت صحیح IRR با حداقل 10000 ریال آغاز کند. درخواست بیرونی بدون retry خودکار ارسال می‌شود؛ callback proof نیست و فقط Verify server-to-server می‌تواند کیف پول را شارژ کند.
+         * ایجاد پرداخت Zarinpal برای شارژ کیف پول یا رزرو
+         * @description فقط مشتری احرازشده می‌تواند پرداخت را آغاز کند. با purpose=wallet_topup مبلغ صحیح IRR حداقل 10000 ریال لازم است و فقط پس از Verify سرور به مانده قابل‌استفاده اضافه می‌شود. با purpose=booking فقط booking_id ارسال می‌شود؛ مالکیت و مبلغ از سرور خوانده می‌شود و در صورت موفقیت مبلغ مستقیماً به قفل رزرو می‌رود، نه کیف پول قابل‌استفاده. callback proof نیست و موفقیت فقط با Verify سرور و گذار اتمی رزرو تعیین می‌شود.
          */
         post: {
             parameters: {
@@ -957,7 +957,7 @@ export interface paths {
         };
         /**
          * callback بازگشت کاربر از Zarinpal
-         * @description پارامترهای Authority و Status مطابق callback واقعی Zarinpal هستند و نام‌های lowercase نیز برای سازگاری پذیرفته می‌شوند. authority رکورد محلی را تعیین می‌کند؛ status فقط داده بازگشت است. موجودی فقط پس از Verify server-to-server و تطبیق با مبلغ و authority محلی تغییر می‌کند.
+         * @description پارامترهای Authority و Status مطابق callback واقعی Zarinpal هستند و نام‌های lowercase نیز برای سازگاری پذیرفته می‌شوند. authority رکورد محلی را تعیین می‌کند؛ status فقط داده بازگشت است. موجودی فقط پس از Verify server-to-server و تطبیق با مبلغ و authority محلی تغییر می‌کند. پس از پردازش، مرورگر با هدایت 303 به `PAYMENT_RETURN_URL` (صفحه نتیجه اپ) فرستاده می‌شود.
          */
         get: {
             parameters: {
@@ -972,9 +972,18 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description callback پردازش شد یا نتیجه قبلی حفظ شد؛ بدنه‌ای برای نمایش به کاربر برنمی‌گردد و صفحه نتیجه فرانت‌اند تصمیم جداگانه باز است */
+                /** @description callback پردازش شد؛ فقط در محیط sandbox بدون PAYMENT_RETURN_URL برای سازگاری برگردانده می‌شود */
                 204: {
                     headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description callback پردازش شد یا نتیجه قبلی حفظ شد؛ مرورگر به صفحه نتیجه فرانت‌اند هدایت می‌شود */
+                303: {
+                    headers: {
+                        /** @description نشانی مطلق صفحه نتیجه که در PAYMENT_RETURN_URL تنظیم شده است */
+                        Location?: string;
                         [name: string]: unknown;
                     };
                     content?: never;
@@ -1121,7 +1130,7 @@ export interface paths {
         put?: never;
         /**
          * ایجاد رزرو
-         * @description مشتری فقط شناسه خدمت و زمان آغاز را ارسال می‌کند؛ مدت، پایان، بافر، مبلغ و ارائه‌دهنده از داده معتبر سرور محاسبه و snapshot می‌شوند. رزرو در همان تراکنش با وضعیت confirmed و payment_method=wallet ایجاد و مبلغ صحیح ریال از مانده قابل‌استفاده به قفل کیف پول منتقل می‌شود.
+         * @description مشتری شناسه خدمت، زمان آغاز و به‌صورت اختیاری روش پرداخت را ارسال می‌کند؛ مدت، پایان، بافر، مبلغ و ارائه‌دهنده از داده معتبر سرور محاسبه و snapshot می‌شوند. پیش‌فرض payment_method=wallet است و رزرو در همان تراکنش confirmed می‌شود و مبلغ از مانده قابل‌استفاده به قفل می‌رود. با payment_method=zarinpal رزرو pending_payment با payment_expires_at ساخته می‌شود و فقط پس از Verify موفق به confirmed می‌رسد؛ در این مسیر مانده قابل‌استفاده کیف پول تغییر نمی‌کند.
          */
         post: {
             parameters: {
@@ -1139,7 +1148,7 @@ export interface paths {
                 };
             };
             responses: {
-                /** @description رزرو confirmed یا پاسخ بازپخش‌شده */
+                /** @description رزرو confirmed، رزرو pending_payment در انتظار پرداخت، یا پاسخ بازپخش‌شده */
                 201: {
                     headers: {
                         [name: string]: unknown;
@@ -2124,16 +2133,30 @@ export interface components {
         };
         PaymentCreateInput: {
             /**
-             * Format: int64
-             * @description مبلغ صحیح ریال؛ Zarinpal آن را به ریال دریافت می‌کند
+             * @description هدف پرداخت؛ wallet_topup شارژ کیف پول (پیش‌فرض) و booking پرداخت مستقیم رزرو است
+             * @enum {string}
              */
-            amount_irr: number;
-        };
+            purpose?: "wallet_topup" | "booking";
+            /**
+             * Format: int64
+             * @description فقط برای wallet_topup؛ مبلغ صحیح ریال که Zarinpal دریافت می‌کند
+             */
+            amount_irr?: number;
+            /**
+             * Format: int64
+             * @description فقط برای booking؛ مبلغ از snapshot معتبر سرور خوانده می‌شود و نباید ارسال شود
+             */
+            booking_id?: number;
+        } & (unknown | unknown);
         Payment: {
             /** Format: int64 */
             id: number;
             /** Format: int64 */
             amount_irr: number;
+            /** @enum {string} */
+            purpose: "wallet_topup" | "booking";
+            /** Format: int64 */
+            booking_id?: number | null;
             /** @enum {string} */
             status: "created" | "pending" | "succeeded" | "failed" | "verification_unknown";
             authority?: string | null;
@@ -2158,6 +2181,12 @@ export interface components {
              * @description لحظه آغاز RFC 3339 با offset
              */
             starts_at: string;
+            /**
+             * @description wallet برای پرداخت از مانده کیف پول؛ zarinpal برای پرداخت مستقیم درگاه و وضعیت pending_payment تا تأیید سرور
+             * @default wallet
+             * @enum {string}
+             */
+            payment_method: "wallet" | "zarinpal";
         };
         Booking: {
             /** Format: int64 */
@@ -2181,7 +2210,14 @@ export interface components {
             price_irr: number;
             buffer_minutes: number;
             /** @enum {string} */
-            status: "confirmed" | "in_progress" | "completion_pending" | "disputed" | "completed" | "cancelled" | "expired";
+            status: "pending_payment" | "confirmed" | "in_progress" | "completion_pending" | "disputed" | "completed" | "cancelled" | "expired";
+            /** @enum {string} */
+            payment_method: "none" | "wallet" | "zarinpal";
+            /**
+             * Format: date-time
+             * @description مهلت پرداخت رزروهای pending_payment؛ پس از آن رزرو فقط در نبود تلاش پرداخت فعال منقضی می‌شود
+             */
+            payment_expires_at?: string | null;
             /**
              * Format: date-time
              * @description زمان ثبت درخواست تکمیل خدمت توسط ارائه‌دهنده

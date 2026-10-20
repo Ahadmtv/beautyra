@@ -7,6 +7,7 @@ function buildForm(overrides: Record<string, string> = {}): FormData {
     service_id: "12",
     starts_at: "2025-03-15T09:00:00+03:30",
     idempotency_key: "7f1c2a4e-9b3d-4e6a-8c1f-2d5b7a9e0f11",
+    payment_idempotency_key: "a2e5b8c1-4d7f-4a0b-9c3e-6f1d8a2b5c7e",
     ...overrides,
   };
   const formData = new FormData();
@@ -19,8 +20,13 @@ function buildForm(overrides: Record<string, string> = {}): FormData {
 describe("parseBookingSubmission", () => {
   it("builds the create-booking input from the form fields", () => {
     expect(parseBookingSubmission(buildForm())).toEqual({
-      input: { service_id: 12, starts_at: "2025-03-15T09:00:00+03:30" },
+      input: {
+        service_id: 12,
+        starts_at: "2025-03-15T09:00:00+03:30",
+        payment_method: "zarinpal",
+      },
       idempotencyKey: "7f1c2a4e-9b3d-4e6a-8c1f-2d5b7a9e0f11",
+      paymentIdempotencyKey: "a2e5b8c1-4d7f-4a0b-9c3e-6f1d8a2b5c7e",
     });
   });
 

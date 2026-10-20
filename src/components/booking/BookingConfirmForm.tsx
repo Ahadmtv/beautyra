@@ -13,11 +13,18 @@ type BookingConfirmFormProps = {
   date: string;
   startAt: string;
   idempotencyKey: string;
+  paymentIdempotencyKey: string;
 };
 
 const initialState: BookingFormState = {};
 
-export function BookingConfirmForm({ serviceId, date, startAt, idempotencyKey }: BookingConfirmFormProps) {
+export function BookingConfirmForm({
+  serviceId,
+  date,
+  startAt,
+  idempotencyKey,
+  paymentIdempotencyKey,
+}: BookingConfirmFormProps) {
   const [state, formAction] = useActionState(createBookingAction, initialState);
 
   return (
@@ -25,6 +32,7 @@ export function BookingConfirmForm({ serviceId, date, startAt, idempotencyKey }:
       <input type="hidden" name="service_id" value={serviceId} />
       <input type="hidden" name="starts_at" value={startAt} />
       <input type="hidden" name="idempotency_key" value={idempotencyKey} />
+      <input type="hidden" name="payment_idempotency_key" value={paymentIdempotencyKey} />
 
       {state.message && (
         <div role="alert" className="flex flex-col items-start gap-3 rounded-md bg-surface p-4 text-sm text-text">
@@ -38,7 +46,7 @@ export function BookingConfirmForm({ serviceId, date, startAt, idempotencyKey }:
         </div>
       )}
 
-      <p className="text-xs text-text-muted">{t("booking.confirm.walletNote")}</p>
+      <p className="text-xs text-text-muted">{t("booking.confirm.gatewayNote")}</p>
       <SubmitButton />
     </form>
   );

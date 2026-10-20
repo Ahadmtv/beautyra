@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 import { DEFAULT_PROVIDER_TIME_ZONE } from "@/config/booking";
 import { t } from "@/config/messages.fa";
@@ -34,6 +34,9 @@ export default async function BookingSuccessPage({ params }: BookingSuccessPageP
   }
 
   const booking = await loadBookingOrNotFound(bookingId);
+  if (booking.status !== "confirmed") {
+    redirect(`/dashboard/bookings/${booking.id}`);
+  }
   const localDate = todayInTimeZone(DEFAULT_PROVIDER_TIME_ZONE, new Date(booking.starts_at));
   const jalaliDate = describeJalaliDate(localDate);
   const time = formatSlotTime(booking.starts_at, DEFAULT_PROVIDER_TIME_ZONE);

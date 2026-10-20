@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 import { t } from "@/config/messages.fa";
 import { env } from "@/config/env";
@@ -24,6 +25,14 @@ const paymentStatusMessages = {
   verification_unknown: "wallet.payment.verificationUnknown",
 } as const;
 
+const bookingPaymentStatusMessages = {
+  created: "booking.payment.pending",
+  pending: "booking.payment.pending",
+  succeeded: "booking.payment.succeeded",
+  failed: "booking.payment.failed",
+  verification_unknown: "booking.payment.verificationUnknown",
+} as const;
+
 type PaymentResultProps = {
   searchParams: Promise<{ authority?: string | string[]; status?: string | string[] }>;
 };
@@ -33,8 +42,9 @@ export default async function PaymentResultPage({ searchParams }: PaymentResultP
 
   const cookieStore = await cookies();
   const rawId = cookieStore.get(PAYMENT_ID_COOKIE)?.value;
-  const returnTo = resolvePaymentReturnPath(cookieStore.get(PAYMENT_RETURN_COOKIE)?.value);
-  const backLabel =
+  const cookieReturnTo = resolvePaymentReturnPath(cookieStore.get(PAYMENT_RETURN_COOKIE)?.value);
+  let returnTo = cookieReturnTo;
+  let backLabel =
     returnTo === PAYMENT_RETURN_FALLBACK ? t("wallet.payment.back") : t("common.back");
 
   const paymentId = rawId && /^\d+$/.test(rawId) ? Number(rawId) : NaN;
@@ -80,12 +90,27 @@ export default async function PaymentResultPage({ searchParams }: PaymentResultP
     );
   }
 
+  const isBookingPayment = payment.purpose === "booking" && payment.booking_id !== null;
+  if (isBookingPayment) {
+    if (payment.status === "succeeded") {
+      redirect(`/bookings/${payment.booking_id}/success`);
+    }
+    returnTo = `/dashboard/bookings/${payment.booking_id}`;
+    backLabel = t("dashboard.booking.title");
+  }
+
   return (
     <main className="mx-auto w-full max-w-page flex-1 px-4 py-6 md:py-8">
       <section className="mx-auto flex max-w-xl flex-col gap-5 rounded-md border border-border bg-white p-5 md:p-7">
-        <h1 className="text-2xl font-bold text-text">{t("wallet.payment.title")}</h1>
+        <h1 className="text-2xl font-bold text-text">
+          {t(isBookingPayment ? "booking.payment.title" : "wallet.payment.title")}
+        </h1>
         <p role="status" className="rounded-md bg-surface p-4 text-text">
-          {t(paymentStatusMessages[payment.status])}
+          {t(
+            isBookingPayment
+              ? bookingPaymentStatusMessages[payment.status]
+              : paymentStatusMessages[payment.status],
+          )}
         </p>
         <dl className="grid gap-4 text-sm sm:grid-cols-2">
           <div className="flex flex-col gap-1">
