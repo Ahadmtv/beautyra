@@ -13,6 +13,7 @@ import { getAuthProvider } from "./provider";
 import type { SessionTokens } from "./types";
 
 const REFRESH_COOKIE_MAX_AGE_SECONDS = 7 * 24 * 60 * 60;
+const SECURE_COOKIES = process.env.NODE_ENV === "production";
 
 export async function getSessionToken(): Promise<string | undefined> {
   return (await cookies()).get(env.SESSION_COOKIE_NAME)?.value;
@@ -38,7 +39,7 @@ export async function requireRole(allowed: Role | readonly Role[]): Promise<Sess
     redirect("/login");
   }
   if (!isRoleAllowed(session, roles)) {
-    redirect("/");
+    redirect("/forbidden");
   }
   return session;
 }
@@ -47,7 +48,7 @@ export async function setSessionCookies(tokens: SessionTokens): Promise<void> {
   const store = await cookies();
   store.set(env.SESSION_COOKIE_NAME, tokens.token, {
     httpOnly: true,
-    secure: true,
+    secure: SECURE_COOKIES,
     sameSite: "lax",
     path: "/",
     expires: new Date(tokens.expiresAt * 1000),
@@ -56,7 +57,7 @@ export async function setSessionCookies(tokens: SessionTokens): Promise<void> {
   if (tokens.refreshToken) {
     store.set(SESSION_REFRESH_COOKIE_NAME, tokens.refreshToken, {
       httpOnly: true,
-      secure: true,
+      secure: SECURE_COOKIES,
       sameSite: "lax",
       path: "/",
       maxAge: REFRESH_COOKIE_MAX_AGE_SECONDS,
