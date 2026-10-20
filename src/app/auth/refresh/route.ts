@@ -1,0 +1,34 @@
+import { NextResponse, type NextRequest } from "next/server";
+
+import { refreshSession } from "@/lib/auth/refresh";
+import { sanitizeNextPath } from "@/lib/auth/redirect";
+import { clearSessionCookies, getRefreshToken, setSessionCookies } from "@/lib/auth/session";
+
+function expired(request: NextRequest, next: string) {
+  const loginUrl = request.nextUrl.clone();
+  loginUrl.pathname = "/login";
+  loginUrl.search = "";
+  loginUrl.searchParams.set("expired", "1");
+  if (next !== "/") {
+    loginUrl.searchParams.set("next", next);
+  }
+  return NextResponse.redirect(loginUrl);
+}
+
+export async function GET(request: NextRequest) {
+  const next = sanitizeNextPath(request.nextUrl.searchParams.get("next"));
+  const refreshToken = await getRefreshToken();
+  if (!refreshToken) {
+    await clearSessionCookies();
+    return expired(request, next);
+  }
+
+  const tokens = await refreshSession(refreshToken);
+  if (!tokens) {
+    await clearSessionCookies();
+    return expired(request, next);
+  }
+
+  await setSessionCookies(tokens);
+  return NextResponse.redirect(new URL(next, request.url));
+}

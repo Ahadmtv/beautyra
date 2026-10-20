@@ -1,24 +1,31 @@
 import type { Session } from "./claims";
 
-export type LoginInput = {
-  phone: string;
-  code: string;
-};
+export type LoginInput =
+  | {
+      email: string;
+      password: string;
+    }
+  | {
+      phone: string;
+      code: string;
+    };
 
-export type LoginResult = {
+export type SessionTokens = {
   token: string;
+  refreshToken?: string;
   expiresAt: number;
 };
 
 export class InvalidCredentialsError extends Error {
   constructor() {
-    super("Invalid phone or code");
+    super("Invalid credentials");
     this.name = "InvalidCredentialsError";
   }
 }
 
 export interface AuthProvider {
-  login(input: LoginInput): Promise<LoginResult>;
+  login(input: LoginInput): Promise<SessionTokens>;
+  refresh(refreshToken: string): Promise<SessionTokens | null>;
   getSession(token: string): Promise<Session | null>;
-  logout(token: string): Promise<void>;
+  logout(refreshToken?: string): Promise<void>;
 }

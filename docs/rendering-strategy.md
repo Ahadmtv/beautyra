@@ -12,6 +12,8 @@
 | `/provider/*` | Dynamic | Provider-only data authorized by the session cookie. |
 | `/admin/*` | Dynamic | Admin-only data and actions; must never be cached. |
 | `/login` | Dynamic | Depends on request state (redirect targets, errors); no caching of auth pages. |
+| `/auth/refresh` | Dynamic | Reads the httpOnly refresh cookie and rotates it; must never be cached. |
+| `/auth/expired` | Dynamic | Clears session cookies and redirects with the requested `next` path. |
 | `/api/health` | Dynamic | Liveness check should reflect the running server, not a build-time snapshot. |
 | `/dev/ui` | Static, returns 404 in production | Development-only component showcase; `notFound()` is called when `NODE_ENV` is `production`. |
 
@@ -33,4 +35,4 @@ Filters (`city`, `neighborhood`, `specialty`, `q`) and the pagination cursor are
 - The page reads no request data, so the HTML is cached by the same lifetime as its data.
 - Canonical URL, Persian title and description, and OpenGraph come from `generateMetadata`. The JSON-LD uses the `Service` type, with `Physician` as provider only when the provider name is known. A `Physician` page would need a provider detail route, which does not exist yet.
 
-Browser JavaScript never reads the JWT. Server Components, Server Actions, and Route Handlers call the backend and attach the token from an httpOnly cookie.
+Browser JavaScript never reads the JWT. Server Components, Server Actions, and Route Handlers call the backend and attach the access token from an httpOnly cookie. The refresh token lives in a separate httpOnly cookie and is used only by `/auth/refresh` and the logout action.

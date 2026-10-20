@@ -15,7 +15,7 @@ export function sanitizeNextPath(value: string | null | undefined, fallback = "/
   } catch {
     return fallback;
   }
-  if (url.origin !== SAFE_BASE_URL || url.pathname === "/login") {
+  if (url.origin !== SAFE_BASE_URL || url.pathname === "/login" || url.pathname.startsWith("/auth/")) {
     return fallback;
   }
 

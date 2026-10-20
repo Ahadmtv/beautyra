@@ -6,6 +6,71 @@ info:
 servers:
   - url: /
 paths:
+  /api/v1/auth/login:
+    post:
+      summary: ورود
+      description: اعتبارنامه ایمیل و رمز عبور را بررسی می‌کند و یک جفت توکن دسترسی و Refresh برمی‌گرداند. فرم ورود فرانت‌اند توکن‌ها را فقط در کوکی‌های HttpOnly نگه می‌دارد.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthLoginInput'
+      responses:
+        '200':
+          description: ورود موفق
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenPair'
+        '400':
+          $ref: '#/components/responses/Problem'
+        '401':
+          $ref: '#/components/responses/Problem'
+        '429':
+          $ref: '#/components/responses/Problem'
+  /api/v1/auth/refresh:
+    post:
+      summary: تازه‌سازی توکن دسترسی
+      description: توکن Refresh را مصرف می‌کند و یک جفت توکن جدید برمی‌گرداند. توکن Refresh قبلی باطل می‌شود و استفاده مجدد از آن خطا می‌دهد.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthRefreshInput'
+      responses:
+        '200':
+          description: جفت توکن جدید
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenPair'
+        '400':
+          $ref: '#/components/responses/Problem'
+        '401':
+          $ref: '#/components/responses/Problem'
+        '429':
+          $ref: '#/components/responses/Problem'
+  /api/v1/auth/logout:
+    post:
+      summary: خروج
+      description: توکن Refresh را در صورت وجود باطل می‌کند. فرانت‌اند در هر صورت کوکی‌های محلی را پاک می‌کند.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthRefreshInput'
+      responses:
+        '200':
+          description: خروج انجام شد
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OperationResult'
+        '400':
+          $ref: '#/components/responses/Problem'
   /api/v1/services:
     get:
       summary: فهرست خدمات فعال و تأییدشده
@@ -704,6 +769,31 @@ components:
           schema:
             $ref: '#/components/schemas/Problem'
   schemas:
+    AuthLoginInput:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string, format: email }
+        password: { type: string, minLength: 8 }
+    AuthRefreshInput:
+      type: object
+      properties:
+        refresh_token: { type: string }
+    OperationResult:
+      type: object
+      required: [status, message]
+      properties:
+        status: { type: string }
+        message: { type: string }
+    TokenPair:
+      type: object
+      required: [access_token, refresh_token, expires_in]
+      properties:
+        access_token: { type: string }
+        refresh_token:
+          type: string
+          description: توکن Refresh فقط یک بار به کلاینت برگردانده می‌شود و در کوکی HttpOnly جداگانه نگه داشته می‌شود.
+        expires_in: { type: integer, format: int64, description: عمر توکن دسترسی بر حسب ثانیه }
     Problem:
       type: object
       required: [type, title, status, code, request_id]

@@ -50,7 +50,7 @@ async function LoginPageContent({ searchParams }: LoginPageProps) {
           </p>
         )}
 
-        <LoginForm next={nextPath} />
+        <LoginForm next={nextPath} mode={env.AUTH_PROVIDER} />
       </div>
     </main>
   );

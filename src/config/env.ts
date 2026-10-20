@@ -5,7 +5,7 @@ const envSchema = z.object({
   SITE_URL: z.url(),
   SESSION_COOKIE_NAME: z.string().min(1),
   USE_MOCK_META: z.enum(["true", "false"]).transform((value) => value === "true"),
-  AUTH_PROVIDER: z.enum(["mock", "real"]).default("mock"),
+  AUTH_PROVIDER: z.enum(["mock", "real"]).default("real"),
   PAYMENT_RETURN_FORWARD_TO_BACKEND: z.enum(["true", "false"]).default("false").transform((value) => value === "true"),
 });
 
@@ -16,3 +16,5 @@ if (!parsed.success) {
 }
 
 export const env = parsed.data;
+
+export const SESSION_REFRESH_COOKIE_NAME = `${env.SESSION_COOKIE_NAME}_refresh`;

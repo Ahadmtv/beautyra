@@ -15,6 +15,7 @@ describe("sanitizeNextPath", () => {
     ["control characters", "/book\n//evil.example"],
     ["relative path without leading slash", "book"],
     ["login page", "/login?next=/book"],
+    ["refresh endpoint", "/auth/refresh?next=/book"],
     ["empty value", ""],
     ["missing value", null],
   ])("falls back to root for %s", (_label, value) => {
