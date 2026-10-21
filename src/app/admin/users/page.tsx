@@ -182,7 +182,7 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
                     <Typography sx={mobileLabelSx}>{t("admin.users.roles")}</Typography>
                     <RoleBadges user={user} />
                   </Box>
-                  <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ pt: 1.25, borderTop: "1px solid #e8efed" }}>
+                  <Stack direction="row" sx={{ alignItems: "center", justifyContent: "space-between", pt: 1.25, borderTop: "1px solid #e8efed" }}>
                     <StatusPill active={user.is_active} />
                     <AdminUserRoleControls user={user} />
                   </Stack>
@@ -191,7 +191,7 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
             ))}
           </Box>
 
-          <Stack direction="row" alignItems="center" justifyContent="space-between" flexWrap="wrap" gap={1.5} sx={{ mt: 2 }}>
+          <Stack direction="row" sx={{ alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 1.5, mt: 2 }}>
             {(cursor !== undefined || q || role) ? (
               <Link href="/admin/users" className="inline-flex min-h-11 items-center rounded-lg border border-border px-4 text-sm font-medium text-primary transition-colors duration-150 hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary motion-reduce:transition-none">
                 {t("admin.users.firstPage")}
