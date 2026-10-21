@@ -12,9 +12,11 @@ type ModalProps = {
   title: string;
   children: ReactNode;
   footer?: ReactNode;
+  className?: string;
+  size?: "default" | "wide";
 };
 
-export function Modal({ open, onClose, title, children, footer }: ModalProps) {
+export function Modal({ open, onClose, title, children, footer, className, size = "default" }: ModalProps) {
   const titleId = useId();
   const { ref, handleBackdropClick } = useNativeDialog(open, onClose);
 
@@ -23,7 +25,7 @@ export function Modal({ open, onClose, title, children, footer }: ModalProps) {
       ref={ref}
       aria-labelledby={titleId}
       onClick={handleBackdropClick}
-      className="m-auto max-h-[90dvh] w-[min(92vw,28rem)] overflow-hidden rounded-lg bg-white p-0 text-text backdrop:bg-black/40"
+      className={`m-auto max-h-[90dvh] ${size === "wide" ? "w-[min(94vw,48rem)]" : "w-[min(92vw,28rem)]"} overflow-hidden rounded-lg bg-white p-0 text-text backdrop:bg-black/40 ${className ?? ""}`}
     >
       <div className="flex max-h-[90dvh] flex-col gap-4 p-6">
         <div className="flex shrink-0 items-start justify-between gap-4">

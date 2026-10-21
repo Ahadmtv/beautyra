@@ -1,5 +1,4 @@
 import type { InputHTMLAttributes } from "react";
-
 import { TextField } from "@mui/material";
 import type { ReactNode } from "react";
 
@@ -11,19 +10,36 @@ type InputProps = InputHTMLAttributes<HTMLInputElement> & {
   startAdornment?: ReactNode;
   endAdornment?: ReactNode;
   compact?: boolean;
+  topLabel?: boolean;
   reserveHelperText?: boolean;
 };
 
-export function Input({ id, label, hint, error, className, startAdornment, endAdornment, compact = false, reserveHelperText = true, required, name, type, value, defaultValue, ...rest }: InputProps) {
+export function Input({
+  id,
+  label,
+  hint,
+  error,
+  className,
+  startAdornment,
+  endAdornment,
+  compact = false,
+  topLabel = false,
+  reserveHelperText = true,
+  required,
+  name,
+  type,
+  value,
+  defaultValue,
+  ...rest
+}: InputProps) {
   const messageId = `${id}-message`;
   const message = error ?? hint;
-
-  return (
+  const field = (
     <TextField
       id={id}
       name={name}
       type={type}
-      label={label}
+      label={topLabel ? undefined : label}
       required={required}
       value={value}
       defaultValue={defaultValue}
@@ -31,27 +47,28 @@ export function Input({ id, label, hint, error, className, startAdornment, endAd
       helperText={message ?? (reserveHelperText ? " " : undefined)}
       fullWidth
       variant="outlined"
-      size={compact ? "small" : "medium"}
-      className={className}
+      size={compact || topLabel ? "small" : "medium"}
+      className={topLabel ? undefined : className}
       slotProps={{
         htmlInput: {
           ...rest,
+          "aria-required": required ? true : undefined,
           "aria-invalid": error ? true : undefined,
           "aria-describedby": message ? messageId : undefined,
         },
         input: { startAdornment, endAdornment },
-        formHelperText: { id: messageId, sx: { mx: 0, minHeight: 20 } },
+        formHelperText: { id: messageId, sx: { mx: 0, minHeight: message || reserveHelperText ? 20 : 0 } },
       }}
       sx={{
         fontFamily: "inherit",
         "& .MuiInputAdornment-positionStart": { marginInlineEnd: 1, marginRight: 0 },
         "& .MuiInputAdornment-positionEnd": { marginInlineStart: 1, marginLeft: 0 },
-        "& .MuiInputBase-input": { fontFamily: "inherit", ...(compact ? { paddingBlock: "10px" } : {}) },
+        "& .MuiInputBase-input": { fontFamily: "inherit", textAlign: rest.dir === "ltr" ? "start" : undefined, fontVariantNumeric: rest.inputMode === "numeric" ? "tabular-nums" : undefined, ...(compact || topLabel ? { paddingBlock: "10px" } : {}) },
         "& .MuiInputLabel-root": { fontFamily: "inherit" },
         "& .MuiOutlinedInput-root": {
-          borderRadius: compact ? "10px" : 2,
+          minHeight: compact || topLabel ? 44 : undefined,
+          borderRadius: compact || topLabel ? "10px" : 2,
           backgroundColor: "#fff",
-          ...(compact ? { minHeight: 44 } : {}),
           "& fieldset": { borderColor: error ? "#d92d20" : "#dce7e4" },
           "&:hover fieldset": { borderColor: error ? "#d92d20" : "#0f766e" },
           "&.Mui-focused fieldset": { borderWidth: 2, borderColor: error ? "#d92d20" : "#0f766e" },
@@ -60,5 +77,16 @@ export function Input({ id, label, hint, error, className, startAdornment, endAd
         "& .MuiFormHelperText-root": { color: error ? "#d92d20" : "#617472", fontFamily: "inherit" },
       }}
     />
+  );
+
+  if (!topLabel) return field;
+
+  return (
+    <div className={`flex min-w-0 flex-col gap-1 ${className ?? ""}`}>
+      <label htmlFor={id} className="text-sm font-medium leading-6 text-text">
+        {label}{required && <span aria-hidden="true" className="ms-1 text-danger">*</span>}
+      </label>
+      {field}
+    </div>
   );
 }

@@ -6,29 +6,44 @@ type TextareaProps = TextareaHTMLAttributes<HTMLTextAreaElement> & {
   label: string;
   hint?: string;
   error?: string;
+  topLabel?: boolean;
 };
 
-export function Textarea({ id, label, hint, error, className, required, name, value, defaultValue, rows = 4, ...rest }: TextareaProps) {
+export function Textarea({
+  id,
+  label,
+  hint,
+  error,
+  className,
+  required,
+  name,
+  value,
+  defaultValue,
+  rows = 4,
+  topLabel = false,
+  ...rest
+}: TextareaProps) {
   const messageId = `${id}-message`;
   const message = error ?? hint;
-
-  return (
+  const field = (
     <TextField
       id={id}
       name={name}
-      label={label}
+      label={topLabel ? undefined : label}
       required={required}
       value={value}
       defaultValue={defaultValue}
       rows={rows}
+      size={topLabel ? "small" : "medium"}
       multiline
       fullWidth
       error={Boolean(error)}
       helperText={message ?? " "}
-      className={className}
+      className={topLabel ? undefined : className}
       slotProps={{
         htmlInput: {
           ...rest,
+          "aria-required": required ? true : undefined,
           "aria-invalid": error ? true : undefined,
           "aria-describedby": message ? messageId : undefined,
         },
@@ -39,7 +54,7 @@ export function Textarea({ id, label, hint, error, className, required, name, va
         "& .MuiInputBase-input": { fontFamily: "inherit" },
         "& .MuiInputLabel-root": { fontFamily: "inherit" },
         "& .MuiOutlinedInput-root": {
-          borderRadius: 2,
+          borderRadius: topLabel ? "10px" : 2,
           backgroundColor: "#fff",
           "& fieldset": { borderColor: error ? "#d92d20" : "#dce7e4" },
           "&:hover fieldset": { borderColor: error ? "#d92d20" : "#0f766e" },
@@ -49,5 +64,16 @@ export function Textarea({ id, label, hint, error, className, required, name, va
         "& .MuiFormHelperText-root": { color: error ? "#d92d20" : "#617472", fontFamily: "inherit" },
       }}
     />
+  );
+
+  if (!topLabel) return field;
+
+  return (
+    <div className={`flex min-w-0 flex-col gap-1 ${className ?? ""}`}>
+      <label htmlFor={id} className="text-sm font-medium leading-6 text-text">
+        {label}{required && <span aria-hidden="true" className="ms-1 text-danger">*</span>}
+      </label>
+      {field}
+    </div>
   );
 }
