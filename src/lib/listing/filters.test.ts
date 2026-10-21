@@ -7,8 +7,10 @@ import { buildListingHref, filterProviderCards, matchesFilters, parseListingFilt
 const card: ProviderCardView = {
   id: 1,
   name: "سالن زیبایی سارا",
+  serviceName: "پاک‌سازی پوست",
   category: "skin-care",
   categoryLabel: "مراقبت پوست",
+  priceIrr: 500_000,
   city: "تهران",
   neighborhood: "میرداماد",
   avatarUrl: null,
@@ -57,8 +59,9 @@ describe("matchesFilters", () => {
     expect(matchesFilters(card, { neighborhood: "vanak" })).toBe(false);
   });
 
-  it("matches the query against the name and category label", () => {
+  it("matches the query against provider, service, and category names", () => {
     expect(matchesFilters(card, { q: "سارا" })).toBe(true);
+    expect(matchesFilters(card, { q: "پاک‌سازی" })).toBe(true);
     expect(matchesFilters(card, { q: "مراقبت" })).toBe(true);
     expect(matchesFilters(card, { q: "ارتوپدی" })).toBe(false);
   });

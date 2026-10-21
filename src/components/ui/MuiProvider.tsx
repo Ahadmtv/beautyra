@@ -6,11 +6,11 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 const theme = createTheme({
   direction: "rtl",
   palette: {
-    primary: { main: "#0f766e", dark: "#0d665f", light: "#e6f4f1" },
-    background: { default: "#f7faf9", paper: "#ffffff" },
-    text: { primary: "#172b2a", secondary: "#617472" },
-    divider: "#dce7e4",
-    warning: { main: "#dba832" },
+    primary: { main: "#0f766e", dark: "#115e59", light: "#eff8f6" },
+    background: { default: "#fcf9f7", paper: "#ffffff" },
+    text: { primary: "#253a37", secondary: "#5d706c" },
+    divider: "#e5dcd6",
+    warning: { main: "#a45b32" },
   },
   shape: { borderRadius: 4 },
   typography: {

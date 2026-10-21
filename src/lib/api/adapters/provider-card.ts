@@ -14,8 +14,10 @@ export type ProviderMeta = {
 export type ProviderCardView = {
   id: number;
   name: string;
+  serviceName: string;
   category: ServiceCategory;
   categoryLabel: string;
+  priceIrr: number;
   city: string | null;
   neighborhood: string | null;
   avatarUrl: string | null;
@@ -29,8 +31,10 @@ export function toProviderCardView(service: Service, meta: ProviderMeta | null):
   return {
     id: service.id,
     name: meta?.name ?? service.name,
+    serviceName: service.name,
     category: service.category,
     categoryLabel: serviceCategoryLabel(service.category),
+    priceIrr: service.price_irr,
     city: meta?.city ?? null,
     neighborhood: meta?.neighborhood ?? null,
     avatarUrl: meta?.avatarUrl ?? null,

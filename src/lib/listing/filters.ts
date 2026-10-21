@@ -41,7 +41,7 @@ export function matchesFilters(card: ProviderCardView, filters: ListingFilters):
     return false;
   }
   if (filters.q) {
-    const haystack = [card.name, card.categoryLabel].join(" ").toLocaleLowerCase("fa-IR");
+    const haystack = [card.name, card.serviceName, card.categoryLabel].join(" ").toLocaleLowerCase("fa-IR");
     if (!haystack.includes(filters.q.toLocaleLowerCase("fa-IR"))) {
       return false;
     }

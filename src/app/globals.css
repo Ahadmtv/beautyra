@@ -1,29 +1,50 @@
 @import "tailwindcss";
 
+:root {
+  --brand-teal-50: #eff8f6;
+  --brand-teal-100: #dcefeb;
+  --brand-teal-200: #b9ddd6;
+  --brand-teal-300: #8cc5bb;
+  --brand-teal-400: #55a69a;
+  --brand-teal-500: #278b80;
+  --brand-teal-600: #16776e;
+  --brand-teal-700: #0f766e;
+  --brand-teal-800: #115e59;
+  --brand-teal-900: #124c49;
+  --brand-blush: #f4b6c2;
+  --brand-blush-deep: #a34f61;
+  --brand-warm-50: #fdfaf8;
+  --brand-warm-100: #f8f1ed;
+  --brand-warm-200: #eee2db;
+  --brand-warm-300: #dfcec5;
+  --brand-warm-700: #74645e;
+  --shadow-soft: 0 8px 24px rgb(65 48 44 / 6%);
+}
+
 @theme inline {
   --font-sans: var(--font-vazirmatn), Tahoma, "Segoe UI", sans-serif;
+  --color-primary: var(--brand-teal-700);
+  --color-primary-hover: var(--brand-teal-800);
+  --color-primary-active: var(--brand-teal-900);
+  --color-primary-soft: var(--brand-teal-50);
+  --color-text: #253a37;
+  --color-text-muted: #5d706c;
+  --color-border: #e5dcd6;
+  --color-surface: var(--brand-warm-100);
+  --color-star: #a45b32;
+  --color-verified: #145c55;
+  --color-danger: #b42318;
 
-  --color-primary: #0f766e;
-  --color-primary-hover: #0d665f;
-  --color-primary-active: #115e59;
-  --color-primary-soft: #e6f4f1;
-  --color-text: #172b2a;
-  --color-text-muted: #617472;
-  --color-border: #dce7e4;
-  --color-surface: #f4f8f7;
-  --color-star: #e9a827;
-  --color-verified: #1684a7;
-  --color-danger: #d92d20;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
 
-  --radius-sm: 8px;
-  --radius-md: 12px;
-
-  --container-page: 1080px;
+  --container-page: 1200px;
 }
 
 @layer base {
   body {
-    background: radial-gradient(ellipse at 50% 0%, rgb(15 118 110 / 6%), transparent 48%), #f7faf9;
+    background: radial-gradient(ellipse at 50% 0%, rgb(15 118 110 / 5%), transparent 50%), #fcf9f7;
     color: var(--color-text);
     font-family: var(--font-sans);
   }
@@ -31,5 +52,27 @@
   :focus-visible {
     outline: 2px solid var(--color-primary);
     outline-offset: 2px;
+  }
+}
+
+.home-hero {
+  background: radial-gradient(ellipse at 12% 10%, rgb(244 182 194 / 18%), transparent 34%), linear-gradient(118deg, #eff8f6 0%, #f8fbf8 54%, #fff8f7 100%);
+}
+
+.home-hero-pattern {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M18 150c53-25 66-82 78-138M42 104c-24-3-34-20-37-39 23 4 37 16 37 39Zm29-40C67 40 80 23 100 9c4 25-6 45-29 55Zm5 38c19-19 41-19 62-9-17 19-38 24-62 9Z' fill='none' stroke='%230f766e' stroke-width='1.4'/%3E%3C/svg%3E");
+  background-position: left center;
+  background-repeat: no-repeat;
+  background-size: 220px;
+}
+
+@keyframes home-card-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
   }
 }

@@ -31,8 +31,10 @@ describe("toProviderCardView", () => {
     expect(card).toEqual({
       id: 11,
       name: "کوتاهی مو",
+      serviceName: "کوتاهی مو",
       category: "haircut",
       categoryLabel: "کوتاهی مو",
+      priceIrr: 500_000,
       city: null,
       neighborhood: null,
       avatarUrl: null,
@@ -46,6 +48,7 @@ describe("toProviderCardView", () => {
     const card = toProviderCardView(service, meta);
 
     expect(card.name).toBe("آرایشگاه سارا");
+    expect(card.serviceName).toBe("کوتاهی مو");
     expect(card.category).toBe("haircut");
     expect(card.categoryLabel).toBe("کوتاهی مو");
     expect(card.city).toBe("تهران");
