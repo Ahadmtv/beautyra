@@ -83,7 +83,7 @@ export function getAdminBookings({
   if (cursor !== undefined) query.set("cursor", String(cursor));
   if (status) query.set("status", status);
   if (q) query.set("q", q);
-  if (refundable !== undefined) query.set("refundable", refundable ? "true" : "false");
+  if (refundable) query.set("refundable", "true");
   return apiFetch<AdminBookingPage>("/api/v1/admin/bookings", {
     auth: true,
     cache: "no-store",
