@@ -23,7 +23,7 @@ async function AdminProvidersContent() {
   return (
     <main className="mx-auto w-full max-w-page flex-1 px-4 py-8">
       <h1 className="mb-3 text-2xl font-bold text-text">{t("admin.providers.title")}</h1>
-      <p className="mb-6 max-w-2xl text-sm leading-7 text-muted">
+      <p className="mb-6 max-w-2xl text-sm leading-7 text-text-muted">
         {t("admin.providers.listGap")}
       </p>
       <ProviderVerificationForm />

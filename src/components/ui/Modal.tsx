@@ -23,10 +23,10 @@ export function Modal({ open, onClose, title, children, footer }: ModalProps) {
       ref={ref}
       aria-labelledby={titleId}
       onClick={handleBackdropClick}
-      className="m-auto w-[min(92vw,28rem)] rounded-lg bg-white p-0 text-text backdrop:bg-black/40"
+      className="m-auto max-h-[90dvh] w-[min(92vw,28rem)] overflow-hidden rounded-lg bg-white p-0 text-text backdrop:bg-black/40"
     >
-      <div className="flex flex-col gap-4 p-6">
-        <div className="flex items-start justify-between gap-4">
+      <div className="flex max-h-[90dvh] flex-col gap-4 p-6">
+        <div className="flex shrink-0 items-start justify-between gap-4">
           <h2 id={titleId} className="text-lg font-semibold">
             {title}
           </h2>
@@ -34,8 +34,8 @@ export function Modal({ open, onClose, title, children, footer }: ModalProps) {
             ×
           </Button>
         </div>
-        <div>{children}</div>
-        {footer && <div className="flex justify-end gap-2">{footer}</div>}
+        <div className="min-h-0 overflow-y-auto overscroll-contain">{children}</div>
+        {footer && <div className="flex shrink-0 flex-wrap justify-end gap-2">{footer}</div>}
       </div>
     </dialog>
   );

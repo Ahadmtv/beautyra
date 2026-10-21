@@ -87,7 +87,7 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
               <ProviderAvatar url={provider?.avatarUrl ?? null} />
               <div className="flex min-w-0 flex-1 flex-col gap-3">
                 <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
-                  <h1 className="min-w-0 text-xl font-bold text-text">{profileName}</h1>
+                  <p className="min-w-0 text-lg font-semibold text-text">{profileName}</p>
                   <Badge tone="verified">{t("badge.verified")}</Badge>
                 </div>
                 {provider && (
@@ -107,9 +107,9 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
                 <span className="rounded-sm bg-surface px-2 py-1 text-xs text-text">
                   {serviceCategoryLabel(service.category)}
                 </span>
-                <h2 id="service-heading" className="text-lg font-bold text-text">
+                <h1 id="service-heading" className="text-xl font-bold text-text">
                   {service.name}
-                </h2>
+                </h1>
               </div>
               {service.description && (
                 <p className="leading-7 whitespace-pre-line text-text">{service.description}</p>

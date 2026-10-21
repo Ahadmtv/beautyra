@@ -94,14 +94,14 @@ export default async function ProviderPayoutsPage({ searchParams }: PayoutPagePr
                 key={payout.id}
                 className="flex flex-col gap-3 rounded-md border border-border bg-white p-4 sm:flex-row sm:items-center sm:justify-between"
               >
-                <div className="flex flex-col gap-1">
+                <div className="flex min-w-0 flex-col gap-1">
                   <span className="font-semibold text-text">{formatTomanFromRial(payout.amount_irr)}</span>
                   <span className="text-xs text-text-muted">
                     {t("provider.payouts.id")}: {numberFormatFa(payout.id)} —{" "}
                     {dateFormatter.format(new Date(payout.created_at))}
                   </span>
                   {payout.admin_note && (
-                    <span className="text-xs text-text-muted">{payout.admin_note}</span>
+                    <span className="break-words text-xs text-text-muted">{payout.admin_note}</span>
                   )}
                 </div>
                 <span
@@ -129,7 +129,7 @@ export default async function ProviderPayoutsPage({ searchParams }: PayoutPagePr
 function BalanceCard({ label, value }: { label: string; value: number }) {
   return (
     <article className="flex flex-col gap-2 rounded-md border border-border bg-white p-4">
-      <h3 className="text-sm text-text-muted">{label}</h3>
+      <h2 className="text-sm text-text-muted">{label}</h2>
       <p className="text-lg font-bold text-text">{formatTomanFromRial(value)}</p>
     </article>
   );

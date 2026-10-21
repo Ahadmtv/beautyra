@@ -37,8 +37,13 @@ export default async function ProviderServicesPage({ searchParams }: ProviderSer
   return (
     <main className="mx-auto w-full max-w-page flex-1 px-4 py-6 md:py-8">
       <h1 className="text-2xl font-bold text-text">{t("provider.services.title")}</h1>
-      <details className="mt-5 rounded-md border border-border bg-white p-4">
-        <summary className="cursor-pointer list-none font-medium text-primary">{t("provider.services.create")}</summary>
+      <details className="group mt-5 rounded-md border border-border bg-white p-4">
+        <summary className="flex cursor-pointer list-none items-center justify-between gap-3 font-medium text-primary">
+          {t("provider.services.create")}
+          <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5 shrink-0 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="m7 10 5 5 5-5" />
+          </svg>
+        </summary>
         <div className="mt-5">
           <ProviderServiceForm submitLabel={t("provider.services.create")} />
         </div>
@@ -48,7 +53,7 @@ export default async function ProviderServicesPage({ searchParams }: ProviderSer
         {page.items.length === 0 ? (
           <EmptyState title={t("provider.services.empty")} />
         ) : (
-          <div className="overflow-x-auto rounded-md border border-border">
+          <div role="region" aria-label={t("provider.services.title")} tabIndex={0} className="overflow-x-auto rounded-md border border-border focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
             <table className="w-full min-w-[880px] border-collapse bg-white text-start text-sm">
               <thead className="bg-surface text-text-muted">
                 <tr>
@@ -71,7 +76,7 @@ export default async function ProviderServicesPage({ searchParams }: ProviderSer
                     <td className="p-3">
                       <details>
                         <summary className="cursor-pointer text-primary hover:underline">{t("provider.services.edit")}</summary>
-                        <div className="min-w-[32rem] py-4">
+                        <div className="w-full min-w-0 py-4">
                           <ProviderServiceForm service={service} submitLabel={t("provider.services.save")} />
                         </div>
                       </details>
