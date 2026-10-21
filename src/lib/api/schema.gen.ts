@@ -695,6 +695,107 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * فهرست کاربران برای مدیر
+         * @description حساب‌ها را با صفحه‌بندی cursor-based، جست‌وجوی متنی و فیلتر نقش برمی‌گرداند. نقش‌های بازگشتی وضعیت جاری پایگاه داده هستند و ممکن است با نقش‌های توکن دسترسی متفاوت باشند.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description شناسه آخرین رکورد صفحه قبلی */
+                    cursor?: components["parameters"]["Cursor"];
+                    /** @description تعداد رکورد صفحه، پیش‌فرض 50 و حداکثر 100 */
+                    limit?: components["parameters"]["Limit"];
+                    /** @description جست‌وجو در ایمیل، تلفن و نام نمایشی ارائه‌دهنده */
+                    q?: string;
+                    role?: "client" | "provider" | "admin";
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description صفحه کاربران */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AdminUserPage"];
+                    };
+                };
+                400: components["responses"]["Problem"];
+                401: components["responses"]["Problem"];
+                403: components["responses"]["Problem"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/users/{userID}/roles/{role}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * اعطا یا لغو نقش کاربر
+         * @description فقط نقش‌های provider و admin قابل تغییرند. مدیر نمی‌تواند نقش حساب خود را تغییر دهد و آخرین مدیر فعال قابل حذف نیست. تغییر نقش و رخداد حسابرسی در یک تراکنش ثبت می‌شوند و در درخواست‌های بعدی همان توکن نیز اثر می‌کنند.
+         */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    userID: number;
+                    role: "provider" | "admin";
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["AdminRoleMutationInput"];
+                };
+            };
+            responses: {
+                /** @description کاربر به‌روزشده */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AdminUser"];
+                    };
+                };
+                400: components["responses"]["Problem"];
+                401: components["responses"]["Problem"];
+                403: components["responses"]["Problem"];
+                404: components["responses"]["Problem"];
+                409: components["responses"]["Problem"];
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/providers/{providerID}/verification": {
         parameters: {
             query?: never;
@@ -1132,7 +1233,7 @@ export interface paths {
         put?: never;
         /**
          * ایجاد رزرو
-         * @description مشتری شناسه خدمت، زمان آغاز و به‌صورت اختیاری روش پرداخت را ارسال می‌کند؛ مدت، پایان، بافر، مبلغ و ارائه‌دهنده از داده معتبر سرور محاسبه و snapshot می‌شوند. پیش‌فرض payment_method=wallet است و رزرو در همان تراکنش confirmed می‌شود و مبلغ از مانده قابل‌استفاده به قفل می‌رود. با payment_method=zarinpal رزرو pending_payment با payment_expires_at ساخته می‌شود و فقط پس از Verify موفق به confirmed می‌رسد؛ در این مسیر مانده قابل‌استفاده کیف پول تغییر نمی‌کند.
+         * @description مشتری شناسه خدمت، زمان آغاز و به‌صورت اختیاری روش پرداخت را ارسال می‌کند؛ مدت، پایان، بافر، مبلغ و ارائه‌دهنده از داده معتبر سرور محاسبه و snapshot می‌شوند. پیش‌فرض payment_method=wallet است و رزرو در همان تراکنش confirmed می‌شود و مبلغ از مانده قابل‌استفاده به قفل می‌رود. با payment_method=zarinpal رزرو pending_payment با payment_expires_at ساخته می‌شود و فقط پس از Verify موفق به confirmed می‌رسد؛ در این مسیر مانده قابل‌استفاده کیف پول تغییر نمی‌کند. اگر مبلغ خدمت مثبت و کمتر از حداقل ۱۰٬۰۰۰ ریال درگاه باشد، درخواست Zarinpal پیش از هرگونه قفل زمان با خطای payment_minimum_not_met و وضعیت 400 رد می‌شود.
          */
         post: {
             parameters: {
@@ -1975,6 +2076,26 @@ export interface components {
             phone?: string | null;
             is_active: boolean;
             roles: string[];
+        };
+        AdminUser: {
+            /** Format: int64 */
+            id: number;
+            /** Format: email */
+            email: string;
+            phone: string | null;
+            display_name: string;
+            roles: ("client" | "provider" | "admin")[];
+            is_active: boolean;
+            /** Format: date-time */
+            created_at: string;
+        };
+        AdminUserPage: {
+            items: components["schemas"]["AdminUser"][];
+            /** Format: int64 */
+            next_cursor: number | null;
+        };
+        AdminRoleMutationInput: {
+            granted: boolean;
         };
         Problem: {
             type: string;

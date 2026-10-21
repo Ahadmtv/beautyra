@@ -7,6 +7,8 @@ import { redirectOnUnauthorized } from "@/lib/auth/session";
 import { PAYMENT_ID_COOKIE } from "./constants";
 import { resolvePaymentStart, type PaymentStartOutcome } from "./start-result";
 
+const SECURE_COOKIES = process.env.NODE_ENV === "production";
+
 export type BookingPaymentStartResult =
   | { kind: "error"; message: string }
   | { kind: "started"; outcome: PaymentStartOutcome };
@@ -24,6 +26,9 @@ export async function startBookingPayment(
   } catch (error) {
     redirectOnUnauthorized(error);
     if (error instanceof ApiError) {
+      if (error.code === "payment_conflict" || error.code === "payment_mismatch") {
+        return { kind: "error", message: t("booking.error.paymentStart") };
+      }
       return { kind: "error", message: problemMessage(error) };
     }
     throw error;
@@ -32,7 +37,7 @@ export async function startBookingPayment(
   const cookieStore = await cookies();
   cookieStore.set(PAYMENT_ID_COOKIE, String(response.data.payment.id), {
     httpOnly: true,
-    secure: true,
+    secure: SECURE_COOKIES,
     sameSite: "lax",
     path: "/",
     maxAge: 600,

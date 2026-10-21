@@ -14,6 +14,7 @@ import { PAYMENT_ID_COOKIE, PAYMENT_RETURN_COOKIE } from "./constants";
 import { resolvePaymentReturnPath } from "./navigation";
 import { resolvePaymentStart } from "./start-result";
 
+const SECURE_COOKIES = process.env.NODE_ENV === "production";
 const paymentInputSchema = z.coerce.number().int().safe().min(10_000);
 
 export type TopUpState =
@@ -84,7 +85,7 @@ export async function createTopUpAction(
   const cookieStore = await cookies();
   cookieStore.set(PAYMENT_ID_COOKIE, String(response.data.payment.id), {
     httpOnly: true,
-    secure: true,
+    secure: SECURE_COOKIES,
     sameSite: "lax",
     path: "/wallet/payment",
     maxAge: 600,
@@ -94,7 +95,7 @@ export async function createTopUpAction(
     resolvePaymentReturnPath(formData.get("return_to")),
     {
       httpOnly: true,
-      secure: true,
+      secure: SECURE_COOKIES,
       sameSite: "lax",
       path: "/wallet",
       maxAge: 600,

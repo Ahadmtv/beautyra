@@ -30,22 +30,26 @@ export async function createBookingAction(
     booking = await createBooking(submission.input, submission.idempotencyKey);
   } catch (error) {
     redirectOnUnauthorized(error);
-    if (error instanceof ApiError && error.status === 409) {
-      return { message: t("booking.error.slotTaken") };
-    }
     if (error instanceof ApiError) {
-      return { message: problemMessage(error) };
+      return { message: bookingErrorMessage(error) };
     }
     throw error;
   }
 
   revalidatePath("/dashboard/bookings");
-  booking = await getBooking(booking.id);
+  try {
+    booking = await getBooking(booking.id);
+  } catch (error) {
+    if (error instanceof ApiError) {
+      return { message: problemMessage(error) };
+    }
+    throw error;
+  }
   if (booking.status === "confirmed") {
     redirect(`/bookings/${booking.id}/success`);
   }
   if (booking.status !== "pending_payment") {
-    return { message: t("booking.error.slotTaken") };
+    return { message: t("booking.error.conflict") };
   }
 
   const payment = await startBookingPayment(booking.id, submission.paymentIdempotencyKey);
@@ -59,4 +63,22 @@ export async function createBookingAction(
     return { message: t("api.error.generic") };
   }
   redirect("/wallet/payment/result");
+}
+
+function bookingErrorMessage(error: ApiError): string {
+  switch (error.code) {
+    case "booking_conflict":
+      return t("booking.error.slotTaken");
+    case "insufficient_wallet_funds":
+      return t("booking.error.insufficientBalance");
+    case "payment_minimum_not_met":
+      return t("booking.error.paymentMinimum");
+    case "service_unavailable":
+      return t("booking.error.notFound");
+    case "idempotency_conflict":
+    case "payment_amount_mismatch":
+      return t("booking.error.duplicate");
+    default:
+      return problemMessage(error);
+  }
 }

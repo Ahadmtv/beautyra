@@ -5,6 +5,7 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { z } from "zod";
 
 import { t } from "@/config/messages.fa";
+import { setAdminUserRole, type AdminRole } from "@/lib/api/admin";
 import { apiFetchWithStatus } from "@/lib/api/client";
 import { applyAdminPayoutAction, type AdminPayoutAction } from "@/lib/api/payouts";
 import { ApiError, problemMessage } from "@/lib/api/problem";
@@ -27,6 +28,12 @@ const disputeResolutionSchema = z.object({
   bookingId: z.number().int().safe().positive(),
   resolution: z.enum(["settle", "cancel"]),
   note: z.string().trim().max(1000),
+});
+
+const userRoleSchema = z.object({
+  userId: z.number().int().safe().positive(),
+  role: z.enum(["provider", "admin"]),
+  granted: z.enum(["true", "false"]).transform((value) => value === "true"),
 });
 
 const payoutActionSchema = z.object({
@@ -211,4 +218,35 @@ export async function adminPayoutAction(
   revalidatePath("/provider/payouts");
   revalidatePath("/wallet");
   return { message: t("admin.payouts.success"), success: true };
+}
+
+export async function updateAdminUserRoleAction(
+  _previous: AdminActionState,
+  formData: FormData,
+): Promise<AdminActionState> {
+  const session = await requireRole("admin");
+  if (isRateLimited(session.userId)) return { message: t("admin.users.error") };
+
+  const parsed = userRoleSchema.safeParse({
+    userId: readPositiveInteger(formData, "user_id"),
+    role: readString(formData, "role"),
+    granted: readString(formData, "granted"),
+  });
+  if (!parsed.success) return { message: t("admin.users.error") };
+
+  try {
+    await setAdminUserRole(parsed.data.userId, parsed.data.role as AdminRole, parsed.data.granted);
+  } catch (error) {
+    redirectOnUnauthorized(error);
+    if (error instanceof ApiError) {
+      if (error.code === "self_role_change_forbidden") return { message: t("admin.users.selfRole") };
+      if (error.code === "last_admin_protected") return { message: t("admin.users.lastAdmin") };
+      if (error.code === "user_inactive") return { message: t("admin.users.inactiveUser") };
+      return { message: problemMessage(error) };
+    }
+    throw error;
+  }
+
+  revalidatePath("/admin/users");
+  return { message: t("admin.users.success"), success: true };
 }

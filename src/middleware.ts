@@ -48,6 +48,7 @@ export const config = {
     "/provider/:path*",
     "/admin/:path*",
     "/book/:path*",
+    "/bookings/:path*",
     "/wallet/:path*",
   ],
 };

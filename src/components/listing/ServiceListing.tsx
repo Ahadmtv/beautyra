@@ -20,7 +20,7 @@ export async function ServiceListing({ params }: { params: URLSearchParams }) {
     <Stack spacing={2.5}>
       {cards.length === 0 ? (
         <Paper elevation={0} sx={{ display: "grid", minHeight: 220, placeItems: "center", p: 4, border: "1px dashed #cbd9d5", borderRadius: 3, bgcolor: "rgba(255,255,255,0.7)" }}>
-          <Stack spacing={1} alignItems="center" textAlign="center">
+          <Stack spacing={1} sx={{ alignItems: "center", textAlign: "center" }}>
             <Box sx={{ display: "grid", width: 48, height: 48, placeItems: "center", borderRadius: "50%", bgcolor: "#e6f4f1", color: "#0f766e" }}>
               <svg aria-hidden="true" viewBox="0 0 24 24" className="size-6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="11" cy="11" r="7" />

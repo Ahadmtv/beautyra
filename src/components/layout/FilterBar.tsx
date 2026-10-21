@@ -46,8 +46,11 @@ export function FilterBar({ filters }: FilterBarProps) {
             reserveHelperText={false}
             className="w-full"
           />
+          {filters.category && <input type="hidden" name="category" value={filters.category} />}
+          {filters.city && <input type="hidden" name="city" value={filters.city} />}
+          {filters.neighborhood && <input type="hidden" name="neighborhood" value={filters.neighborhood} />}
         </Box>
-        <Stack direction="row" alignItems="center" gap={1.5} sx={{ minWidth: 0 }}>
+        <Stack direction="row" sx={{ alignItems: "center", gap: 1.5, minWidth: 0 }}>
           <Button type="submit" variant="primary" className="w-full md:w-auto">
             <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               <circle cx="11" cy="11" r="7" />

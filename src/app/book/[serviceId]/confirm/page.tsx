@@ -8,6 +8,7 @@ import { t } from "@/config/messages.fa";
 import { getProviderAvailability } from "@/lib/api/availability";
 import { ApiError } from "@/lib/api/problem";
 import { loadPublicServiceDetailOrNotFound } from "@/lib/api/services";
+import { getWalletBalance } from "@/lib/api/wallet";
 import type { AvailabilityResponse } from "@/lib/api/types";
 import { ROLES } from "@/lib/auth/claims";
 import { requireRole } from "@/lib/auth/session";
@@ -42,6 +43,7 @@ export default async function BookingConfirmPage({ params, searchParams }: Confi
 
   const availability = await loadAvailabilityOrNotFound(service.provider_id, service.id, date);
   const slot = availability.slots.find((item) => item.start_at === startAt);
+  const walletAvailableIrr = await loadWalletAvailableOrNull();
 
   return (
     <main className="mx-auto w-full max-w-page flex-1 px-4 py-6 md:py-8">
@@ -91,6 +93,7 @@ export default async function BookingConfirmPage({ params, searchParams }: Confi
             providerName={provider?.name ?? null}
             durationMinutes={service.duration_minutes}
             priceIrr={service.price_irr}
+            walletAvailableIrr={walletAvailableIrr}
             availability={availability}
             startAt={slot.start_at}
           />
@@ -106,6 +109,7 @@ type ConfirmationDetailsProps = {
   providerName: string | null;
   durationMinutes: number;
   priceIrr: number;
+  walletAvailableIrr: number | null;
   availability: AvailabilityResponse;
   startAt: string;
 };
@@ -116,6 +120,7 @@ function ConfirmationDetails({
   providerName,
   durationMinutes,
   priceIrr,
+  walletAvailableIrr,
   availability,
   startAt,
 }: ConfirmationDetailsProps) {
@@ -159,11 +164,27 @@ function ConfirmationDetails({
         serviceId={serviceId}
         date={availability.date}
         startAt={startAt}
+        priceIrr={priceIrr}
+        walletAvailableIrr={walletAvailableIrr}
         idempotencyKey={randomUUID()}
         paymentIdempotencyKey={randomUUID()}
       />
     </>
   );
+}
+
+async function loadWalletAvailableOrNull(): Promise<number | null> {
+  try {
+    return (await getWalletBalance()).available_irr;
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 401) {
+      redirect("/auth/expired");
+    }
+    if (error instanceof ApiError && (error.status === 403 || error.status === 404)) {
+      return null;
+    }
+    throw error;
+  }
 }
 
 async function loadAvailabilityOrNotFound(

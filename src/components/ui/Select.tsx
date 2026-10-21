@@ -1,17 +1,25 @@
-import type { SelectHTMLAttributes } from "react";
+import type { ChangeEventHandler } from "react";
 import { FormControl, FormHelperText, InputLabel, NativeSelect, OutlinedInput } from "@mui/material";
 
 type SelectOption = { value: string; label: string };
 
-type SelectProps = SelectHTMLAttributes<HTMLSelectElement> & {
+type SelectProps = {
   id: string;
   label: string;
   options: ReadonlyArray<SelectOption>;
   placeholder?: string;
   error?: string;
+  className?: string;
+  required?: boolean;
+  name?: string;
+  disabled?: boolean;
+  defaultValue?: string | number | readonly string[];
+  value?: string | number | readonly string[];
+  onChange?: ChangeEventHandler<HTMLSelectElement>;
+  "aria-label"?: string;
 };
 
-export function Select({ id, label, options, placeholder, error, className, required, ...rest }: SelectProps) {
+export function Select({ id, label, options, placeholder, error, className, required, name, disabled, defaultValue, value, onChange, "aria-label": ariaLabel }: SelectProps) {
   const messageId = `${id}-message`;
 
   return (
@@ -37,9 +45,13 @@ export function Select({ id, label, options, placeholder, error, className, requ
     >
       <InputLabel htmlFor={id}>{label}</InputLabel>
       <NativeSelect
-        {...rest}
+        name={name}
+        disabled={disabled}
+        defaultValue={defaultValue}
+        value={value}
+        onChange={onChange}
         input={<OutlinedInput label={label} />}
-        inputProps={{ id, "aria-describedby": error ? messageId : undefined }}
+        inputProps={{ id, "aria-describedby": error ? messageId : undefined, "aria-label": ariaLabel }}
       >
         {placeholder && <option value="">{placeholder}</option>}
         {options.map((option) => (

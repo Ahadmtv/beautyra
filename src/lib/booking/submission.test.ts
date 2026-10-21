@@ -30,6 +30,14 @@ describe("parseBookingSubmission", () => {
     });
   });
 
+  it("uses the selected wallet payment method", () => {
+    expect(parseBookingSubmission(buildForm({ payment_method: "wallet" }))?.input.payment_method).toBe("wallet");
+  });
+
+  it("rejects an unsupported payment method", () => {
+    expect(parseBookingSubmission(buildForm({ payment_method: "cash" }))).toBeNull();
+  });
+
   it("reuses the same idempotency key when the same form is resubmitted", () => {
     const form = buildForm();
 

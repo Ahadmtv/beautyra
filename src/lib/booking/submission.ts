@@ -7,6 +7,7 @@ const submissionSchema = z.object({
   starts_at: z.iso.datetime({ offset: true }),
   idempotency_key: z.string().min(1).max(128),
   payment_idempotency_key: z.string().min(1).max(128),
+  payment_method: z.enum(["wallet", "zarinpal"]).default("zarinpal"),
 });
 
 export type BookingSubmission = {
@@ -21,6 +22,7 @@ export function parseBookingSubmission(formData: FormData): BookingSubmission | 
     starts_at: readField(formData, "starts_at"),
     idempotency_key: readField(formData, "idempotency_key"),
     payment_idempotency_key: readField(formData, "payment_idempotency_key"),
+    payment_method: readField(formData, "payment_method") || undefined,
   });
   if (!parsed.success) {
     return null;
@@ -29,7 +31,7 @@ export function parseBookingSubmission(formData: FormData): BookingSubmission | 
     input: {
       service_id: parsed.data.service_id,
       starts_at: parsed.data.starts_at,
-      payment_method: "zarinpal",
+      payment_method: parsed.data.payment_method,
     },
     idempotencyKey: parsed.data.idempotency_key,
     paymentIdempotencyKey: parsed.data.payment_idempotency_key,

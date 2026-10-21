@@ -21,6 +21,7 @@ export const metadata: Metadata = {
 };
 
 const statusOptions = [
+  { value: "pending_payment", label: t("dashboard.bookings.status.pending_payment") },
   { value: "confirmed", label: t("dashboard.bookings.status.confirmed") },
   { value: "in_progress", label: t("dashboard.bookings.status.in_progress") },
   { value: "completion_pending", label: t("dashboard.bookings.status.completion_pending") },

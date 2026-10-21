@@ -33,7 +33,7 @@ export function ProviderCard({ card }: { card: ProviderCardView }) {
           {card.name.slice(0, 1)}
         </Avatar>
         <Stack spacing={1.1} sx={{ minWidth: 0, flex: 1 }}>
-          <Stack direction="row" alignItems="center" flexWrap="wrap" gap={0.75}>
+          <Stack direction="row" sx={{ alignItems: "center", flexWrap: "wrap", gap: 0.75 }}>
             <Typography component="h2" sx={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFamily: "inherit", fontSize: 15, fontWeight: 750, color: "#172b2a" }}>
               {card.name}
             </Typography>
@@ -49,7 +49,7 @@ export function ProviderCard({ card }: { card: ProviderCardView }) {
           <Box sx={{ mt: "auto !important", display: "flex", minHeight: 24, alignItems: "center", justifyContent: "space-between", gap: 1, flexWrap: "wrap" }}>
             {card.neighborhood && <Typography sx={{ fontFamily: "inherit", fontSize: 12, color: "#617472" }}>{card.neighborhood}</Typography>}
             {card.rating !== null && (
-              <Stack direction="row" alignItems="center" spacing={0.75} sx={{ direction: "ltr" }}>
+              <Stack direction="row" spacing={0.75} sx={{ alignItems: "center", direction: "ltr" }}>
                 <Rating
                   value={card.rating}
                   readOnly

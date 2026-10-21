@@ -38,7 +38,7 @@ export function buttonClassName({
     .join(" ");
 }
 
-type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+type ButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, "color"> & {
   variant?: ButtonVariant;
   size?: ButtonSize;
   loading?: boolean;
