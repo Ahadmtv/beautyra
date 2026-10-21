@@ -192,3 +192,7 @@
 - **فرانت** — آزمون محافظ `src/config/messages.guard.test.ts` (۵ آزمون): منع واژه‌های فنی در همه‌ی پیام‌ها + پوشش لیبل enumهای وضعیت رزرو/تسویه/احراز.
 - **فرانت** — بازخورد نهایی: `npm run lint` ✅ | `npm run typecheck` ✅ | `npm run test` ✅ (22 فایل، ۱۳۵ آزمون) | `npm run build` ✅.
 - **NEXT:** تثبیت گیت (کامیت تغییرات فعلی در دو مخزن؛ شاخه بک‌اند `main` بدون کامیت است) و سپس بازبینی ادامه‌ی ردیف‌های «بخش ۳» با تصمیم محصولی (فیلتر شهر/محله نیازمند ADR و مهاجرت داده).
+
+### ۱۴۰۵/۰۷/۲۹ — رفع دو خطای اجرایی SSR
+- `internal/platform/middleware.go::ErrorHandler` خطای ۴۰۴ مسیریابی فایبر (fiber.ErrNotFound) را به ۵۰۰ «خطای داخلی سرور» تبدیل می‌کرد → نگاشت به ۴۰۴ `route_not_found` و ۴۰۵ `method_not_allowed` (+ آزمون واحد `internal/platform/errorhandler_test.go`)؛ بک‌اند `a943284`، کانتینر بازبیلد شد.
+- `GET /api/v1/admin/bookings?refundable=false` طبق OpenAPI باید boolean معتبر تلقی شود ولی ۴۰۰ برگشت می‌داد → پذیرش `false` در handler (+ آزمون integration) و حذف پارامتر در حالت uncheck در `src/lib/api/admin.ts`؛ بک‌اند `516afda`، فرانت `2dbfb30`.
