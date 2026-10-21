@@ -125,7 +125,7 @@ export async function createAdminRefundAction(
     throw error;
   }
 
-  revalidatePath("/admin/refunds");
+  revalidatePath("/admin/bookings");
   revalidatePath("/dashboard/bookings");
   revalidatePath("/wallet");
   return {
@@ -168,7 +168,7 @@ export async function resolveDisputeAction(
     throw error;
   }
 
-  revalidatePath("/admin/disputes");
+  revalidatePath("/admin/bookings");
   revalidatePath("/dashboard/bookings");
   revalidatePath("/provider/bookings");
   revalidatePath("/wallet");

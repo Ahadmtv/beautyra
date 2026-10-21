@@ -30,8 +30,7 @@ const roleLinks: Record<Role, Array<{ href: string; label: MessageKey; icon: str
   admin: [
     { href: "/admin/users", label: "admin.nav.users", icon: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 9a7 7 0 0 1 14 0m2-9h4m-2-2v4" },
     { href: "/admin/providers", label: "admin.nav.providers", icon: "M12 3 4 7v5c0 5 3.5 8 8 9 4.5-1 8-4 8-9V7z" },
-    { href: "/admin/refunds", label: "admin.nav.refunds", icon: "M4 7h16M7 4 4 7l3 3m13 7H4m13-3 3 3-3 3" },
-    { href: "/admin/disputes", label: "admin.nav.disputes", icon: "M12 3 3 20h18L12 3Zm0 6v5m0 3h.01" },
+    { href: "/admin/bookings", label: "admin.nav.bookings", icon: "M8 3v3m8-3v3M4 9h16M5 5h14v15H5z" },
     { href: "/admin/payouts", label: "admin.nav.payouts", icon: "M3 6h18v13H3zM3 10h18m-4 5h1" },
   ],
 };

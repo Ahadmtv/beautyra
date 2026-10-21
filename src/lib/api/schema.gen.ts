@@ -796,6 +796,56 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/providers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * فهرست ارائه‌دهندگان برای مدیر
+         * @description همه نمایه‌های ارائه‌دهنده را با صفحه‌بندی cursor-based، فیلتر وضعیت تأیید و جست‌وجوی متنی (نام نمایشی، ایمیل و تلفن مالک) برمی‌گرداند.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description شناسه آخرین رکورد صفحه قبلی */
+                    cursor?: components["parameters"]["Cursor"];
+                    /** @description تعداد رکورد صفحه، پیش‌فرض 50 و حداکثر 100 */
+                    limit?: components["parameters"]["Limit"];
+                    verification_status?: "pending" | "verified" | "rejected";
+                    /** @description جست‌وجو در نام نمایشی، ایمیل و تلفن مالک */
+                    q?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description صفحه ارائه‌دهندگان */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AdminProviderPage"];
+                    };
+                };
+                400: components["responses"]["Problem"];
+                401: components["responses"]["Problem"];
+                403: components["responses"]["Problem"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/providers/{providerID}/verification": {
         parameters: {
             query?: never;
@@ -1136,6 +1186,58 @@ export interface paths {
                 401: components["responses"]["Problem"];
                 403: components["responses"]["Problem"];
                 404: components["responses"]["Problem"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/bookings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * فهرست رزروها برای مدیر
+         * @description همه رزروهای سامانه را با صفحه‌بندی cursor-based، فیلتر وضعیت، جست‌وجوی متنی (نام خدمت، ایمیل مشتری و نام نمایشی ارائه‌دهنده) و نمای بازپرداخت‌پذیر برمی‌گرداند. در نمای بازپرداخت‌پذیر فقط رزروهای completed با قفل تسویه‌شده و بازپرداخت‌نشده برمی‌گردند.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description شناسه آخرین رکورد صفحه قبلی */
+                    cursor?: components["parameters"]["Cursor"];
+                    /** @description تعداد رکورد صفحه، پیش‌فرض 50 و حداکثر 100 */
+                    limit?: components["parameters"]["Limit"];
+                    status?: "pending_payment" | "confirmed" | "in_progress" | "completion_pending" | "disputed" | "completed" | "cancelled" | "expired";
+                    /** @description جست‌وجو در نام خدمت، ایمیل مشتری و نام نمایشی ارائه‌دهنده */
+                    q?: string;
+                    /** @description اگر true باشد فقط رزروهای بازپرداخت‌پذیر برمی‌گردند */
+                    refundable?: boolean;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description صفحه رزروها برای مدیر */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AdminBookingPage"];
+                    };
+                };
+                400: components["responses"]["Problem"];
+                401: components["responses"]["Problem"];
+                403: components["responses"]["Problem"];
             };
         };
         put?: never;
@@ -1787,6 +1889,54 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/payouts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * فهرست درخواست‌های تسویه برای مدیر
+         * @description همه درخواست‌های تسویه سامانه را با صفحه‌بندی cursor-based و فیلتر اختیاری وضعیت برمی‌گرداند و نام نمایشی ارائه‌دهنده هر ردیف را برمی‌گرداند.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description شناسه آخرین رکورد صفحه قبلی */
+                    cursor?: components["parameters"]["Cursor"];
+                    /** @description تعداد رکورد صفحه، پیش‌فرض 50 و حداکثر 100 */
+                    limit?: components["parameters"]["Limit"];
+                    status?: "requested" | "approved" | "processing" | "paid" | "rejected" | "failed";
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description صفحه درخواست‌های تسویه برای مدیر */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AdminPayoutPage"];
+                    };
+                };
+                400: components["responses"]["Problem"];
+                401: components["responses"]["Problem"];
+                403: components["responses"]["Problem"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/payouts/{payoutID}/approve": {
         parameters: {
             query?: never;
@@ -2097,6 +2247,30 @@ export interface components {
         AdminRoleMutationInput: {
             granted: boolean;
         };
+        AdminProvider: {
+            /** Format: int64 */
+            provider_id: number;
+            display_name: string;
+            /** @enum {string} */
+            verification_status: "pending" | "verified" | "rejected";
+            is_active: boolean;
+            /**
+             * Format: email
+             * @description از contact مالک حساب ارائه‌دهنده؛ فقط برای مدیر
+             */
+            owner_email: string;
+            /** @description تلفن مالک؛ فقط برای مدیر */
+            owner_phone?: string | null;
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        AdminProviderPage: {
+            items: components["schemas"]["AdminProvider"][];
+            /** Format: int64 */
+            next_cursor: number | null;
+        };
         Problem: {
             type: string;
             title: string;
@@ -2151,6 +2325,8 @@ export interface components {
             price_irr: number;
             buffer_minutes: number;
             is_active: boolean;
+            /** @description نام نمایشی ارائه‌دهنده خدمت؛ برای نمایش در فهرست عمومی */
+            provider_display_name?: string;
         };
         ServiceInput: {
             name: string;
@@ -2385,6 +2561,15 @@ export interface components {
             /** Format: date-time */
             updated_at: string;
         };
+        /** @description ردیف درخواست تسویه از نگاه مدیر با نام نمایشی ارائه‌دهنده */
+        AdminPayout: components["schemas"]["PayoutRequest"] & {
+            provider_display_name: string;
+        };
+        AdminPayoutPage: {
+            items: components["schemas"]["AdminPayout"][];
+            /** Format: int64 */
+            next_cursor: number | null;
+        };
         PayoutPage: {
             items: components["schemas"]["PayoutRequest"][];
             /** Format: int64 */
@@ -2395,6 +2580,44 @@ export interface components {
         };
         BookingPage: {
             items: components["schemas"]["Booking"][];
+            /** Format: int64 */
+            next_cursor: number | null;
+        };
+        /** @description ردیف رزرو از نگاه مدیر با اطلاعات تماس مشتری و وضعیت بازپرداخت */
+        AdminBooking: {
+            /** Format: int64 */
+            id: number;
+            /** @enum {string} */
+            status: "pending_payment" | "confirmed" | "in_progress" | "completion_pending" | "disputed" | "completed" | "cancelled" | "expired";
+            service_name: string;
+            /** Format: date-time */
+            starts_at: string;
+            /** Format: date-time */
+            ends_at: string;
+            /**
+             * Format: int64
+             * @description مبلغ صحیح ریال
+             */
+            price_irr: number;
+            /** @enum {string} */
+            payment_method: "none" | "wallet" | "zarinpal";
+            /**
+             * Format: email
+             * @description اطلاعات تماس مشتری؛ فقط برای مدیر
+             */
+            client_email: string;
+            /** @description تلفن مشتری؛ فقط برای مدیر */
+            client_phone?: string | null;
+            provider_display_name: string;
+            /** @description اختلاف حل‌نشده روی این رزرو وجود دارد */
+            has_open_dispute: boolean;
+            /** @description رزرو completed است و قفل تسویه‌شده آن بازپرداخت نشده */
+            refundable: boolean;
+            /** Format: date-time */
+            created_at: string;
+        };
+        AdminBookingPage: {
+            items: components["schemas"]["AdminBooking"][];
             /** Format: int64 */
             next_cursor: number | null;
         };

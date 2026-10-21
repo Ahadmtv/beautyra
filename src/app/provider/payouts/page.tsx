@@ -12,7 +12,6 @@ import { getWalletBalance } from "@/lib/api/wallet";
 import { ApiError } from "@/lib/api/problem";
 import { redirectOnUnauthorized, requireRole } from "@/lib/auth/session";
 import { formatTomanFromRial } from "@/lib/format/money";
-import { numberFormatFa } from "@/lib/format/digits";
 
 export const metadata: Metadata = {
   title: `${t("provider.payouts.title")} | ${t("brand.name")}`,
@@ -97,7 +96,6 @@ export default async function ProviderPayoutsPage({ searchParams }: PayoutPagePr
                 <div className="flex min-w-0 flex-col gap-1">
                   <span className="font-semibold text-text">{formatTomanFromRial(payout.amount_irr)}</span>
                   <span className="text-xs text-text-muted">
-                    {t("provider.payouts.id")}: {numberFormatFa(payout.id)} —{" "}
                     {dateFormatter.format(new Date(payout.created_at))}
                   </span>
                   {payout.admin_note && (

@@ -11,6 +11,10 @@ describe("Jalali provider date inputs", () => {
     expect(jalaliDateTimeToGregorian("۱۴۰۴-۰۱-۰۱T۰۹:۰۰:۰۰+۰۳:۳۰")).toBe("2025-03-21T09:00:00+03:30");
   });
 
+  it("converts Jalali local date-times separated by a space", () => {
+    expect(jalaliDateTimeToGregorian("۱۴۰۴/۰۱/۰۱ ۰۹:۰۰")).toBe("2025-03-21T09:00");
+  });
+
   it("rejects invalid Jalali calendar days", () => {
     expect(jalaliDateToGregorianIso("۱۴۰۴/۱۳/۰۱")).toBeNull();
     expect(jalaliDateToGregorianIso("۱۴۰۴/۱۲/۳۰")).toBeNull();

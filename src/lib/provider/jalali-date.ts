@@ -4,7 +4,7 @@ import { gregorianToJalali, jalaliToGregorian } from "@/lib/jalali/convert";
 const JALALI_DATE_PATTERN = /^(\d{4})[/-](\d{1,2})[/-](\d{1,2})$/;
 
 export function jalaliDateTimeToGregorian(value: string): string | null {
-  const match = /^(.*?)[Tt](.+)$/.exec(toAsciiDigits(value.trim()));
+  const match = /^(.*?)[Tt ](.+)$/.exec(toAsciiDigits(value.trim()));
   if (!match) return null;
   const date = jalaliDateToGregorianIso(match[1]);
   return date ? `${date}T${match[2]}` : null;

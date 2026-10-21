@@ -12,7 +12,6 @@ import { ApiError } from "@/lib/api/problem";
 import { redirectOnUnauthorized } from "@/lib/auth/session";
 import { formatSlotTime, todayInTimeZone } from "@/lib/booking/dates";
 import { describeJalaliDate } from "@/lib/jalali/labels";
-import { numberFormatFa } from "@/lib/format/digits";
 
 export const metadata: Metadata = {
   title: `${t("provider.timeOff.title")} | ${t("brand.name")}`,
@@ -47,7 +46,7 @@ export default async function ProviderTimeOffPage({ searchParams }: ProviderTime
           </svg>
         </summary>
         <div className="mt-5 max-w-2xl">
-          <p className="mb-4 text-sm text-text-muted">{t("provider.timeOff.timeZoneNote", { timeZone })}</p>
+          <p className="mb-4 text-sm text-text-muted">{t("provider.timeOff.timeZoneNote")}</p>
           <TimeOffForm />
         </div>
       </details>
@@ -70,7 +69,6 @@ export default async function ProviderTimeOffPage({ searchParams }: ProviderTime
                   </p>
                 )}
                 {item.reason && <p className="mt-2 text-sm text-text">{item.reason}</p>}
-                <p className="mt-2 text-xs text-text-muted">{t("provider.timeOff.reference")}: {numberFormatFa(item.id)}</p>
               </li>
             ))}
           </ul>
