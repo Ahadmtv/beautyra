@@ -148,7 +148,7 @@ export const messages = {
   "dashboard.bookings.title": "رزروهای من",
   "dashboard.bookings.filter.status": "وضعیت رزرو",
   "dashboard.bookings.filter.all": "همه وضعیت‌ها",
-  "dashboard.bookings.filter.submit": "اعمال فیلتر",
+
   "dashboard.bookings.status.pending_payment": "در انتظار پرداخت",
   "dashboard.bookings.status.confirmed": "تأییدشده",
   "dashboard.bookings.status.in_progress": "در حال انجام",

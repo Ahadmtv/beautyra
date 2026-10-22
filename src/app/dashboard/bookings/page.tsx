@@ -3,9 +3,9 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { BookingStatusBadge } from "@/components/dashboard/BookingStatusBadge";
-import { Button } from "@/components/ui/Button";
+import { BookingsStatusFilter } from "@/components/dashboard/BookingsStatusFilter";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { Select } from "@/components/ui/Select";
+
 import { t } from "@/config/messages.fa";
 import { getCustomerBookings } from "@/lib/api/bookings";
 import type { Booking, BookingPage } from "@/lib/api/types";
@@ -67,19 +67,15 @@ export default async function CustomerBookingsPage({ searchParams }: BookingsPag
           <h1 className="text-2xl font-bold text-text">{t("dashboard.bookings.title")}</h1>
           <p className="mt-2 text-xs text-text-muted">{t("dashboard.booking.timeZoneNote")}</p>
         </div>
-        <form method="get" className="flex flex-col gap-3 sm:flex-row sm:items-end">
-          <Select
-            id="booking-status"
-            name="status"
-            label={t("dashboard.bookings.filter.status")}
-            placeholder={t("dashboard.bookings.filter.all")}
+        <div className="w-full sm:max-w-xs">
+          <BookingsStatusFilter
+            key={selectedStatus}
+            selectedStatus={selectedStatus}
             options={statusOptions}
-            defaultValue={selectedStatus}
+            label={t("dashboard.bookings.filter.status")}
+            allLabel={t("dashboard.bookings.filter.all")}
           />
-          <Button type="submit" variant="outline">
-            {t("dashboard.bookings.filter.submit")}
-          </Button>
-        </form>
+        </div>
       </div>
 
       {selectedStatus && (
