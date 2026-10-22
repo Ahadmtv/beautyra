@@ -62,9 +62,14 @@ export function Select({
       sx={{
         fontFamily: "inherit",
         "& .MuiInputLabel-root": { fontFamily: "inherit" },
+        "& .MuiInputBase-root": { width: "100%", minWidth: 0 },
         "& .MuiNativeSelect-select": {
-          minHeight: compact || topLabel ? "44px" : "1.25rem",
+          display: "block",
+          width: "100%",
+          minWidth: 0,
+          minHeight: compact || topLabel ? "44px" : "56px",
           boxSizing: "border-box",
+          paddingBlock: compact || topLabel ? "10px" : "16px",
           paddingInlineStart: "14px !important",
           paddingInlineEnd: "38px !important",
           textAlign: "start",
