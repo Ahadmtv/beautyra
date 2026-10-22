@@ -1,7 +1,6 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { t } from "@/config/messages.fa";
@@ -10,7 +9,7 @@ import { ApiError, problemMessage } from "@/lib/api/problem";
 import { redirectOnUnauthorized, requireRole } from "@/lib/auth/session";
 import { toAsciiDigits } from "@/lib/format/digits";
 
-export type ProviderPayoutState = { message?: string };
+export type ProviderPayoutState = { message?: string; success?: boolean };
 
 const payoutSchema = z.object({
   amountIRR: z.number().int().safe().positive(),
@@ -57,7 +56,6 @@ export async function requestPayoutAction(
     throw error;
   }
 
-  revalidatePath("/provider/payouts");
   revalidatePath("/wallet");
-  redirect("/provider/payouts");
+  return { message: t("provider.payouts.success"), success: true };
 }

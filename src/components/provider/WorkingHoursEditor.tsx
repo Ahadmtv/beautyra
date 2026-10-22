@@ -1,8 +1,10 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/Button";
+import { useActionFeedback } from "@/components/ui/use-action-feedback";
 import { t, WEEKDAY_NAMES_BY_UTC_DAY } from "@/config/messages.fa";
 import type { WorkingInterval } from "@/lib/api/types";
 import {
@@ -23,9 +25,11 @@ const saturdayFirstWeek = [
 ] as const;
 
 export function WorkingHoursEditor({ initialIntervals }: { initialIntervals: WorkingInterval[] }) {
+  const router = useRouter();
   const [intervals, setIntervals] = useState(initialIntervals);
   const [state, formAction, pending] = useActionState(saveWorkingHoursAction, initialState);
   const [clientError, setClientError] = useState(false);
+  useActionFeedback(state, { onSuccess: () => router.refresh() });
 
   function updateInterval(index: number, field: "opens_at" | "closes_at", value: string) {
     setIntervals((current) => current.map((interval, itemIndex) =>
@@ -130,9 +134,9 @@ export function WorkingHoursEditor({ initialIntervals }: { initialIntervals: Wor
           );
         })}
       </div>
-      {(clientError || state.message) && (
+      {clientError && (
         <p role="alert" className="text-sm text-danger">
-          {state.message ?? t("provider.workingHours.invalid")}
+          {t("provider.workingHours.invalid")}
         </p>
       )}
       <Button type="submit" loading={pending} className="w-fit">

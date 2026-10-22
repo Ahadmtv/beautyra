@@ -5,6 +5,7 @@ import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
 
 import { Button } from "@/components/ui/Button";
+import { useActionFeedback } from "@/components/ui/use-action-feedback";
 import { PAYMENT_GATEWAY_MINIMUM_IRR } from "@/config/booking";
 import { t } from "@/config/messages.fa";
 import { type BookingFormState, createBookingAction } from "@/lib/booking/actions";
@@ -32,6 +33,7 @@ export function BookingConfirmForm({
   paymentIdempotencyKey,
 }: BookingConfirmFormProps) {
   const [state, formAction] = useActionState(createBookingAction, initialState);
+  useActionFeedback(state);
   const gatewayAllowed = priceIrr === 0 || priceIrr >= PAYMENT_GATEWAY_MINIMUM_IRR;
   const walletCovers = walletAvailableIrr !== null && walletAvailableIrr >= priceIrr;
   const [paymentMethod, setPaymentMethod] = useState<"wallet" | "zarinpal">(
@@ -89,8 +91,7 @@ export function BookingConfirmForm({
       </fieldset>
 
       {state.message && (
-        <div role="alert" className="flex flex-col items-start gap-3 rounded-md bg-surface p-4 text-sm text-text">
-          <p>{state.message}</p>
+        <div className="flex flex-col items-start gap-3 rounded-md bg-surface p-4 text-sm text-text">
           <Link
             href={`/book/${serviceId}?date=${date}`}
             className="font-medium text-primary hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"

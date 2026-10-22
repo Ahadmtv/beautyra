@@ -12,6 +12,9 @@ export type RegisterState = {
     password?: string;
     form?: string;
   };
+  message?: string;
+  success?: boolean;
+  redirectTo?: string;
 };
 
 export const registerSchema = z.object({

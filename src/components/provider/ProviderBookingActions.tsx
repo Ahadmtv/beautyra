@@ -3,9 +3,11 @@
 import { useState } from "react";
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
+import { useActionFeedback } from "@/components/ui/use-action-feedback";
 import { t, type MessageKey } from "@/config/messages.fa";
 import {
   transitionProviderBookingAction,
@@ -28,8 +30,15 @@ const confirmationLabels: Record<Transition, MessageKey> = {
 };
 
 export function ProviderBookingActions({ bookingId, available }: { bookingId: number; available: Transition[] }) {
+  const router = useRouter();
   const [state, formAction] = useActionState(transitionProviderBookingAction, initialState);
   const [transition, setTransition] = useState<Transition | null>(null);
+  useActionFeedback(state, {
+    onSuccess: () => {
+      setTransition(null);
+      router.refresh();
+    },
+  });
 
   if (available.length === 0) return null;
 
@@ -62,11 +71,6 @@ export function ProviderBookingActions({ bookingId, available }: { bookingId: nu
             <input type="hidden" name="booking_id" value={bookingId} />
             <input type="hidden" name="transition" value={transition} />
             <p className="text-sm leading-7 text-text">{t(confirmationLabels[transition])}</p>
-            {state.message && (
-              <p role="alert" className="rounded-md bg-surface p-3 text-sm text-danger">
-                {state.message}
-              </p>
-            )}
             <div className="flex flex-wrap justify-end gap-2">
               <Button type="button" variant="outline" onClick={() => setTransition(null)}>
                 {t("provider.bookings.close")}

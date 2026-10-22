@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useActionState, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Avatar,
   Box,
@@ -14,8 +15,9 @@ import {
 } from "@mui/material";
 import Link from "next/link";
 
+import { useActionFeedback } from "@/components/ui/use-action-feedback";
 import { t, type MessageKey } from "@/config/messages.fa";
-import { logoutAction } from "@/lib/auth/actions";
+import { logoutAction, type LogoutState } from "@/lib/auth/actions";
 import type { Role } from "@/lib/auth/claims";
 
 const roleLabelKeys: Record<Role, MessageKey> = {
@@ -44,7 +46,16 @@ function MenuGlyph({ path }: { path: string }) {
 }
 
 export function AccountMenu({ role }: { role: Role }) {
+  const router = useRouter();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const [logoutState, logoutFormAction, logoutPending] = useActionState<LogoutState, FormData>(logoutAction, {});
+  useActionFeedback(logoutState, {
+    onSuccess: () => {
+      setAnchorEl(null);
+      router.replace("/");
+      router.refresh();
+    },
+  });
   const open = Boolean(anchorEl);
   const roleLabel = t(roleLabelKeys[role]);
 
@@ -122,8 +133,8 @@ export function AccountMenu({ role }: { role: Role }) {
           </MenuItem>
         ))}
         <Divider sx={{ my: 0.75, borderColor: "#e8efed" }} />
-        <form action={logoutAction}>
-          <MenuItem component="button" type="submit" sx={{ ...menuItemSx, width: "100%", color: "#b42318" }}>
+        <form action={logoutFormAction}>
+          <MenuItem component="button" type="submit" disabled={logoutPending} sx={{ ...menuItemSx, width: "100%", color: "#b42318" }}>
             <ListItemIcon sx={{ ...menuIconSx, color: "inherit" }}><MenuGlyph path="M10 17l5-5-5-5m5 5H3m10-9h5a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-5" /></ListItemIcon>
             <ListItemText disableTypography>{t("auth.logout")}</ListItemText>
           </MenuItem>

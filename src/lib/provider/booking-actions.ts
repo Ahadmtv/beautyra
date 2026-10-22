@@ -1,7 +1,6 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { t } from "@/config/messages.fa";
@@ -18,6 +17,7 @@ const transitionSchema = z.enum(["start", "request_completion", "cancel"]);
 
 export type ProviderBookingActionState = {
   message?: string;
+  success?: boolean;
 };
 
 export async function transitionProviderBookingAction(
@@ -50,7 +50,11 @@ export async function transitionProviderBookingAction(
     throw error;
   }
 
-  revalidatePath("/provider/bookings");
   if (transition.data !== "start") revalidatePath("/wallet");
-  redirect("/provider/bookings");
+  const successMessages = {
+    start: "provider.bookings.startSuccess",
+    request_completion: "provider.bookings.completeSuccess",
+    cancel: "provider.bookings.cancelSuccess",
+  } as const;
+  return { message: t(successMessages[transition.data]), success: true };
 }

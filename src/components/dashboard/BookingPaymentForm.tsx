@@ -1,9 +1,10 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useMemo } from "react";
 import { useFormStatus } from "react-dom";
 
 import { Button } from "@/components/ui/Button";
+import { useActionFeedback } from "@/components/ui/use-action-feedback";
 import { t } from "@/config/messages.fa";
 import { type BookingPaymentState, retryBookingPaymentAction } from "@/lib/payments/actions";
 
@@ -17,16 +18,16 @@ export function BookingPaymentForm({
   idempotencyKey: string;
 }) {
   const [state, formAction] = useActionState(retryBookingPaymentAction, initialState);
+  const feedbackState = useMemo(
+    () => ({ message: state.kind === "error" ? state.message : undefined }),
+    [state],
+  );
+  useActionFeedback(feedbackState);
 
   return (
     <form action={formAction} className="flex flex-col items-start gap-3">
       <input type="hidden" name="booking_id" value={bookingId} />
       <input type="hidden" name="idempotency_key" value={idempotencyKey} />
-      {state.kind === "error" && (
-        <p role="alert" className="text-sm text-rose-700">
-          {state.message}
-        </p>
-      )}
       <SubmitButton />
     </form>
   );

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { ReactNode } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
 
 import { Button } from "@/components/ui/Button";
@@ -17,6 +18,7 @@ import { formatTomanFromRial } from "@/lib/format/money";
 type ProviderServicesViewProps = { page: ServicePage };
 
 export function ProviderServicesView({ page }: ProviderServicesViewProps) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [selectedService, setSelectedService] = useState<Service | undefined>();
   const [dirty, setDirty] = useState(false);
@@ -34,6 +36,13 @@ export function ProviderServicesView({ page }: ProviderServicesViewProps) {
     setOpen(false);
     setSelectedService(undefined);
     setDirty(false);
+  }
+
+  function handleSaved() {
+    setOpen(false);
+    setSelectedService(undefined);
+    setDirty(false);
+    router.refresh();
   }
 
   return (
@@ -128,6 +137,7 @@ export function ProviderServicesView({ page }: ProviderServicesViewProps) {
           service={selectedService}
           formId={`provider-service-form-${formSession}`}
           onCancel={closeForm}
+          onSaved={handleSaved}
           onDirtyChange={setDirty}
         />
       </Modal>

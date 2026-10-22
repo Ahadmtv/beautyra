@@ -1,13 +1,13 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useState } from "react";
 import { InputAdornment } from "@mui/material";
 
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
-import { useToast } from "@/components/ui/Toast";
+import { useActionFeedback } from "@/components/ui/use-action-feedback";
 import { SERVICE_CATEGORY_OPTIONS, t } from "@/config/messages.fa";
 import type { Service } from "@/lib/api/types";
 import { numberFormatFa, toAsciiDigits } from "@/lib/format/digits";
@@ -23,6 +23,7 @@ type ProviderServiceFormProps = {
   service?: Service;
   formId: string;
   onCancel: () => void;
+  onSaved: () => void;
   onDirtyChange: (dirty: boolean) => void;
 };
 
@@ -32,19 +33,15 @@ type NumericErrors = {
   buffer?: string;
 };
 
-export function ProviderServiceForm({ service, formId, onCancel, onDirtyChange }: ProviderServiceFormProps) {
+export function ProviderServiceForm({ service, formId, onCancel, onSaved, onDirtyChange }: ProviderServiceFormProps) {
   const [state, formAction, pending] = useActionState(saveProviderServiceAction, initialState);
   const [duration, setDuration] = useState(numberFormatFa(service?.duration_minutes ?? 30));
   const [price, setPrice] = useState(numberFormatFa(service?.price_irr ?? 0));
   const [buffer, setBuffer] = useState(numberFormatFa(service?.buffer_minutes ?? 0));
   const [errors, setErrors] = useState<NumericErrors>({});
-  const { showToast } = useToast();
   const parsedPrice = parseInteger(price);
   const pricePreview = parsedPrice === null ? undefined : t("provider.services.tomanPreview", { amount: formatTomanFromRial(parsedPrice) });
-
-  useEffect(() => {
-    if (state.message) showToast(state.message, "error");
-  }, [state.message, showToast]);
+  useActionFeedback(state, { onSuccess: onSaved });
 
   return (
     <form
@@ -149,7 +146,6 @@ export function ProviderServiceForm({ service, formId, onCancel, onDirtyChange }
           {t("provider.services.active")}
         </label>
       )}
-      {state.message && <p role="alert" className="text-sm text-danger md:col-span-2">{state.message}</p>}
       <div className="sticky bottom-0 z-10 -mx-6 mt-2 flex flex-wrap justify-end gap-2 border-t border-border bg-white/95 px-6 py-4 backdrop-blur-sm md:col-span-2">
         <Button type="button" variant="ghost" onClick={onCancel}>{t("provider.services.cancel")}</Button>
         <Button type="submit" loading={pending}>{t("provider.services.save")}</Button>

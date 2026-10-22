@@ -96,7 +96,6 @@ export async function updateProviderVerificationAction(
   }
 
   revalidateTag("services", { expire: 0 });
-  revalidatePath("/admin/providers");
   return { message: t("admin.providers.success"), success: true };
 }
 
@@ -126,7 +125,6 @@ export async function createAdminRefundAction(
     throw error;
   }
 
-  revalidatePath("/admin/bookings");
   revalidatePath("/dashboard/bookings");
   revalidatePath("/wallet");
   return {
@@ -169,7 +167,6 @@ export async function resolveDisputeAction(
     throw error;
   }
 
-  revalidatePath("/admin/bookings");
   revalidatePath("/dashboard/bookings");
   revalidatePath("/provider/bookings");
   revalidatePath("/wallet");
@@ -215,7 +212,6 @@ export async function adminPayoutAction(
     throw error;
   }
 
-  revalidatePath("/admin/payouts");
   revalidatePath("/provider/payouts");
   revalidatePath("/wallet");
   return { message: t("admin.payouts.success"), success: true };
@@ -248,6 +244,5 @@ export async function updateAdminUserRoleAction(
     throw error;
   }
 
-  revalidatePath("/admin/users");
   return { message: t("admin.users.success"), success: true };
 }

@@ -1,8 +1,10 @@
 "use client";
 
 import { useActionState, useId, useState } from "react";
-import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, Menu, MenuItem } from "@mui/material";
+import { useRouter } from "next/navigation";
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, Menu, MenuItem } from "@mui/material";
 
+import { useActionFeedback } from "@/components/ui/use-action-feedback";
 import { t } from "@/config/messages.fa";
 import { updateAdminUserRoleAction, type AdminActionState } from "@/lib/admin/actions";
 import type { AdminUser } from "@/lib/api/types";
@@ -12,8 +14,15 @@ type ManagedRole = "provider" | "admin";
 type RoleChange = { role: ManagedRole; granted: boolean };
 
 export function AdminUserRoleControls({ user }: { user: AdminUser }) {
+  const router = useRouter();
   const [state, formAction, pending] = useActionState(updateAdminUserRoleAction, initialState);
   const formPrefix = useId();
+  useActionFeedback(state, {
+    onSuccess: () => {
+      setConfirmation(null);
+      router.refresh();
+    },
+  });
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [confirmation, setConfirmation] = useState<RoleChange | null>(null);
   const isProvider = user.roles.includes("provider");
@@ -31,7 +40,6 @@ export function AdminUserRoleControls({ user }: { user: AdminUser }) {
     if (!confirmation) return;
     const form = document.getElementById(`${formPrefix}-${confirmation.role}`);
     if (form instanceof HTMLFormElement) form.requestSubmit();
-    setConfirmation(null);
   }
 
   return (
@@ -83,11 +91,6 @@ export function AdminUserRoleControls({ user }: { user: AdminUser }) {
           </Button>
         </DialogActions>
       </Dialog>
-      {state.message && (
-        <Alert severity={state.success ? "success" : "error"} sx={{ maxWidth: 240, fontFamily: "inherit", fontSize: 12, py: 0.25 }}>
-          {state.message}
-        </Alert>
-      )}
     </Box>
   );
 }

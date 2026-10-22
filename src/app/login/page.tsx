@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 };
 
 type LoginPageProps = {
-  searchParams: Promise<{ next?: string; expired?: string; registered?: string }>;
+  searchParams: Promise<{ next?: string; expired?: string }>;
 };
 
 export default function LoginPage(props: LoginPageProps) {
@@ -28,7 +28,7 @@ export default function LoginPage(props: LoginPageProps) {
 }
 
 async function LoginPageContent({ searchParams }: LoginPageProps) {
-  const { next, expired, registered } = await searchParams;
+  const { next, expired } = await searchParams;
   const nextPath = sanitizeNextPath(next);
 
   if (await getSession()) {
@@ -65,7 +65,6 @@ async function LoginPageContent({ searchParams }: LoginPageProps) {
           </Box>
 
           {expired === "1" && <Alert severity="info" role="status" sx={{ borderRadius: 2, fontFamily: "inherit", "& .MuiAlert-message": { fontFamily: "inherit" } }}>{t("auth.sessionExpired")}</Alert>}
-          {registered === "1" && <Alert severity="success" role="status" sx={{ borderRadius: 2, fontFamily: "inherit", "& .MuiAlert-message": { fontFamily: "inherit" } }}>{t("auth.register.success")}</Alert>}
           {env.AUTH_PROVIDER === "mock" && <Alert severity="info" sx={{ borderRadius: 2, fontFamily: "inherit", "& .MuiAlert-message": { fontFamily: "inherit" } }}>{t("auth.mockHint")}</Alert>}
 
           <LoginForm next={nextPath} mode={env.AUTH_PROVIDER} />

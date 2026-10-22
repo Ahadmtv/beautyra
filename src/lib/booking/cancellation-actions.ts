@@ -1,7 +1,6 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 
 import { t } from "@/config/messages.fa";
 import { cancelBooking } from "@/lib/api/bookings";
@@ -11,6 +10,7 @@ import { parseServiceId } from "@/lib/api/service-id";
 
 export type CancellationState = {
   message?: string;
+  success?: boolean;
 };
 
 export async function cancelBookingAction(
@@ -39,7 +39,6 @@ export async function cancelBookingAction(
   }
 
   revalidatePath("/dashboard/bookings");
-  revalidatePath(`/dashboard/bookings/${bookingId}`);
   revalidatePath("/wallet");
-  redirect(`/dashboard/bookings/${bookingId}`);
+  return { message: t("dashboard.booking.cancel.success"), success: true };
 }

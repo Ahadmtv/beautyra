@@ -1,10 +1,11 @@
 "use client";
 
-import { useActionState, useCallback, useId, useState } from "react";
+import { useActionState, useId, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from "@mui/material";
 
 import { Select } from "@/components/ui/Select";
+import { useActionFeedback } from "@/components/ui/use-action-feedback";
 import { t } from "@/config/messages.fa";
 import { updateProviderVerificationAction, type AdminActionState } from "@/lib/admin/actions";
 import { getVerificationEligibility } from "@/lib/admin/provider-verification";
@@ -25,18 +26,13 @@ export function AdminProviderVerificationControls({ provider }: { provider: Admi
   const [dialogOpen, setDialogOpen] = useState(false);
   const [status, setStatus] = useState<AdminProviderVerificationStatus>(provider.verification_status);
   const eligibility = getVerificationEligibility(provider, status);
-  const submitVerification = useCallback(
-    async (previous: AdminActionState, formData: FormData) => {
-      const next = await updateProviderVerificationAction(previous, formData);
-      if (next.success) {
-        setDialogOpen(false);
-        router.refresh();
-      }
-      return next;
+  const [state, formAction, pending] = useActionState(updateProviderVerificationAction, initialState);
+  useActionFeedback(state, {
+    onSuccess: () => {
+      setDialogOpen(false);
+      router.refresh();
     },
-    [router],
-  );
-  const [state, formAction, pending] = useActionState(submitVerification, initialState);
+  });
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 0.75, minWidth: 0 }}>
@@ -79,11 +75,6 @@ export function AdminProviderVerificationControls({ provider }: { provider: Admi
                 {t("admin.providers.unchanged")}
               </Typography>
             )}
-            {state.message && !state.success && (
-              <Alert severity="error" sx={{ fontFamily: "inherit", fontSize: 12, "& .MuiAlert-message": { fontFamily: "inherit" } }}>
-                {state.message}
-              </Alert>
-            )}
           </DialogContent>
           <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
             <Button type="button" onClick={() => setDialogOpen(false)} disabled={pending} sx={{ fontFamily: "inherit", fontWeight: 600, textTransform: "none" }}>
@@ -95,11 +86,6 @@ export function AdminProviderVerificationControls({ provider }: { provider: Admi
           </DialogActions>
         </form>
       </Dialog>
-      {state.message && (!dialogOpen || state.success) && (
-        <Alert severity={state.success ? "success" : "error"} sx={{ maxWidth: 260, fontFamily: "inherit", fontSize: 12, py: 0.25 }}>
-          {state.message}
-        </Alert>
-      )}
     </Box>
   );
 }

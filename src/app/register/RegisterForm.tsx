@@ -1,11 +1,12 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useMemo } from "react";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { PasswordInput } from "@/components/ui/PasswordInput";
-import Alert from "@mui/material/Alert";
+import { useActionFeedback } from "@/components/ui/use-action-feedback";
 import { t } from "@/config/messages.fa";
 import { registerAction } from "@/lib/auth/actions";
 import type { RegisterState } from "@/lib/auth/register";
@@ -13,7 +14,15 @@ import type { RegisterState } from "@/lib/auth/register";
 const initialState: RegisterState = {};
 
 export function RegisterForm({ next }: { next: string }) {
+  const router = useRouter();
   const [state, formAction, pending] = useActionState(registerAction, initialState);
+  const feedbackState = useMemo(
+    () => ({ message: state.message ?? state.errors?.form, success: state.success }),
+    [state],
+  );
+  useActionFeedback(feedbackState, {
+    onSuccess: () => router.replace(state.redirectTo ?? "/login"),
+  });
 
   return (
     <form action={formAction} noValidate className="flex flex-col gap-4">
@@ -49,11 +58,6 @@ export function RegisterForm({ next }: { next: string }) {
         required
         error={state.errors?.password}
       />
-      {state.errors?.form && (
-        <Alert severity="error" role="alert" sx={{ borderRadius: 2, fontFamily: "inherit", "& .MuiAlert-message": { fontFamily: "inherit" } }}>
-          {state.errors.form}
-        </Alert>
-      )}
       <Button type="submit" loading={pending} className="w-full">
         {t("auth.register.submit")}
       </Button>

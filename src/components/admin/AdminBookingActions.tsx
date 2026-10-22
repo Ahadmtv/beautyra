@@ -1,8 +1,10 @@
 "use client";
 
 import { useActionState, useId, useState } from "react";
-import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControlLabel, Radio, RadioGroup } from "@mui/material";
+import { useRouter } from "next/navigation";
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControlLabel, Radio, RadioGroup } from "@mui/material";
 import { Input } from "@/components/ui/Input";
+import { useActionFeedback } from "@/components/ui/use-action-feedback";
 
 import { t } from "@/config/messages.fa";
 import { createAdminRefundAction, resolveDisputeAction, type AdminActionState } from "@/lib/admin/actions";
@@ -21,10 +23,17 @@ export function AdminBookingActions({ booking }: { booking: AdminBooking }) {
 }
 
 function RefundDialog({ bookingId }: { bookingId: number }) {
+  const router = useRouter();
   const [state, formAction, pending] = useActionState(createAdminRefundAction, initialState);
   const formId = useId();
   const [open, setOpen] = useState(false);
   const [idempotencyKey, setIdempotencyKey] = useState<string | null>(null);
+  useActionFeedback(state, {
+    onSuccess: () => {
+      setOpen(false);
+      router.refresh();
+    },
+  });
 
   function openDialog() {
     setIdempotencyKey(state.idempotencyKey ?? crypto.randomUUID());
@@ -61,26 +70,28 @@ function RefundDialog({ bookingId }: { bookingId: number }) {
             <Button type="button" onClick={() => setOpen(false)} disabled={pending} sx={{ fontFamily: "inherit", fontWeight: 600, textTransform: "none" }}>
               {t("admin.users.cancel")}
             </Button>
-            <Button type="submit" variant="contained" color="error" disabled={pending || !idempotencyKey} onClick={() => setOpen(false)} sx={{ fontFamily: "inherit", fontWeight: 700, textTransform: "none" }}>
+            <Button type="submit" variant="contained" color="error" disabled={pending || !idempotencyKey} sx={{ fontFamily: "inherit", fontWeight: 700, textTransform: "none" }}>
               {t("admin.bookings.refund")}
             </Button>
           </DialogActions>
         </form>
       </Dialog>
-      {state.message && (
-        <Alert severity={state.success ? "success" : "error"} sx={{ maxWidth: 260, fontFamily: "inherit", fontSize: 12, py: 0.25 }}>
-          {state.message}
-        </Alert>
-      )}
     </>
   );
 }
 
 function DisputeDialog({ bookingId }: { bookingId: number }) {
+  const router = useRouter();
   const [state, formAction, pending] = useActionState(resolveDisputeAction, initialState);
   const formId = useId();
   const [open, setOpen] = useState(false);
   const [resolution, setResolution] = useState<"settle" | "cancel">("settle");
+  useActionFeedback(state, {
+    onSuccess: () => {
+      setOpen(false);
+      router.refresh();
+    },
+  });
 
   return (
     <>
@@ -120,17 +131,12 @@ function DisputeDialog({ bookingId }: { bookingId: number }) {
             <Button type="button" onClick={() => setOpen(false)} disabled={pending} sx={{ fontFamily: "inherit", fontWeight: 600, textTransform: "none" }}>
               {t("admin.users.cancel")}
             </Button>
-            <Button type="submit" variant="contained" disabled={pending} onClick={() => setOpen(false)} sx={{ fontFamily: "inherit", fontWeight: 700, textTransform: "none" }}>
+            <Button type="submit" variant="contained" disabled={pending} sx={{ fontFamily: "inherit", fontWeight: 700, textTransform: "none" }}>
               {t("admin.disputes.submit")}
             </Button>
           </DialogActions>
         </form>
       </Dialog>
-      {state.message && (
-        <Alert severity={state.success ? "success" : "error"} sx={{ maxWidth: 260, fontFamily: "inherit", fontSize: 12, py: 0.25 }}>
-          {state.message}
-        </Alert>
-      )}
     </>
   );
 }

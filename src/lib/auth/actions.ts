@@ -1,6 +1,5 @@
 "use server";
 
-import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { env } from "@/config/env";
@@ -24,6 +23,14 @@ export type LoginState = {
     code?: string;
     form?: string;
   };
+  message?: string;
+  success?: boolean;
+  redirectTo?: string;
+};
+
+export type LogoutState = {
+  message?: string;
+  success?: boolean;
 };
 
 const realLoginSchema = z.object({
@@ -90,7 +97,11 @@ export async function loginAction(_previous: LoginState, formData: FormData): Pr
   }
 
   await setSessionCookies(result);
-  redirect(sanitizeNextPath(readField(formData, "next")));
+  return {
+    message: t("auth.login.success"),
+    success: true,
+    redirectTo: sanitizeNextPath(readField(formData, "next")),
+  };
 }
 
 export async function registerAction(
@@ -112,17 +123,24 @@ export async function registerAction(
   }
 
   const next = sanitizeNextPath(readField(formData, "next"));
-  const query = new URLSearchParams({ registered: "1" });
+  const query = new URLSearchParams();
   if (next !== "/") query.set("next", next);
-  redirect(`/login?${query.toString()}`);
+  const queryString = query.toString();
+  const suffix = queryString ? `?${queryString}` : "";
+
+  return {
+    message: t("auth.register.success"),
+    success: true,
+    redirectTo: `/login${suffix}`,
+  };
 }
 
-export async function logoutAction(): Promise<void> {
+export async function logoutAction(): Promise<LogoutState> {
   const refreshToken = await getRefreshToken();
   try {
     await getAuthProvider().logout(refreshToken);
   } finally {
     await clearSessionCookies();
   }
-  redirect("/");
+  return { message: t("auth.logout.success"), success: true };
 }

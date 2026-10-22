@@ -1,11 +1,13 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
+import { useActionFeedback } from "@/components/ui/use-action-feedback";
 import { t } from "@/config/messages.fa";
 import { createTimeOffAction, type TimeOffActionState } from "@/lib/provider/time-off-actions";
 
@@ -17,11 +19,20 @@ const kindOptions = [
 ];
 
 export function TimeOffForm() {
+  const router = useRouter();
+  const formRef = useRef<HTMLFormElement>(null);
   const [kind, setKind] = useState("time_off");
   const [state, formAction, pending] = useActionState(createTimeOffAction, initialState);
+  useActionFeedback(state, {
+    onSuccess: () => {
+      formRef.current?.reset();
+      setKind("time_off");
+      router.refresh();
+    },
+  });
 
   return (
-    <form action={formAction} className="flex flex-col gap-4">
+    <form ref={formRef} action={formAction} className="flex flex-col gap-4">
       <Select
         id="time-off-kind"
         name="kind"
@@ -63,7 +74,6 @@ export function TimeOffForm() {
           <Textarea id="time-off-reason" name="reason" label={t("provider.timeOff.reason")} maxLength={500} />
         </>
       )}
-      {state.message && <p role="alert" className="text-sm text-danger">{state.message}</p>}
       <Button type="submit" loading={pending} className="w-fit">
         {t("provider.timeOff.create")}
       </Button>

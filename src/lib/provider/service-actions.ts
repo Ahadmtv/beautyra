@@ -1,7 +1,6 @@
 "use server";
 
-import { revalidatePath, revalidateTag } from "next/cache";
-import { redirect } from "next/navigation";
+import { revalidateTag } from "next/cache";
 import { z } from "zod";
 
 import { isServiceCategory, t, type ServiceCategory } from "@/config/messages.fa";
@@ -37,6 +36,7 @@ const serviceFieldsSchema = z.object({
 
 export type ProviderServiceActionState = {
   message?: string;
+  success?: boolean;
 };
 
 export async function saveProviderServiceAction(
@@ -71,8 +71,7 @@ export async function saveProviderServiceAction(
     throw error;
   }
 
-  revalidatePath("/provider/services");
-  redirect("/provider/services");
+  return { message: t("provider.services.saveSuccess"), success: true };
 }
 
 export async function mutateProviderServiceAction(
@@ -102,8 +101,12 @@ export async function mutateProviderServiceAction(
     throw error;
   }
 
-  revalidatePath("/provider/services");
-  redirect("/provider/services");
+  return {
+    message: intent === "deactivate"
+      ? t("provider.services.deactivateSuccess")
+      : t("provider.services.toggleSuccess"),
+    success: true,
+  };
 }
 
 function readString(formData: FormData, name: string): string {

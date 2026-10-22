@@ -1,8 +1,10 @@
 "use client";
 
 import { useActionState, useId, useState } from "react";
-import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Menu, MenuItem } from "@mui/material";
+import { useRouter } from "next/navigation";
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Menu, MenuItem } from "@mui/material";
 import { Input } from "@/components/ui/Input";
+import { useActionFeedback } from "@/components/ui/use-action-feedback";
 
 import { t } from "@/config/messages.fa";
 import { adminPayoutAction, type AdminActionState } from "@/lib/admin/actions";
@@ -33,11 +35,18 @@ const actionLabelKeys: Record<PayoutAction, Parameters<typeof t>[0]> = {
 const destructiveActions = new Set<PayoutAction>(["reject", "fail"]);
 
 export function AdminPayoutActions({ payout }: { payout: AdminPayout }) {
+  const router = useRouter();
   const [state, formAction, pending] = useActionState(adminPayoutAction, initialState);
   const formId = useId();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [selectedAction, setSelectedAction] = useState<PayoutAction | null>(null);
   const [reference, setReference] = useState("");
+  useActionFeedback(state, {
+    onSuccess: () => {
+      setSelectedAction(null);
+      router.refresh();
+    },
+  });
 
   const actions = allowedActions[payout.status];
   const open = Boolean(anchorEl);
@@ -125,17 +134,12 @@ export function AdminPayoutActions({ payout }: { payout: AdminPayout }) {
             <Button type="button" onClick={() => setSelectedAction(null)} disabled={pending} sx={{ fontFamily: "inherit", fontWeight: 600, textTransform: "none" }}>
               {t("admin.users.cancel")}
             </Button>
-            <Button type="submit" variant="contained" disabled={pending || (referenceRequired(selectedAction) && reference.trim() === "")} onClick={() => setSelectedAction(null)} sx={{ fontFamily: "inherit", fontWeight: 700, textTransform: "none" }}>
+            <Button type="submit" variant="contained" disabled={pending || (referenceRequired(selectedAction) && reference.trim() === "")} sx={{ fontFamily: "inherit", fontWeight: 700, textTransform: "none" }}>
               {t("admin.payouts.submit")}
             </Button>
           </DialogActions>
         </form>
       </Dialog>
-      {state.message && (
-        <Alert severity={state.success ? "success" : "error"} sx={{ maxWidth: 260, fontFamily: "inherit", fontSize: 12, py: 0.25 }}>
-          {state.message}
-        </Alert>
-      )}
     </Box>
   );
 }

@@ -2,10 +2,12 @@
 
 import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Textarea } from "@/components/ui/Textarea";
+import { useActionFeedback } from "@/components/ui/use-action-feedback";
 import { t } from "@/config/messages.fa";
 import {
   confirmCompletionAction,
@@ -16,10 +18,23 @@ import {
 const initialState: CompletionState = {};
 
 export function BookingCompletionActions({ bookingId }: { bookingId: number }) {
+  const router = useRouter();
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [disputeOpen, setDisputeOpen] = useState(false);
   const [confirmState, confirmAction] = useActionState(confirmCompletionAction, initialState);
   const [disputeState, disputeAction] = useActionState(disputeBookingAction, initialState);
+  useActionFeedback(confirmState, {
+    onSuccess: () => {
+      setConfirmOpen(false);
+      router.refresh();
+    },
+  });
+  useActionFeedback(disputeState, {
+    onSuccess: () => {
+      setDisputeOpen(false);
+      router.refresh();
+    },
+  });
 
   return (
     <div className="flex flex-wrap gap-2">
@@ -36,11 +51,6 @@ export function BookingCompletionActions({ bookingId }: { bookingId: number }) {
         <form action={confirmAction} className="flex flex-col gap-4">
           <input type="hidden" name="booking_id" value={bookingId} />
           <p className="text-sm leading-7 text-text">{t("dashboard.booking.completion.confirmation")}</p>
-          {confirmState.message && (
-            <p role="alert" className="rounded-md bg-surface p-3 text-sm text-danger">
-              {confirmState.message}
-            </p>
-          )}
           <div className="flex flex-wrap justify-end gap-2">
             <Button variant="outline" onClick={() => setConfirmOpen(false)}>
               {t("dashboard.booking.completion.close")}
@@ -66,11 +76,6 @@ export function BookingCompletionActions({ bookingId }: { bookingId: number }) {
             maxLength={1000}
             required
           />
-          {disputeState.message && (
-            <p role="alert" className="rounded-md bg-surface p-3 text-sm text-danger">
-              {disputeState.message}
-            </p>
-          )}
           <div className="flex flex-wrap justify-end gap-2">
             <Button variant="outline" onClick={() => setDisputeOpen(false)}>
               {t("dashboard.booking.dispute.close")}

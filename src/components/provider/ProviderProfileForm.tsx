@@ -1,11 +1,13 @@
 "use client";
 
 import { useActionState } from "react";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
+import { useActionFeedback } from "@/components/ui/use-action-feedback";
 import { t } from "@/config/messages.fa";
 import type { ProviderProfile } from "@/lib/api/types";
 import { saveProfileAction, type ProfileActionState } from "@/lib/provider/profile-actions";
@@ -23,7 +25,9 @@ export function ProviderProfileForm({
   timeZoneOptions,
   defaultTimeZone,
 }: ProviderProfileFormProps) {
+  const router = useRouter();
   const [state, formAction, pending] = useActionState(saveProfileAction, initialProfileActionState);
+  useActionFeedback(state, { onSuccess: () => router.refresh() });
 
   return (
     <form action={formAction} className="flex max-w-2xl flex-col gap-5">
@@ -59,7 +63,6 @@ export function ProviderProfileForm({
         />
         {t("provider.profile.active")}
       </label>
-      {state.message && <p role="alert" className="text-sm text-danger">{state.message}</p>}
       <Button type="submit" loading={pending} className="w-fit">
         {t("provider.profile.save")}
       </Button>

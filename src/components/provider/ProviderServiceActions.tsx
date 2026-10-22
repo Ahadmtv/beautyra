@@ -1,10 +1,11 @@
 "use client";
 
-import { useActionState, useEffect, useId, useRef, useState } from "react";
+import { useActionState, useId, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, Menu, MenuItem, Button as MuiButton } from "@mui/material";
 
 import { Button } from "@/components/ui/Button";
-import { useToast } from "@/components/ui/Toast";
+import { useActionFeedback } from "@/components/ui/use-action-feedback";
 import { t } from "@/config/messages.fa";
 import type { Service } from "@/lib/api/types";
 import {
@@ -15,18 +16,21 @@ import {
 const initialState: ProviderServiceActionState = {};
 
 export function ProviderServiceActions({ service }: { service: Service }) {
+  const router = useRouter();
   const [toggleState, toggleAction, togglePending] = useActionState(mutateProviderServiceAction, initialState);
   const [deactivateState, deactivateAction, deactivatePending] = useActionState(mutateProviderServiceAction, initialState);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const toggleFormRef = useRef<HTMLFormElement>(null);
   const toggleFormId = useId();
-  const { showToast } = useToast();
-  const message = toggleState.message ?? deactivateState.message;
 
-  useEffect(() => {
-    if (message) showToast(message, "error");
-  }, [message, showToast]);
+  useActionFeedback(toggleState, { onSuccess: () => router.refresh() });
+  useActionFeedback(deactivateState, {
+    onSuccess: () => {
+      setConfirmOpen(false);
+      router.refresh();
+    },
+  });
 
   return (
     <div className="flex flex-col items-start gap-2">
@@ -107,7 +111,6 @@ export function ProviderServiceActions({ service }: { service: Service }) {
           </DialogActions>
         </form>
       </Dialog>
-      {message && <p role="alert" className="max-w-xs text-sm text-danger">{message}</p>}
     </div>
   );
 }

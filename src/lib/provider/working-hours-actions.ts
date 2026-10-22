@@ -1,7 +1,5 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { t } from "@/config/messages.fa";
@@ -18,6 +16,7 @@ const workingHoursSchema = z.object({
 
 export type WorkingHoursActionState = {
   message?: string;
+  success?: boolean;
 };
 
 export async function saveWorkingHoursAction(
@@ -49,6 +48,5 @@ export async function saveWorkingHoursAction(
     throw error;
   }
 
-  revalidatePath("/provider/working-hours");
-  redirect("/provider/working-hours");
+  return { message: t("provider.workingHours.saveSuccess"), success: true };
 }

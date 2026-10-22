@@ -1,7 +1,5 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { t } from "@/config/messages.fa";
@@ -21,6 +19,7 @@ const timeRangeSchema = z.object({
 
 export type TimeOffActionState = {
   message?: string;
+  success?: boolean;
 };
 
 export async function createTimeOffAction(
@@ -69,8 +68,7 @@ export async function createTimeOffAction(
     throw error;
   }
 
-  revalidatePath("/provider/time-off");
-  redirect("/provider/time-off");
+  return { message: t("provider.timeOff.createSuccess"), success: true };
 }
 
 function readString(formData: FormData, name: string): string {

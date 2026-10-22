@@ -1,7 +1,6 @@
 "use server";
 
-import { revalidatePath, revalidateTag } from "next/cache";
-import { redirect } from "next/navigation";
+import { revalidateTag } from "next/cache";
 import { z } from "zod";
 
 import { t } from "@/config/messages.fa";
@@ -20,6 +19,7 @@ const profileSchema = z.object({
 
 export type ProfileActionState = {
   message?: string;
+  success?: boolean;
 };
 
 export async function saveProfileAction(
@@ -49,8 +49,7 @@ export async function saveProfileAction(
   }
 
   revalidateTag("services", { expire: 0 });
-  revalidatePath("/provider/profile");
-  redirect("/provider/profile");
+  return { message: t("provider.profile.saveSuccess"), success: true };
 }
 
 function readString(formData: FormData, name: string): string {

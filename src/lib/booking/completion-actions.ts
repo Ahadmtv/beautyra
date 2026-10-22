@@ -1,7 +1,6 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { t } from "@/config/messages.fa";
@@ -10,7 +9,7 @@ import { ApiError, problemMessage } from "@/lib/api/problem";
 import { parseServiceId } from "@/lib/api/service-id";
 import { redirectOnUnauthorized, requireRole } from "@/lib/auth/session";
 
-export type CompletionState = { message?: string };
+export type CompletionState = { message?: string; success?: boolean };
 
 const disputeSchema = z.object({
   bookingId: z.number().int().safe().positive(),
@@ -36,8 +35,8 @@ export async function confirmCompletionAction(
     throw error;
   }
 
-  revalidateAfterChange(bookingId);
-  redirect(`/dashboard/bookings/${bookingId}`);
+  revalidateAfterChange();
+  return { message: t("dashboard.booking.completion.success"), success: true };
 }
 
 export async function disputeBookingAction(
@@ -70,8 +69,8 @@ export async function disputeBookingAction(
     throw error;
   }
 
-  revalidateAfterChange(parsed.data.bookingId);
-  redirect(`/dashboard/bookings/${parsed.data.bookingId}`);
+  revalidateAfterChange();
+  return { message: t("dashboard.booking.dispute.success"), success: true };
 }
 
 function readString(formData: FormData, name: string): string {
@@ -84,8 +83,7 @@ function readBookingId(formData: FormData): number | null {
   return typeof value === "string" ? parseServiceId(value) : null;
 }
 
-function revalidateAfterChange(bookingId: number): void {
+function revalidateAfterChange(): void {
   revalidatePath("/dashboard/bookings");
-  revalidatePath(`/dashboard/bookings/${bookingId}`);
   revalidatePath("/wallet");
 }
