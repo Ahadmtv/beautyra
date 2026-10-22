@@ -11,7 +11,6 @@ ARG SESSION_COOKIE_NAME=beautyra_session
 ENV API_BASE_URL=$API_BASE_URL \
     SITE_URL=$SITE_URL \
     SESSION_COOKIE_NAME=$SESSION_COOKIE_NAME \
-    USE_MOCK_META=false \
     AUTH_PROVIDER=real \
     PAYMENT_RETURN_FORWARD_TO_BACKEND=false
 COPY --from=dependencies /app/node_modules ./node_modules

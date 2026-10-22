@@ -25,7 +25,7 @@ export default async function BookingPage({ params, searchParams }: BookingPageP
   await requireRole(ROLES);
 
   const { serviceId } = await params;
-  const { service, provider } = await loadPublicServiceDetailOrNotFound(serviceId);
+  const { service, providerName } = await loadPublicServiceDetailOrNotFound(serviceId);
   const priceLabel = service.price_irr === 0 ? t("service.free") : formatTomanFromRial(service.price_irr);
 
   return (
@@ -53,7 +53,7 @@ export default async function BookingPage({ params, searchParams }: BookingPageP
       <header className="mt-6 flex flex-col gap-3 rounded-md border border-border bg-white p-4 md:p-6">
         <h1 className="text-xl font-bold text-text">{t("booking.title")}</h1>
         <p className="font-medium text-text">{service.name}</p>
-        {provider && <p className="text-sm text-text-muted">{provider.name}</p>}
+        {providerName && <p className="text-sm text-text-muted">{providerName}</p>}
         <dl className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
           <div className="flex gap-2">
             <dt className="text-text-muted">{t("service.duration")}</dt>

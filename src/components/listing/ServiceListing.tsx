@@ -3,7 +3,6 @@ import { Box, Paper, Stack, Typography } from "@mui/material";
 
 import { ListingRetry } from "@/components/listing/ListingRetry";
 import { t, serviceCategoryLabel } from "@/config/messages.fa";
-import { CITY_OPTIONS, NEIGHBORHOOD_OPTIONS } from "@/config/filter-options";
 import { getPublicServiceCards } from "@/lib/api/services";
 import { DEFAULT_PAGE_LIMIT, nextPageHref, parseCursor } from "@/lib/api/pagination";
 import { filterProviderCards, parseListingFilters, buildListingHref } from "@/lib/listing/filters";
@@ -48,8 +47,6 @@ function ResultsHeader({ params, filters, count }: { params: URLSearchParams; fi
   const activeFilters = [
     filters.category ? { key: "category", label: serviceCategoryLabel(filters.category) } : null,
     filters.q ? { key: "q", label: filters.q } : null,
-    filters.city ? { key: "city", label: CITY_OPTIONS.find((option) => option.value === filters.city)?.label ?? filters.city } : null,
-    filters.neighborhood ? { key: "neighborhood", label: NEIGHBORHOOD_OPTIONS.find((option) => option.value === filters.neighborhood)?.label ?? filters.neighborhood } : null,
   ].filter((filter): filter is { key: string; label: string } => filter !== null);
 
   return (

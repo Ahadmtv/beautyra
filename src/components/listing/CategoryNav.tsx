@@ -41,7 +41,7 @@ export function CategoryNav({ params }: { params: URLSearchParams }) {
           );
         })}
       </ul>
-      {(filters.category || filters.q || filters.city || filters.neighborhood) && (
+      {(filters.category || filters.q) && (
         <Link href="/" scroll={false} className="mt-3 inline-flex min-h-9 items-center gap-1 text-xs font-semibold text-primary underline-offset-4 hover:underline focus-visible:rounded-sm">
           <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M4 7h16M7 12h10m-7 5h4" /></svg>
           {t("home.clearFilters")}

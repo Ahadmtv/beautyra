@@ -5,13 +5,17 @@ import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Input } from "@/components/ui/Input";
 import { LoadMoreLink } from "@/components/ui/LoadMoreLink";
-import { Rating } from "@/components/ui/Rating";
 import { Select } from "@/components/ui/Select";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Textarea } from "@/components/ui/Textarea";
 import { FilterBar } from "@/components/layout/FilterBar";
-import { CITY_OPTIONS } from "@/config/filter-options";
 import { DialogDemo } from "./DialogDemo";
+
+const DEMO_SELECT_OPTIONS = [
+  { value: "option-1", label: "Option 1" },
+  { value: "option-2", label: "Option 2" },
+  { value: "option-3", label: "Option 3" },
+];
 
 export default function DevUiPage() {
   if (process.env.NODE_ENV === "production") notFound();
@@ -45,13 +49,13 @@ export default function DevUiPage() {
           <Select
             id="dev-select"
             label={t("devUi.selectLabel")}
-            options={CITY_OPTIONS}
+            options={DEMO_SELECT_OPTIONS}
             placeholder={t("common.selectPlaceholder")}
           />
           <Select
             id="dev-select-error"
             label={t("devUi.selectLabel")}
-            options={CITY_OPTIONS}
+            options={DEMO_SELECT_OPTIONS}
             error={t("validation.required")}
           />
           <div className="md:col-span-2">
@@ -65,10 +69,6 @@ export default function DevUiPage() {
         <div className="flex flex-wrap items-center gap-6">
           <Badge>{t("badge.verified")}</Badge>
           <Badge tone="verified">{t("badge.verified")}</Badge>
-          <Rating value={0} count={0} />
-          <Rating value={3.5} count={12} />
-          <Rating value={4.5} count={300} />
-          <Rating value={5} count={300} />
         </div>
       </section>
 

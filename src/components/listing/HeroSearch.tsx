@@ -16,8 +16,6 @@ export function HeroSearch({ filters }: { filters: ListingFilters }) {
           <svg aria-hidden="true" viewBox="0 0 24 24" className="ms-3 size-5 shrink-0 text-primary" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
           <input id="home-query" name="q" type="search" maxLength={100} defaultValue={filters.q ?? ""} placeholder={t("filter.searchPlaceholder")} className="min-w-0 flex-1 border-0 bg-transparent px-1 text-sm text-text outline-none placeholder:text-text-muted/80 focus-visible:outline-none" />
           {filters.category && <input type="hidden" name="category" value={filters.category} />}
-          {filters.city && <input type="hidden" name="city" value={filters.city} />}
-          {filters.neighborhood && <input type="hidden" name="neighborhood" value={filters.neighborhood} />}
           <button type="submit" className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-bold text-white transition-colors hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary motion-reduce:transition-none">
             <span>{t("filter.search")}</span>
           </button>

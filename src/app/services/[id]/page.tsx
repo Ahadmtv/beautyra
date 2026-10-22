@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { BookingPanel } from "@/components/service/BookingPanel";
-import { ProviderAvatar } from "@/components/listing/ProviderAvatar";
 import { Badge } from "@/components/ui/Badge";
-import { Rating } from "@/components/ui/Rating";
 import { env } from "@/config/env";
 import { messages, serviceCategoryLabel, t } from "@/config/messages.fa";
 import { DEFAULT_PAGE_LIMIT } from "@/lib/api/pagination";
@@ -48,16 +46,15 @@ export async function generateMetadata({ params }: ServicePageProps): Promise<Me
 
 export default async function ServiceDetailPage({ params }: ServicePageProps) {
   const { id } = await params;
-  const { service, provider } = await loadPublicServiceDetailOrNotFound(id);
+  const { service, providerName } = await loadPublicServiceDetailOrNotFound(id);
 
   const priceLabel = service.price_irr === 0 ? t("service.free") : formatTomanFromRial(service.price_irr);
-  const profileName = provider?.name ?? service.name;
   const jsonLd = buildServiceJsonLd({
     url: new URL(`/services/${service.id}`, env.SITE_URL).toString(),
     name: service.name,
     description: service.description,
     priceIrr: service.price_irr,
-    providerName: provider?.name ?? null,
+    providerName,
   });
 
   return (
@@ -84,18 +81,13 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
         <div className="mt-6 grid gap-8 md:grid-cols-[1fr_20rem] md:items-start">
           <div className="flex min-w-0 flex-col gap-6">
             <header className="flex gap-4 rounded-md border border-border bg-white p-4 md:p-6">
-              <ProviderAvatar url={provider?.avatarUrl ?? null} />
               <div className="flex min-w-0 flex-1 flex-col gap-3">
                 <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
-                  <p className="min-w-0 text-lg font-semibold text-text">{profileName}</p>
-                  <Badge tone="verified">{t("badge.verified")}</Badge>
+                  <p className="min-w-0 text-lg font-semibold text-text">
+                    {providerName ?? t("service.providerFallback")}
+                  </p>
+                  {providerName && <Badge tone="verified">{t("badge.verified")}</Badge>}
                 </div>
-                {provider && (
-                  <div className="mt-auto flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-sm text-text-muted">
-                    <span>{provider.neighborhood}</span>
-                    <Rating value={provider.rating} count={provider.reviewCount} />
-                  </div>
-                )}
               </div>
             </header>
 

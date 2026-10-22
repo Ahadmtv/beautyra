@@ -31,7 +31,7 @@ export default async function BookingConfirmPage({ params, searchParams }: Confi
   await requireRole(ROLES);
 
   const { serviceId } = await params;
-  const { service, provider } = await loadPublicServiceDetailOrNotFound(serviceId);
+  const { service, providerName } = await loadPublicServiceDetailOrNotFound(serviceId);
   const { date: rawDate, start_at: rawStartAt } = await searchParams;
   const date = firstValue(rawDate);
   const startAt = firstValue(rawStartAt);
@@ -90,7 +90,7 @@ export default async function BookingConfirmPage({ params, searchParams }: Confi
           <ConfirmationDetails
             serviceId={service.id}
             serviceName={service.name}
-            providerName={provider?.name ?? null}
+            providerName={providerName}
             durationMinutes={service.duration_minutes}
             priceIrr={service.price_irr}
             walletAvailableIrr={walletAvailableIrr}

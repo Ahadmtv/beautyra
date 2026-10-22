@@ -1,12 +1,13 @@
 import { cacheLife, cacheTag } from "next/cache";
 import { notFound } from "next/navigation";
 
-import { env } from "@/config/env";
-
-import { type ProviderCardView, type ProviderMeta, toProviderCardView } from "./adapters/provider-card";
+import {
+  normalizeProviderDisplayName,
+  type ProviderCardView,
+  toProviderCardView,
+} from "./adapters/provider-card";
 import { apiFetch } from "./client";
 import { ApiError } from "./problem";
-import { getMockProviderMeta } from "./mock/provider-meta";
 import { buildPageQuery, type CursorPage } from "./pagination";
 import { parseServiceId } from "./service-id";
 import type { Service, ServicePage } from "./types";
@@ -16,7 +17,7 @@ const PUBLIC_SERVICE_DETAIL_REVALIDATE_SECONDS = 600;
 
 export type ServiceDetail = {
   service: Service;
-  provider: ProviderMeta | null;
+  providerName: string | null;
 };
 
 export async function getPublicServiceCards(
@@ -35,9 +36,7 @@ export async function getPublicServiceCards(
   const page = await apiFetch<ServicePage>("/api/v1/services", { query });
 
   return {
-    items: page.items.map((service) =>
-      toProviderCardView(service, resolveProviderMeta(service.provider_id)),
-    ),
+    items: page.items.map(toProviderCardView),
     nextCursor: page.next_cursor,
   };
 }
@@ -49,7 +48,7 @@ export async function getPublicServiceDetail(id: number): Promise<ServiceDetail>
 
   const service = await apiFetch<Service>(`/api/v1/services/${id}`);
 
-  return { service, provider: resolveProviderMeta(service.provider_id) };
+  return { service, providerName: normalizeProviderDisplayName(service.provider_display_name) };
 }
 
 export async function loadPublicServiceDetailOrNotFound(rawId: string): Promise<ServiceDetail> {
@@ -66,8 +65,4 @@ export async function loadPublicServiceDetailOrNotFound(rawId: string): Promise<
     }
     throw error;
   }
-}
-
-function resolveProviderMeta(providerId: number): ProviderMeta | null {
-  return env.USE_MOCK_META ? getMockProviderMeta(providerId) : null;
 }

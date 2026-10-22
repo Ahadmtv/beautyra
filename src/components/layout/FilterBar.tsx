@@ -12,7 +12,7 @@ type FilterBarProps = {
 };
 
 export function FilterBar({ filters }: FilterBarProps) {
-  const hasActiveFilters = Boolean(filters.city || filters.neighborhood || filters.q);
+  const hasActiveFilters = Boolean(filters.q);
 
   return (
     <Box component="section" aria-label={t("filter.label")} sx={{ borderBottom: "1px solid #e3ece9", bgcolor: "rgba(255,255,255,0.8)" }}>
@@ -47,8 +47,6 @@ export function FilterBar({ filters }: FilterBarProps) {
             className="w-full"
           />
           {filters.category && <input type="hidden" name="category" value={filters.category} />}
-          {filters.city && <input type="hidden" name="city" value={filters.city} />}
-          {filters.neighborhood && <input type="hidden" name="neighborhood" value={filters.neighborhood} />}
         </Box>
         <Stack direction="row" sx={{ alignItems: "center", gap: 1.5, minWidth: 0 }}>
           <Button type="submit" variant="primary" className="w-full md:w-auto">

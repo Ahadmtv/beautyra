@@ -12,7 +12,7 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Set `API_BASE_URL` and `SITE_URL` to the deployment's backend and frontend origins. `AUTH_PROVIDER=real` is the default: registration uses `POST /api/v1/auth/register` (which creates a `client` account and then redirects to login), and login uses `POST /api/v1/auth/login` with email and password. Access and refresh tokens are stored in separate httpOnly cookies; `/auth/refresh` rotates the refresh token before redirecting back to the protected page. `/account` reads the authenticated profile from `GET /api/v1/me`. `AUTH_PROVIDER=mock` remains available for UI-only development, but its unsigned tokens are rejected by the backend, so protected API calls require `real`. Do not use mock authentication in production. `USE_MOCK_META=true` enables placeholder provider card details until the API exposes those fields.
+Set `API_BASE_URL` and `SITE_URL` to the deployment's backend and frontend origins. `AUTH_PROVIDER=real` is the default: registration uses `POST /api/v1/auth/register` (which creates a `client` account and then redirects to login), and login uses `POST /api/v1/auth/login` with email and password. Access and refresh tokens are stored in separate httpOnly cookies; `/auth/refresh` rotates the refresh token before redirecting back to the protected page. `/account` reads the authenticated profile from `GET /api/v1/me`. `AUTH_PROVIDER=mock` remains available for UI-only development, but its unsigned tokens are rejected by the backend, so protected API calls require `real`. Do not use mock authentication in production.
 
 ## Commands
 
@@ -68,10 +68,10 @@ The frontend does not invent missing endpoints. Tracked contract gaps in `docs/b
 
 1. Authentication, refresh/logout, and documented JWT claims.
 2. Public provider list/profile and verified provider details.
-3. Provider card data (name, location, photo, rating, reviews) and image upload.
-4. Server-side city, neighborhood, and search filtering plus city/neighborhood taxonomies; service categories are already supported by the API.
+3. Provider location, photo, rating, review data, and image upload; the provider display name is supported through `provider_display_name`.
+4. Server-side free-text search filtering; service categories are already supported by the API.
 5. A documented payment-provider callback/return agreement.
-6. Admin provider listing; verification is currently ID-driven.
+6. Admin provider listing and verification controls; incomplete profiles are blocked from approval.
 7. A documented problem-code catalog.
 8. Listing other services for a provider.
 9. Provider time zone on public service/provider data and bookings.

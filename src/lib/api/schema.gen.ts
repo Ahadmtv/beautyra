@@ -2330,8 +2330,8 @@ export interface components {
             price_irr: number;
             buffer_minutes: number;
             is_active: boolean;
-            /** @description نام نمایشی ارائه‌دهنده خدمت؛ برای نمایش در فهرست عمومی */
-            provider_display_name?: string;
+            /** @description نام نمایشی ارائه‌دهنده خدمت؛ برای نمایش در فهرست عمومی. مقدار خالی یعنی نمایه ارائه‌دهنده هنوز تکمیل نشده است. */
+            provider_display_name: string;
         };
         ServiceInput: {
             name: string;

@@ -6,38 +6,35 @@ import { buildListingHref, filterProviderCards, matchesFilters, parseListingFilt
 
 const card: ProviderCardView = {
   id: 1,
-  name: "سالن زیبایی سارا",
-  serviceName: "پاک‌سازی پوست",
+  providerName: "Sara Salon",
+  serviceName: "Haircut",
   category: "skin-care",
-  categoryLabel: "مراقبت پوست",
+  categoryLabel: "Skin care",
   priceIrr: 500_000,
-  city: "تهران",
-  neighborhood: "میرداماد",
-  avatarUrl: null,
-  rating: 4,
-  reviewCount: 120,
   verified: true,
 };
 
 describe("parseListingFilters", () => {
-  it("keeps only known option values", () => {
-    const params = new URLSearchParams("category=skin-care&city=unknown&neighborhood=vanak");
+  it("keeps only known category values", () => {
+    const params = new URLSearchParams("category=skin-care&city=tehran&neighborhood=vanak");
 
     expect(parseListingFilters(params)).toEqual({
       category: "skin-care",
-      city: undefined,
-      neighborhood: "vanak",
       q: undefined,
     });
   });
 
-  it("rejects former medical specialty values", () => {
+  it("ignores legacy location filters and former medical specialties", () => {
+    expect(parseListingFilters(new URLSearchParams("city=tehran&neighborhood=vanak"))).toEqual({
+      category: undefined,
+      q: undefined,
+    });
     expect(parseListingFilters(new URLSearchParams("category=dermatology")).category).toBeUndefined();
     expect(parseListingFilters(new URLSearchParams("specialty=dermatology")).category).toBeUndefined();
   });
 
   it("trims and bounds the search query", () => {
-    const params = new URLSearchParams({ q: `  ${"الف".repeat(80)}  ` });
+    const params = new URLSearchParams({ q: `  ${"a".repeat(120)}  ` });
 
     expect(parseListingFilters(params).q).toHaveLength(100);
   });
@@ -53,17 +50,16 @@ describe("matchesFilters", () => {
     expect(matchesFilters(card, { category: "makeup" })).toBe(false);
   });
 
-  it("matches city and neighborhood by their Persian labels", () => {
-    expect(matchesFilters(card, { city: "tehran", neighborhood: "mirdamad" })).toBe(true);
-    expect(matchesFilters(card, { city: "karaj" })).toBe(false);
-    expect(matchesFilters(card, { neighborhood: "vanak" })).toBe(false);
+  it("matches the query against provider, service, and category names", () => {
+    expect(matchesFilters(card, { q: "Sara" })).toBe(true);
+    expect(matchesFilters(card, { q: "Haircut" })).toBe(true);
+    expect(matchesFilters(card, { q: "Skin care" })).toBe(true);
+    expect(matchesFilters(card, { q: "Unknown" })).toBe(false);
   });
 
-  it("matches the query against provider, service, and category names", () => {
-    expect(matchesFilters(card, { q: "سارا" })).toBe(true);
-    expect(matchesFilters(card, { q: "پاک‌سازی" })).toBe(true);
-    expect(matchesFilters(card, { q: "مراقبت" })).toBe(true);
-    expect(matchesFilters(card, { q: "ارتوپدی" })).toBe(false);
+  it("matches the service name when the provider name is unavailable", () => {
+    expect(matchesFilters({ ...card, providerName: null }, { q: "Haircut" })).toBe(true);
+    expect(matchesFilters({ ...card, providerName: null }, { q: "Sara" })).toBe(false);
   });
 
   it("accepts every card when no filter is set", () => {
@@ -77,7 +73,7 @@ describe("filterProviderCards", () => {
       ...card,
       id: 2,
       category: "nails",
-      categoryLabel: "ناخن",
+      categoryLabel: "Nails",
     };
 
     expect(filterProviderCards([card, other], { category: "nails" })).toEqual([other]);
@@ -89,17 +85,15 @@ describe("buildListingHref", () => {
     expect(buildListingHref(new URLSearchParams("cursor=50"), {})).toBe("/");
   });
 
-  it("drops the cursor and applies changes", () => {
-    const current = new URLSearchParams("city=tehran&cursor=50");
+  it("drops the cursor and legacy location parameters", () => {
+    const current = new URLSearchParams("city=tehran&neighborhood=vanak&cursor=50");
 
-    expect(buildListingHref(current, { category: "skin-care" })).toBe(
-      "/?city=tehran&category=skin-care",
-    );
+    expect(buildListingHref(current, { category: "skin-care" })).toBe("/?category=skin-care");
   });
 
   it("removes a parameter when its value is null", () => {
-    const current = new URLSearchParams("category=skin-care&city=tehran");
+    const current = new URLSearchParams("category=skin-care&q=Haircut");
 
-    expect(buildListingHref(current, { category: null })).toBe("/?city=tehran");
+    expect(buildListingHref(current, { category: null })).toBe("/?q=Haircut");
   });
 });

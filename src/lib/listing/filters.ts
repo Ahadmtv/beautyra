@@ -1,4 +1,3 @@
-import { CITY_OPTIONS, NEIGHBORHOOD_OPTIONS } from "@/config/filter-options";
 import { SERVICE_CATEGORY_OPTIONS } from "@/config/messages.fa";
 import type { ProviderCardView } from "@/lib/api/adapters/provider-card";
 
@@ -6,8 +5,6 @@ type Option = { readonly value: string; readonly label: string };
 
 export type ListingFilters = {
   category?: string;
-  city?: string;
-  neighborhood?: string;
   q?: string;
 };
 
@@ -17,15 +14,9 @@ function knownValue(options: readonly Option[], raw: string | null): string | un
   return options.find((option) => option.value === raw)?.value;
 }
 
-function labelFor(options: readonly Option[], value: string): string {
-  return options.find((option) => option.value === value)?.label ?? value;
-}
-
 export function parseListingFilters(params: URLSearchParams): ListingFilters {
   return {
     category: knownValue(SERVICE_CATEGORY_OPTIONS, params.get("category")),
-    city: knownValue(CITY_OPTIONS, params.get("city")),
-    neighborhood: knownValue(NEIGHBORHOOD_OPTIONS, params.get("neighborhood")),
     q: params.get("q")?.trim().slice(0, MAX_QUERY_LENGTH) || undefined,
   };
 }
@@ -34,14 +25,11 @@ export function matchesFilters(card: ProviderCardView, filters: ListingFilters):
   if (filters.category && card.category !== filters.category) {
     return false;
   }
-  if (filters.city && card.city !== labelFor(CITY_OPTIONS, filters.city)) {
-    return false;
-  }
-  if (filters.neighborhood && card.neighborhood !== labelFor(NEIGHBORHOOD_OPTIONS, filters.neighborhood)) {
-    return false;
-  }
   if (filters.q) {
-    const haystack = [card.name, card.serviceName, card.categoryLabel].join(" ").toLocaleLowerCase("fa-IR");
+    const haystack = [card.providerName, card.serviceName, card.categoryLabel]
+      .filter((value): value is string => Boolean(value))
+      .join(" ")
+      .toLocaleLowerCase("fa-IR");
     if (!haystack.includes(filters.q.toLocaleLowerCase("fa-IR"))) {
       return false;
     }
@@ -63,6 +51,8 @@ export function buildListingHref(
 ): string {
   const next = new URLSearchParams(current);
   next.delete("cursor");
+  next.delete("city");
+  next.delete("neighborhood");
   for (const [key, value] of Object.entries(changes)) {
     if (value === null) {
       next.delete(key);

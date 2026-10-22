@@ -57,7 +57,7 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
 function HomeLayout({ params, listing }: { params: URLSearchParams; listing: ReactNode }) {
   const filters = parseListingFilters(params);
   const selectedCategoryLabel = SERVICE_CATEGORY_OPTIONS.find((option) => option.value === filters.category)?.label;
-  const hasActiveFilters = Boolean(filters.category || filters.q || filters.city || filters.neighborhood);
+  const hasActiveFilters = Boolean(filters.category || filters.q);
 
   return (
     <>

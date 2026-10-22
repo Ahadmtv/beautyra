@@ -24,10 +24,10 @@
 
 ## Home page (`/`) with filters
 
-Filters (`category`, `city`, `neighborhood`, `q`) and the pagination cursor are URL search params, so every filtered or paged URL is shareable and rendered on the server.
+Filters (`category` and `q`) and the pagination cursor are URL search params, so every filtered or paged URL is shareable and rendered on the server.
 
 - The backend call lives in `getPublicServiceCards(cursor, limit, category)` (`src/lib/api/services.ts`). It is a `"use cache"` function with a 300-second revalidation and the `services` tag. The cache key includes the cursor, limit, and category, so each beauty category has its own cached backend page.
-- Category filtering runs in PostgreSQL through `GET /api/v1/services?category=`. City, neighborhood, and free-text filtering still run in memory on the cached page (`src/lib/listing/filters.ts`).
+- Category filtering runs in PostgreSQL through `GET /api/v1/services?category=`. Free-text filtering still runs in memory on the cached page (`src/lib/listing/filters.ts`).
 - `src/app/page.tsx` reads `searchParams` inside a `Suspense` boundary. The header, filter bar, category navigation, and skeleton are the prerendered App Shell. The listing streams in after the params are resolved.
 - Because the page reads `searchParams`, Next.js does not store the full HTML of the unfiltered home page as an ISR entry. Only the shell and the cached data are reused.
 - The remaining filters apply only to the fetched page. A page can show fewer cards than `limit`, or none, while `next_cursor` still points to more results. The "load more" link stays visible in that case (`docs/backend-gaps.md`, item 4).

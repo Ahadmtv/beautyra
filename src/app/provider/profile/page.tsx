@@ -34,7 +34,7 @@ export default async function ProviderProfilePage() {
     if (!(error instanceof ApiError && error.status === 404)) throw error;
   }
 
-  const verificationStatus = profile?.verification_status ?? "pending";
+  const verificationStatus = profile?.verification_status;
   const defaultTimeZone = profile?.time_zone ?? "Asia/Tehran";
   const timeZoneOptions = [...new Set([defaultTimeZone, ...IANA_TIME_ZONES])]
     .sort()
@@ -45,9 +45,11 @@ export default async function ProviderProfilePage() {
       <section className="flex flex-col gap-6 rounded-md border border-border bg-white p-4 md:p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h1 className="text-2xl font-bold text-text">{t("provider.profile.title")}</h1>
-          <span className={`inline-flex rounded-sm border px-2 py-1 text-xs font-medium ${verificationClasses[verificationStatus]}`}>
-            {t(verificationLabels[verificationStatus])}
-          </span>
+          {verificationStatus && (
+            <span className={`inline-flex rounded-sm border px-2 py-1 text-xs font-medium ${verificationClasses[verificationStatus]}`}>
+              {t(verificationLabels[verificationStatus])}
+            </span>
+          )}
         </div>
         <p className="text-sm text-text-muted">{t("provider.profile.verificationNote")}</p>
         <ProviderProfileForm
