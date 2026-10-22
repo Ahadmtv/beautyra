@@ -5,6 +5,7 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { z } from "zod";
 
 import { t } from "@/config/messages.fa";
+import { providerVerificationErrorMessage } from "@/lib/admin/provider-verification";
 import { setAdminUserRole, type AdminRole } from "@/lib/api/admin";
 import { apiFetchWithStatus } from "@/lib/api/client";
 import { applyAdminPayoutAction, type AdminPayoutAction } from "@/lib/api/payouts";
@@ -90,7 +91,7 @@ export async function updateProviderVerificationAction(
     });
   } catch (error) {
     redirectOnUnauthorized(error);
-    if (error instanceof ApiError) return { message: problemMessage(error) };
+    if (error instanceof ApiError) return { message: providerVerificationErrorMessage(error) };
     throw error;
   }
 

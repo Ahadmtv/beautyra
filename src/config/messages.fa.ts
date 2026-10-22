@@ -454,6 +454,8 @@ export const messages = {
   "admin.providers.nextPage": "صفحه بعد",
   "admin.providers.success": "وضعیت تأیید ارائه‌دهنده به‌روزرسانی شد.",
   "admin.providers.error": "به‌روزرسانی وضعیت انجام نشد. اطلاعات را بررسی کنید.",
+  "admin.providers.profileIncomplete": "تأیید ممکن نیست؛ ارائه‌دهنده هنوز نمایه خود را تکمیل نکرده است.",
+  "admin.providers.unchanged": "وضعیت انتخاب‌شده با وضعیت فعلی یکسان است.",
   "admin.bookings.title": "مدیریت رزروها",
   "admin.bookings.subtitle": "همه رزروهای سامانه را بررسی کنید؛ بازپرداخت و حل اختلاف از روی ردیف فهرست انجام می‌شود.",
   "admin.bookings.searchLabel": "جست‌وجوی رزرو",

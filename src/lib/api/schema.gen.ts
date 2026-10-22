@@ -861,7 +861,7 @@ export interface paths {
         head?: never;
         /**
          * تغییر وضعیت تأیید ارائه‌دهنده
-         * @description فقط مدیر می‌تواند وضعیت تأیید نمایه را به pending، verified یا rejected تغییر دهد.
+         * @description فقط مدیر می‌تواند وضعیت تأیید نمایه را به pending، verified یا rejected تغییر دهد. تأیید (verified) پیش از تکمیل نمایه با خطای 409 و کد profile_incomplete رد می‌شود.
          */
         patch: {
             parameters: {
@@ -894,6 +894,8 @@ export interface paths {
                 401: components["responses"]["Problem"];
                 403: components["responses"]["Problem"];
                 404: components["responses"]["Problem"];
+                /** @description نمایه ناتمام است (profile_incomplete) */
+                409: components["responses"]["Problem"];
             };
         };
         trace?: never;
@@ -2250,10 +2252,13 @@ export interface components {
         AdminProvider: {
             /** Format: int64 */
             provider_id: number;
+            /** @description تا تکمیل نمایه ممکن است خالی باشد */
             display_name: string;
             /** @enum {string} */
             verification_status: "pending" | "verified" | "rejected";
             is_active: boolean;
+            /** @description درست یعنی نام نمایشی نمایه پر شده و ارائه‌دهنده قابل تأیید است */
+            profile_completed: boolean;
             /**
              * Format: email
              * @description از contact مالک حساب ارائه‌دهنده؛ فقط برای مدیر

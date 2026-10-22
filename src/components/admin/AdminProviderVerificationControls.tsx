@@ -1,11 +1,13 @@
 "use client";
 
-import { useActionState, useId, useState } from "react";
-import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
+import { useActionState, useCallback, useId, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from "@mui/material";
 
 import { Select } from "@/components/ui/Select";
 import { t } from "@/config/messages.fa";
 import { updateProviderVerificationAction, type AdminActionState } from "@/lib/admin/actions";
+import { getVerificationEligibility } from "@/lib/admin/provider-verification";
 import type { AdminProvider } from "@/lib/api/types";
 import type { AdminProviderVerificationStatus } from "@/lib/api/admin";
 
@@ -18,10 +20,23 @@ const statusOptions = [
 ] as const;
 
 export function AdminProviderVerificationControls({ provider }: { provider: AdminProvider }) {
-  const [state, formAction, pending] = useActionState(updateProviderVerificationAction, initialState);
+  const router = useRouter();
   const formId = useId();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [status, setStatus] = useState<AdminProviderVerificationStatus>(provider.verification_status);
+  const eligibility = getVerificationEligibility(provider, status);
+  const submitVerification = useCallback(
+    async (previous: AdminActionState, formData: FormData) => {
+      const next = await updateProviderVerificationAction(previous, formData);
+      if (next.success) {
+        setDialogOpen(false);
+        router.refresh();
+      }
+      return next;
+    },
+    [router],
+  );
+  const [state, formAction, pending] = useActionState(submitVerification, initialState);
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 0.75, minWidth: 0 }}>
@@ -44,28 +59,43 @@ export function AdminProviderVerificationControls({ provider }: { provider: Admi
           <DialogTitle id={`${formId}-title`} sx={{ fontFamily: "inherit", fontSize: 18, fontWeight: 700 }}>
             {t("admin.providers.title")}
           </DialogTitle>
-          <DialogContent sx={{ p: 3 }}>
+          <DialogContent sx={{ p: 3, display: "flex", flexDirection: "column", gap: 2 }}>
             <input type="hidden" name="provider_id" value={provider.provider_id} />
             <Select
               id={`${formId}-status`}
               name="verification_status"
               label={t("admin.providers.verification")}
               options={statusOptions}
-              defaultValue={status}
+              value={status}
               onChange={(event) => setStatus(event.target.value as AdminProviderVerificationStatus)}
             />
+            {!provider.profile_completed && (
+              <Alert severity="warning" sx={{ fontFamily: "inherit", fontSize: 12, "& .MuiAlert-message": { fontFamily: "inherit" } }}>
+                {t("admin.providers.profileIncomplete")}
+              </Alert>
+            )}
+            {eligibility.unchanged && (
+              <Typography sx={{ fontFamily: "inherit", fontSize: 12, color: "#617472" }}>
+                {t("admin.providers.unchanged")}
+              </Typography>
+            )}
+            {state.message && !state.success && (
+              <Alert severity="error" sx={{ fontFamily: "inherit", fontSize: 12, "& .MuiAlert-message": { fontFamily: "inherit" } }}>
+                {state.message}
+              </Alert>
+            )}
           </DialogContent>
           <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
             <Button type="button" onClick={() => setDialogOpen(false)} disabled={pending} sx={{ fontFamily: "inherit", fontWeight: 600, textTransform: "none" }}>
               {t("admin.users.cancel")}
             </Button>
-            <Button type="submit" variant="contained" disabled={pending} sx={{ fontFamily: "inherit", fontWeight: 700, textTransform: "none" }}>
+            <Button type="submit" variant="contained" disabled={pending || !eligibility.submitAllowed} sx={{ fontFamily: "inherit", fontWeight: 700, textTransform: "none" }}>
               {t("admin.providers.submit")}
             </Button>
           </DialogActions>
         </form>
       </Dialog>
-      {state.message && (
+      {state.message && (!dialogOpen || state.success) && (
         <Alert severity={state.success ? "success" : "error"} sx={{ maxWidth: 260, fontFamily: "inherit", fontSize: 12, py: 0.25 }}>
           {state.message}
         </Alert>
