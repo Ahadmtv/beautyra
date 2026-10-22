@@ -10,6 +10,7 @@ import { MobileCategoryDrawer } from "@/components/listing/MobileCategoryDrawer"
 import { ServiceCardsSkeleton } from "@/components/listing/ServiceCardsSkeleton";
 import { ServiceListing } from "@/components/listing/ServiceListing";
 import { messages, SERVICE_CATEGORY_OPTIONS, t } from "@/config/messages.fa";
+import { getSession } from "@/lib/auth/session";
 import { searchParamsFromRecord } from "@/lib/api/pagination";
 import { parseListingFilters } from "@/lib/listing/filters";
 
@@ -36,18 +37,19 @@ type HomePageProps = {
 
 export default function HomePage({ searchParams }: HomePageProps) {
   return (
-    <Suspense fallback={<HomeLayout params={new URLSearchParams()} listing={<ServiceCardsSkeleton />} />}>
+    <Suspense fallback={<HomeLayout params={new URLSearchParams()} listing={<ServiceCardsSkeleton />} showHomeCta={false} />}>
       <HomeContent searchParams={searchParams} />
     </Suspense>
   );
 }
 
 async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
-  const params = searchParamsFromRecord(await searchParams);
+  const [params, session] = await Promise.all([searchParams.then(searchParamsFromRecord), getSession()]);
 
   return (
     <HomeLayout
       params={params}
+      showHomeCta={!session}
       listing={
         <Suspense fallback={<ServiceCardsSkeleton />}>
           <ServiceListing params={params} />
@@ -57,7 +59,7 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
   );
 }
 
-function HomeLayout({ params, listing }: { params: URLSearchParams; listing: ReactNode }) {
+function HomeLayout({ params, listing, showHomeCta }: { params: URLSearchParams; listing: ReactNode; showHomeCta: boolean }) {
   const filters = parseListingFilters(params);
   const selectedCategoryLabel = SERVICE_CATEGORY_OPTIONS.find((option) => option.value === filters.category)?.label;
   const hasActiveFilters = Boolean(filters.category || filters.q);
@@ -85,7 +87,7 @@ function HomeLayout({ params, listing }: { params: URLSearchParams; listing: Rea
         </div>
       </main>
       <HowItWorks />
-      <HomeCta />
+      {showHomeCta && <HomeCta />}
     </>
   );
 }
