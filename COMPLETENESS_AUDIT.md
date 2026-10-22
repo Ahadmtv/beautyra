@@ -196,3 +196,23 @@
 ### ۱۴۰۵/۰۷/۲۹ — رفع دو خطای اجرایی SSR
 - `internal/platform/middleware.go::ErrorHandler` خطای ۴۰۴ مسیریابی فایبر (fiber.ErrNotFound) را به ۵۰۰ «خطای داخلی سرور» تبدیل می‌کرد → نگاشت به ۴۰۴ `route_not_found` و ۴۰۵ `method_not_allowed` (+ آزمون واحد `internal/platform/errorhandler_test.go`)؛ بک‌اند `a943284`، کانتینر بازبیلد شد.
 - `GET /api/v1/admin/bookings?refundable=false` طبق OpenAPI باید boolean معتبر تلقی شود ولی ۴۰۰ برگشت می‌داد → پذیرش `false` در handler (+ آزمون integration) و حذف پارامتر در حالت uncheck در `src/lib/api/admin.ts`؛ بک‌اند `516afda`، فرانت `2dbfb30`.
+
+## شکاف چرخه حیات ارائه‌دهنده (Provider lifecycle gap)
+
+### شواهد زنجیره کامل
+1. **واگذاری نقش، نمایه نمی‌سازد.** `identity/service.go:309-386` (`AdminSetRole`) فقط `store.SetRole` (identity/store.go:395-411؛ `INSERT INTO user_roles … ON CONFLICT DO NOTHING` / `DELETE`) + رخداد حسابرسی را در یک تراکنش انجام می‌دهد و هیچ تماسی با `provider_profiles` ندارد.
+2. **تنها مسیر ساخت `provider_profiles` فرم خود ارائه‌دهنده است.** `providers/profile.go:112-132` (`Put`; `INSERT … ON CONFLICT (provider_id) DO UPDATE`) از `PUT /api/v1/provider/profile` (providerapi/handler.go:41 و PutProfile در handler.go:145-159) فراخوانی می‌شود؛ `ValidateProfile` (profile.go:36-47) `display_name` خالی را رد می‌کند، پس ردیف نمایه فقط پس از تکمیل فرم ساخته می‌شود.
+3. **فهرست مدیریتی فقط صاحبان نمایه را برمی‌گرداند.** `providers/profile.go:159-170` (`AdminList`) روی `provider_profiles pp JOIN users u` اجرا می‌شود؛ کاربری که نقش `provider` دارد ولی هیچ نمایه‌ای ندارد از فهرست حذف می‌شود. جانب فرانت نیز سالم است: فیلترها در query واقعی اعمال می‌شوند و هیچ فیلتر سمت کلاینت در `src/app/admin/providers/page.tsx` که ردیف‌ها را پنهان کند وجود ندارد (داده مستقیم از `getAdminProviders`).
+4. **«در حال بررسی» بدون هیچ نمایه‌ای، یک پیش‌فرض UI است.** `GET /provider/profile` برای نداشتن نمایه ۴۰۴ problem برمی‌گرداند (providerapi/handler.go:437-440). صفحه `src/app/provider/profile/page.tsx:30-37` این ۴۰۴ را بی‌سروصدا رد می‌کند و `verificationStatus = profile?.verification_status ?? "pending"` می‌نویسد؛ پس حالت «بدون نمایه» به نشان «در انتظار بررسی» (کلید `provider.profile.verification.pending`) فرو می‌کاهد. این دقیقاً همان چیزی است که مالک محصول دید.
+5. **صفحات دیگر ارائه‌دهنده بدون نمایه از قبل گارد دارند:** ساخت خدمت به FK `services.provider_id → provider_profiles` (migrations/0003:34) برخورد می‌کند و خطای ۲۳۵۰۳ به ۴۰۹ «ابتدا نمایه ارائه‌دهنده را ثبت کنید» (providerapi/handler.go:486-487) نگاشت می‌شود؛ تنظیم ساعات کاری/مرخصی بدون نمایه نیز ۴۰۴ «پیش از تنظیم برنامه، نمایه …» برمی‌گرداند (scheduling/schedule.go:294 و providerapi/handler.go:467-468).
+
+### پرسش مالک محصول — پاسخ مستند
+- **(الف) پس از واگذاری نقش، تأیید مدیر دوم لازم است؟** بله: دو گام مجزا وجود دارد؛ (۱) واگذاری نقش = مجاز شدن تکمیل نمایه (به‌تنهایی نه نمایه می‌سازد و نه چیزی را عمومی می‌کند)، (۲) تأیید وضعیت از مسیر `PATCH /admin/providers/{id}/verification` (providerapi/handler.go:55) پس از تکمیل فرم. رؤیت عمومی خدمات امروز فقط با `p.is_active AND p.verification_status='verified'` (catalog/services.go:138 و :155 و :182 و :209) اعمال می‌شود.
+- **(ب) چرا در فهرست تأیید نمی‌آید؟** چون `AdminList` روی `provider_profiles` JOIN می‌کند و این کاربر اصلاً ردیف نمایه ندارد — شاهد واقعی: `user_roles` برای `id=19` دو سطر (`client` و `provider`) دارد ولی `SELECT … FROM provider_profiles WHERE provider_id=19` نتیجه‌ای ندارد.
+- فرض مطرح‌شده در تیکت **تأیید شد** (موارد ۱ تا ۴ در بالا).
+
+### شکاف‌های مرتبط اضافی (شناخت‌شده در بررسی)
+- نقش پس از پس گرفتن (revoke): امروز نمایه `provider_profiles` حذف نمی‌شود و هیچ قاعده‌ای آن را از دسترس خارج نمی‌کند؛ خدماتی که پیش از پس گرفتن نقش verified و is_active=true بودند همچنان در فهرست عمومی، جزئیات خدمت و در دسترس‌پذیری/رزرو پیدا می‌شوند (کوئی‌های catalog/services.go هیچ چکی بر وجود نقش در `user_roles` ندارند).
+- نقش بدون نمایه + ساخت خدمت: ۴۰۹ «ابتدا نمایه ارائه‌دهنده را ثبت کنید» رفتار درستی است، ولی صفحه خدمات ارائه‌دهنده راهنمای روشنی برای همین حالت نشان نمی‌دهد.
+- واگذاری دوباره نقش: idempotent است (`ON CONFLICT DO NOTHING` در identity/store.go:399) و خطا یا تکرار نمی‌سازد.
+- قید `provider_profiles_display_name_check` (مigrations/0003) طول `display_name` را بین ۱ تا ۱۶۰ مجاز می‌داند؛ پس امروز «نمایه ناتمام» اصلاً قابل ساخت نیست و پشتیبانی از آن نیازمند مهاجرت است.
