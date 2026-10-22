@@ -7,9 +7,10 @@ const QUICK_CATEGORY_VALUES = ["haircut", "nails", "makeup", "massage", "skin-ca
 
 export function HeroSearch({ filters }: { filters: ListingFilters }) {
   return (
-    <section className="home-hero relative border-b border-[var(--brand-teal-100)]">
-      <div className="relative mx-auto flex w-full max-w-page items-center px-4 py-12 sm:px-6 sm:py-20">
-        <div className="flex min-w-0 max-w-2xl flex-col gap-5">
+    <section className="relative">
+      <div aria-hidden="true" className="home-hero-media" />
+      <div className="relative mx-auto flex w-full max-w-page items-center px-4 pb-16 pt-40 sm:px-6 md:pb-20 lg:py-20">
+        <div className="flex min-w-0 max-w-xl flex-col gap-5 xl:max-w-2xl">
           <span className="inline-flex w-fit items-center gap-2 rounded-full bg-white/80 px-3 py-1 text-xs font-bold text-primary ring-1 ring-inset ring-[var(--brand-teal-200)]">
             <span aria-hidden="true" className="size-1.5 rounded-full bg-[var(--brand-blush-deep)]" />
             {t("brand.name")} <span className="text-[var(--brand-blush-deep)]">·</span> {t("brand.suffix")}

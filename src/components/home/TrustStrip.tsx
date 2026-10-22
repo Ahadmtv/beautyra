@@ -25,21 +25,21 @@ const ITEMS: { title: MessageKey; text: MessageKey; icon: string }[] = [
 
 export function TrustStrip() {
   return (
-    <section aria-label={t("home.trust.verifiedTitle")} className="mx-auto w-full max-w-page px-4 pt-6 sm:px-6">
-      <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+    <section className="relative z-10 mx-auto -mt-10 w-full max-w-page px-4 sm:px-6 md:-mt-12">
+      <ul className="grid grid-cols-1 gap-px overflow-hidden rounded-3xl border border-[var(--brand-warm-200)] bg-[var(--brand-warm-200)] shadow-[0_24px_60px_rgba(15,72,67,0.14)] sm:grid-cols-2 lg:grid-cols-4">
         {ITEMS.map((item) => (
-          <li
-            key={item.title}
-            className="flex items-start gap-3 rounded-2xl border border-[var(--brand-warm-200)] bg-white/90 p-4 shadow-[0_8px_24px_rgba(65,48,44,0.05)]"
-          >
-            <span aria-hidden="true" className="grid size-10 shrink-0 place-items-center rounded-xl bg-[var(--brand-teal-50)] text-primary">
-              <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <li key={item.title} className="group flex items-start gap-4 bg-white p-5 transition-colors duration-200 hover:bg-[var(--brand-teal-50)] sm:p-6">
+            <span
+              aria-hidden="true"
+              className="grid size-12 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(135deg,var(--brand-teal-50),#f8e7e8)] text-primary ring-1 ring-inset ring-white transition-transform duration-200 group-hover:scale-105 motion-reduce:transition-none"
+            >
+              <svg viewBox="0 0 24 24" className="size-6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                 <path d={item.icon} />
               </svg>
             </span>
-            <div className="min-w-0">
-              <h3 className="text-sm font-bold text-text">{t(item.title)}</h3>
-              <p className="mt-1 text-xs leading-6 text-text-muted">{t(item.text)}</p>
+            <div className="min-w-0 pt-0.5">
+              <h3 className="text-[15px] font-bold text-text">{t(item.title)}</h3>
+              <p className="mt-1.5 text-[13px] leading-6 text-text-muted">{t(item.text)}</p>
             </div>
           </li>
         ))}

@@ -9,7 +9,7 @@ const STEPS: { title: MessageKey; text: MessageKey }[] = [
 
 export function HowItWorks() {
   return (
-    <section aria-labelledby="home-how-title" className="border-t border-[var(--brand-warm-200)] bg-white/60">
+    <section id="how-it-works" aria-labelledby="home-how-title" className="scroll-mt-24 border-t border-[var(--brand-warm-200)] bg-white/60">
       <div className="mx-auto w-full max-w-page px-4 py-12 sm:px-6 sm:py-16">
         <div className="mx-auto mb-10 max-w-2xl text-center">
           <h2 id="home-how-title" className="text-xl font-extrabold text-text sm:text-2xl">

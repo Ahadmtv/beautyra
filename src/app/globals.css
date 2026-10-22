@@ -61,17 +61,25 @@
   }
 }
 
-.home-hero {
+.home-hero-media {
   --hero-image: url("/images/Pastel%20Botanical%20Beauty%20Flat%20Lay.png");
-  background-color: #f8fbf8;
-  background-image: linear-gradient(rgb(255 255 255 / 86%), rgb(255 255 255 / 86%)), var(--hero-image);
-  background-position: center;
-  background-size: cover;
+  position: absolute;
+  inset: 0 0 auto;
+  height: 15rem;
+  background: var(--hero-image) left bottom / cover no-repeat;
+  -webkit-mask-image: linear-gradient(to bottom, #000 68%, transparent);
+  mask-image: linear-gradient(to bottom, #000 68%, transparent);
 }
 
 @media (min-width: 1024px) {
-  .home-hero {
-    background-image: linear-gradient(to left, rgb(255 255 255 / 96%) 0%, rgb(255 255 255 / 84%) 40%, rgb(255 255 255 / 10%) 80%), var(--hero-image);
+  .home-hero-media {
+    inset: 0;
+    height: auto;
+    background:
+      linear-gradient(to left, rgb(255 255 255 / 96%) 0%, rgb(255 255 255 / 90%) 45%, rgb(255 255 255 / 40%) 62%, rgb(255 255 255 / 0%) 80%),
+      var(--hero-image) left bottom / cover no-repeat #f6faf7;
+    -webkit-mask-image: none;
+    mask-image: none;
   }
 }
 

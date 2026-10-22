@@ -51,9 +51,12 @@ function ResultsHeader({ params, filters, count }: { params: URLSearchParams; fi
 
   return (
     <Box>
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-lg font-bold text-text sm:text-xl">{heading}</h2>
-        <span className="inline-flex min-h-8 items-center rounded-full bg-white px-3 text-xs font-semibold text-text-muted ring-1 ring-inset ring-[var(--brand-warm-200)]">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <span aria-hidden="true" className="h-7 w-1.5 rounded-full bg-[linear-gradient(180deg,var(--brand-teal-500),var(--brand-blush-deep))]" />
+          <h2 className="text-lg font-bold text-text sm:text-xl">{heading}</h2>
+        </div>
+        <span className="inline-flex min-h-8 items-center rounded-full bg-[var(--brand-teal-50)] px-3.5 text-xs font-semibold text-primary ring-1 ring-inset ring-[var(--brand-teal-100)]">
           {t("home.resultsCount", { count: numberFormatFa(count) })}
         </span>
       </div>

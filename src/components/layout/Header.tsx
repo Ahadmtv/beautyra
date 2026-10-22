@@ -2,8 +2,13 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { AppBar, Box, Toolbar, Typography } from "@mui/material";
 
-import { t } from "@/config/messages.fa";
+import { t, type MessageKey } from "@/config/messages.fa";
 import { HeaderAccount, LoginLink } from "./HeaderAccount";
+
+const NAV_LINKS: { href: string; label: MessageKey }[] = [
+  { href: "/#providers", label: "header.services" },
+  { href: "/#how-it-works", label: "header.howItWorks" },
+];
 
 export function Header() {
   return (
@@ -24,6 +29,17 @@ export function Header() {
             </Typography>
           </Box>
         </Link>
+        <nav aria-label={t("header.nav")} className="hidden items-center gap-1 md:flex">
+          {NAV_LINKS.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="inline-flex min-h-10 items-center rounded-full px-4 text-sm font-semibold text-text-muted transition-colors hover:bg-[var(--brand-teal-50)] hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary motion-reduce:transition-none"
+            >
+              {t(link.label)}
+            </Link>
+          ))}
+        </nav>
         <Suspense fallback={<LoginLink />}>
           <HeaderAccount />
         </Suspense>

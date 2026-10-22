@@ -47,7 +47,7 @@ export function ProviderCard({ card, delayMs }: { card: ProviderCardView; delayM
         backgroundColor: "#fff",
         boxShadow: "0 4px 18px rgba(65, 48, 44, 0.045)",
         transition: "border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease",
-        animation: delayMs === undefined ? "none" : "home-card-in 420ms both",
+        animation: delayMs === undefined ? "none" : "home-card-in 420ms backwards",
         animationDelay: delayMs === undefined ? undefined : `${delayMs}ms`,
         "&:hover": { borderColor: "rgba(15, 118, 110, 0.42)", boxShadow: "0 12px 30px rgba(38, 69, 64, 0.12)", transform: "translateY(-3px)" },
         "@media (prefers-reduced-motion: reduce)": { animation: "none", transition: "none" },
