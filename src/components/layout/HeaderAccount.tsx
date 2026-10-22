@@ -8,8 +8,8 @@ export function LoginLink() {
   return (
     <MuiLinkButton
       href="/login"
-      variant="outlined"
-      sx={{ minHeight: 40, px: 2, borderRadius: 999, borderColor: "#dce7e4", color: "#0f766e", fontFamily: "inherit", fontSize: 14, fontWeight: 700, textTransform: "none", "&:hover": { borderColor: "#0f766e", bgcolor: "#e6f4f1" } }}
+      variant="contained"
+      sx={{ minHeight: 42, px: 2.5, borderRadius: 999, bgcolor: "#0f766e", color: "#ffffff", boxShadow: "0 6px 16px rgba(15,118,110,.22)", fontFamily: "inherit", fontSize: 14, fontWeight: 700, textTransform: "none", "&:hover": { bgcolor: "#0b5f58", boxShadow: "0 8px 20px rgba(15,118,110,.3)" } }}
     >
       {t("header.login")}
     </MuiLinkButton>

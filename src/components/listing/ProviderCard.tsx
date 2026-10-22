@@ -59,20 +59,20 @@ export function ProviderCard({ card, delayMs }: { card: ProviderCardView; delayM
           <Avatar aria-hidden="true" sx={{ zIndex: 1, width: 68, height: 68, border: "3px solid rgba(255,255,255,.9)", bgcolor: accent, background: `linear-gradient(145deg, ${accent}, #172b2a)`, color: "#fff", fontFamily: "inherit", fontSize: 25, fontWeight: 800, boxShadow: "0 5px 14px rgba(23,43,42,.16)" }}>
             {displayName.slice(0, 1)}
           </Avatar>
-          {card.verified && (
-            <Chip
-              icon={<CheckIcon />}
-              label={t("badge.verified")}
-              size="small"
-              sx={{ zIndex: 1, height: 29, bgcolor: "rgba(255,255,255,.93)", color: "#145c55", fontFamily: "inherit", fontSize: 11, fontWeight: 750, "& .MuiChip-icon": { color: "#0f766e", ml: 0.5, mr: -0.25 } }}
-            />
-          )}
         </Box>
         <CardContent sx={{ display: "flex", minWidth: 0, flex: 1, flexDirection: "column", gap: 1.5, p: 2, "&:last-child": { pb: 2 } }}>
           <Box sx={{ display: "flex", minWidth: 0, alignItems: "center", justifyContent: "space-between", gap: 1 }}>
             <Typography component="h2" sx={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFamily: "inherit", fontSize: 16, fontWeight: 750, color: "#263b38" }}>
               {displayName}
             </Typography>
+            {card.verified && (
+              <Box component="span" sx={{ display: "inline-flex", flexShrink: 0, alignItems: "center", gap: 0.5, height: 24, px: 0.75, pe: 1, borderRadius: 999, border: "1px solid #cfe8e2", bgcolor: "#eef8f5", color: "#145c55", fontFamily: "inherit", fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>
+                <Box component="span" aria-hidden="true" sx={{ display: "inline-flex", width: 18, height: 18, alignItems: "center", justifyContent: "center", borderRadius: "50%", bgcolor: "#0f766e", color: "#fff" }}>
+                  <CheckIcon />
+                </Box>
+                {t("badge.verified")}
+              </Box>
+            )}
           </Box>
           {card.categoryLabel && <Chip size="small" label={card.categoryLabel} sx={{ alignSelf: "flex-start", maxWidth: "100%", height: 27, bgcolor: "#f2f7f5", color: "#42615c", fontFamily: "inherit", fontSize: 11, "& .MuiChip-label": { overflow: "hidden", textOverflow: "ellipsis" } }} />}
           <Box sx={{ display: "flex", minHeight: 25, alignItems: "center", justifyContent: "flex-end", gap: 1 }}>

@@ -1,6 +1,9 @@
 import { Suspense, type ReactNode } from "react";
 import type { Metadata } from "next";
 
+import { HomeCta } from "@/components/home/HomeCta";
+import { HowItWorks } from "@/components/home/HowItWorks";
+import { TrustStrip } from "@/components/home/TrustStrip";
 import { CategoryNav } from "@/components/listing/CategoryNav";
 import { HeroSearch } from "@/components/listing/HeroSearch";
 import { MobileCategoryDrawer } from "@/components/listing/MobileCategoryDrawer";
@@ -62,7 +65,8 @@ function HomeLayout({ params, listing }: { params: URLSearchParams; listing: Rea
   return (
     <>
       <HeroSearch filters={filters} />
-      <main className="mx-auto w-full max-w-page flex-1 px-4 pb-10 pt-6 sm:px-6">
+      <TrustStrip />
+      <main className="mx-auto w-full max-w-page flex-1 px-4 pb-12 pt-10 sm:px-6">
         <div className="mb-5 flex flex-col gap-3 lg:hidden">
           <MobileCategoryDrawer selectedCategoryLabel={selectedCategoryLabel} hasActiveFilters={hasActiveFilters}>
             <CategoryNav params={params} />
@@ -75,11 +79,13 @@ function HomeLayout({ params, listing }: { params: URLSearchParams; listing: Rea
               <CategoryNav params={params} />
             </div>
           </aside>
-          <section aria-label={t("home.providers")} className="min-w-0">
+          <section id="providers" aria-label={t("home.providers")} className="min-w-0 scroll-mt-24">
             {listing}
           </section>
         </div>
       </main>
+      <HowItWorks />
+      <HomeCta />
     </>
   );
 }

@@ -58,7 +58,7 @@ function categoryLinkClass(selected: boolean) {
   ].join(" ");
 }
 
-function CategoryIcon({ category }: { category: string }) {
+export function CategoryIcon({ category }: { category: string }) {
   const paths: Record<string, string> = {
     all: "M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z",
     haircut: "M6 5 18 19M18 5 6 19M5 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm14 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z",

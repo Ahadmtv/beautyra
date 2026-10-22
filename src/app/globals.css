@@ -44,7 +44,13 @@
 
 @layer base {
   body {
-    background: radial-gradient(ellipse at 50% 0%, rgb(15 118 110 / 5%), transparent 50%), #fcf9f7;
+    background-color: #fcf9f7;
+    background-image:
+      radial-gradient(ellipse at 0% 0%, rgb(244 182 194 / 14%), transparent 42%),
+      radial-gradient(ellipse at 100% 100%, rgb(15 118 110 / 8%), transparent 46%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' viewBox='0 0 240 240'%3E%3Cg fill='none' stroke='%238cc5bb' stroke-width='1.2' opacity='0.35'%3E%3Cpath d='M30 60c20-24 52-30 74-14-18 22-50 30-74 14Z'/%3E%3Cpath d='M30 60c18 6 32 16 44 30'/%3E%3Cpath d='M150 170c-6-22 6-42 30-50 4 22-8 42-30 50Z'/%3E%3Cpath d='M150 170c-2 14 4 30 18 38'/%3E%3Cpath d='M186 36l3 8 8 3-8 3-3 8-3-8-8-3 8-3 3-8Z' fill='%23f4b6c2' stroke='none' opacity='0.7'/%3E%3Ccircle cx='80' cy='190' r='3' fill='%23b9ddd6' stroke='none'/%3E%3C/g%3E%3C/svg%3E");
+    background-repeat: no-repeat, no-repeat, repeat;
+    background-size: auto, auto, 240px 240px;
     color: var(--color-text);
     font-family: var(--font-sans);
   }
@@ -56,14 +62,17 @@
 }
 
 .home-hero {
-  background: radial-gradient(ellipse at 12% 10%, rgb(244 182 194 / 18%), transparent 34%), linear-gradient(118deg, #eff8f6 0%, #f8fbf8 54%, #fff8f7 100%);
+  --hero-image: url("/images/Pastel%20Botanical%20Beauty%20Flat%20Lay.png");
+  background-color: #f8fbf8;
+  background-image: linear-gradient(rgb(255 255 255 / 86%), rgb(255 255 255 / 86%)), var(--hero-image);
+  background-position: center;
+  background-size: cover;
 }
 
-.home-hero-pattern {
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M18 150c53-25 66-82 78-138M42 104c-24-3-34-20-37-39 23 4 37 16 37 39Zm29-40C67 40 80 23 100 9c4 25-6 45-29 55Zm5 38c19-19 41-19 62-9-17 19-38 24-62 9Z' fill='none' stroke='%230f766e' stroke-width='1.4'/%3E%3C/svg%3E");
-  background-position: left center;
-  background-repeat: no-repeat;
-  background-size: 220px;
+@media (min-width: 1024px) {
+  .home-hero {
+    background-image: linear-gradient(to left, rgb(255 255 255 / 96%) 0%, rgb(255 255 255 / 84%) 40%, rgb(255 255 255 / 10%) 80%), var(--hero-image);
+  }
 }
 
 @keyframes home-card-in {
