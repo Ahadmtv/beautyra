@@ -226,6 +226,226 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/images": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * فهرست تصاویر کاربر جاری
+         * @description تصاویر نمایه و در صورت داشتن نقش ارائه‌دهنده، تصویر کاور کاربر احرازشده را برمی‌گرداند.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description مجموعه تصاویر کاربر */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ImageSet"];
+                    };
+                };
+                401: components["responses"]["Problem"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/images/profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * بارگذاری یا جایگزینی تصویر نمایه کاربر
+         * @description یک تصویر با فرمت JPEG، PNG یا WebP تا حداکثر ۵ مگابایت می‌پذیرد و آن را به‌صورت JPEG استاندارد و برش‌خورده با نسبت ۱:۱ ذخیره می‌کند.
+         */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "multipart/form-data": {
+                        /**
+                         * Format: binary
+                         * @description فایل تصویر ورودی
+                         */
+                        file: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description تصویر نمایه جایگزین شد */
+                200: {
+                    headers: {
+                        /** @description نشانی عمومی تصویر ایجاد یا ذخیره‌شده */
+                        Location?: string;
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Image"];
+                    };
+                };
+                /** @description تصویر نمایه جدید ایجاد شد */
+                201: {
+                    headers: {
+                        /** @description نشانی عمومی تصویر ایجاد یا ذخیره‌شده */
+                        Location?: string;
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Image"];
+                    };
+                };
+                400: components["responses"]["Problem"];
+                401: components["responses"]["Problem"];
+                413: components["responses"]["Problem"];
+                415: components["responses"]["Problem"];
+                422: components["responses"]["Problem"];
+            };
+        };
+        post?: never;
+        /**
+         * حذف تصویر نمایه کاربر
+         * @description تصویر نمایه فعلی کاربر جاری را حذف می‌کند.
+         */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description تصویر نمایه با موفقیت حذف شد */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                401: components["responses"]["Problem"];
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/images/cover": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * بارگذاری یا جایگزینی تصویر کاور ارائه‌دهنده
+         * @description فقط برای کاربران با نقش ارائه‌دهنده مجاز است. تصویر ورودی به نسبت ۱۶:۹ برش خورده و با ابعاد حداکثر ۱۶۰۰ پیکسل به‌صورت JPEG ذخیره می‌شود.
+         */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "multipart/form-data": {
+                        /**
+                         * Format: binary
+                         * @description فایل تصویر ورودی
+                         */
+                        file: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description تصویر کاور جایگزین شد */
+                200: {
+                    headers: {
+                        /** @description نشانی عمومی تصویر ایجاد یا ذخیره‌شده */
+                        Location?: string;
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Image"];
+                    };
+                };
+                /** @description تصویر کاور جدید ایجاد شد */
+                201: {
+                    headers: {
+                        /** @description نشانی عمومی تصویر ایجاد یا ذخیره‌شده */
+                        Location?: string;
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Image"];
+                    };
+                };
+                400: components["responses"]["Problem"];
+                401: components["responses"]["Problem"];
+                403: components["responses"]["Problem"];
+                413: components["responses"]["Problem"];
+                415: components["responses"]["Problem"];
+                422: components["responses"]["Problem"];
+            };
+        };
+        post?: never;
+        /**
+         * حذف تصویر کاور ارائه‌دهنده
+         * @description فقط برای کاربران با نقش ارائه‌دهنده مجاز است. تصویر کاور ارائه‌دهنده را حذف می‌کند.
+         */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description تصویر کاور با موفقیت حذف شد */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                401: components["responses"]["Problem"];
+                403: components["responses"]["Problem"];
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/services": {
         parameters: {
             query?: never;
@@ -2228,6 +2448,8 @@ export interface components {
             phone?: string | null;
             is_active: boolean;
             roles: string[];
+            /** @description نشانی اینترنتی تصویر نمایه کاربر در صورت وجود */
+            profile_image_url?: string;
         };
         AdminUser: {
             /** Format: int64 */
@@ -2298,6 +2520,10 @@ export interface components {
             is_active: boolean;
             /** @enum {string} */
             verification_status: "pending" | "verified" | "rejected";
+            /** @description نشانی اینترنتی تصویر نمایه ارائه‌دهنده */
+            profile_image_url?: string;
+            /** @description نشانی اینترنتی تصویر سربرگ یا کاور ارائه‌دهنده */
+            cover_image_url?: string;
         };
         ProviderProfileInput: {
             display_name: string;
@@ -2332,6 +2558,8 @@ export interface components {
             is_active: boolean;
             /** @description نام نمایشی ارائه‌دهنده خدمت؛ برای نمایش در فهرست عمومی. مقدار خالی یعنی نمایه ارائه‌دهنده هنوز تکمیل نشده است. */
             provider_display_name: string;
+            /** @description نشانی اینترنتی تصویر نمایه ارائه‌دهنده این خدمت در صورت وجود */
+            provider_profile_image_url?: string;
         };
         ServiceInput: {
             name: string;
@@ -2641,6 +2869,32 @@ export interface components {
                 /** Format: date-time */
                 end_at: string;
             }[];
+        };
+        Image: {
+            /**
+             * @description جایگاه تصویر (نمایه کاربر یا کاور ارائه‌دهنده)
+             * @enum {string}
+             */
+            purpose: "profile" | "cover";
+            /** @description نشانی وب عمومی تصویر */
+            url: string;
+            /** @example image/jpeg */
+            content_type: string;
+            /** @example 512 */
+            width: number;
+            /** @example 512 */
+            height: number;
+            /**
+             * Format: int64
+             * @example 125400
+             */
+            byte_size: number;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        ImageSet: {
+            profile?: components["schemas"]["Image"];
+            cover?: components["schemas"]["Image"];
         };
     };
     responses: {

@@ -51,6 +51,14 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async rewrites() {
+    return [
+      {
+        source: "/static/img/:path*",
+        destination: `${env.API_BASE_URL.replace(/\/$/, "")}/static/img/:path*`,
+      },
+    ];
+  },
   cacheComponents: true,
   partialPrefetching: true,
   turbopack: {

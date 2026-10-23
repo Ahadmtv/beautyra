@@ -37,3 +37,5 @@ export type AdminBooking = Schemas["AdminBooking"];
 export type AdminBookingPage = Schemas["AdminBookingPage"];
 export type AdminPayout = Schemas["AdminPayout"];
 export type AdminPayoutPage = Schemas["AdminPayoutPage"];
+export type Image = Schemas["Image"];
+export type ImageSet = Schemas["ImageSet"];

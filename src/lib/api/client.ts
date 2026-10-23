@@ -43,7 +43,8 @@ export async function apiFetchWithStatus<T>(
   }
 
   const headers = new Headers({ Accept: "application/json" });
-  if (body !== undefined) {
+  const isFormData = typeof FormData !== "undefined" && body instanceof FormData;
+  if (body !== undefined && !isFormData) {
     headers.set("Content-Type", "application/json");
   }
   if (idempotencyKey) {
@@ -65,7 +66,7 @@ export async function apiFetchWithStatus<T>(
   const init: RequestInit = {
     method,
     headers,
-    body: body === undefined ? undefined : JSON.stringify(body),
+    body: body === undefined ? undefined : isFormData ? body : JSON.stringify(body),
     cache,
     signal: AbortSignal.timeout(timeoutMs),
   };
