@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 
 import { Skeleton } from "@/components/ui/Skeleton";
+import { ImageUpload } from "@/components/ui/ImageUpload";
 import { t } from "@/config/messages.fa";
 import { getCurrentUser } from "@/lib/api/auth";
 import type { User, WalletBalance } from "@/lib/api/types";
@@ -10,6 +11,10 @@ import { getWalletBalance } from "@/lib/api/wallet";
 import { ROLES, type Role } from "@/lib/auth/claims";
 import { redirectOnUnauthorized, requireRole } from "@/lib/auth/session";
 import { formatTomanFromRial } from "@/lib/format/money";
+import {
+  uploadProfileImageAction,
+  deleteProfileImageAction,
+} from "@/lib/auth/image-actions";
 
 export const metadata: Metadata = {
   title: `${t("auth.account.title")} | ${t("brand.name")}`,
@@ -30,6 +35,14 @@ export default async function AccountPage() {
     <main className="mx-auto w-full max-w-page flex-1 px-4 py-6 md:py-8">
       <h1 className="text-2xl font-bold text-text">{t("auth.account.title")}</h1>
       <div className="mt-6 flex max-w-xl flex-col gap-6">
+        <ImageUpload
+          currentImageUrl={user.profile_image_url}
+          aspect="square"
+          title={t("image.upload.profileTitle")}
+          hint={t("image.upload.profileHint")}
+          uploadAction={uploadProfileImageAction}
+          deleteAction={deleteProfileImageAction}
+        />
         <section className="rounded-md border border-border bg-white p-4 md:p-6">
           <dl className="flex flex-col gap-4">
             <DetailField label={t("auth.account.email")} value={user.email} dir="ltr" />

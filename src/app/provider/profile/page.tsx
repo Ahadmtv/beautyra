@@ -7,6 +7,15 @@ import type { ProviderProfile } from "@/lib/api/types";
 import { ApiError } from "@/lib/api/problem";
 import { redirectOnUnauthorized } from "@/lib/auth/session";
 import { ProviderProfileForm } from "@/components/provider/ProviderProfileForm";
+import { ImageUpload } from "@/components/ui/ImageUpload";
+import {
+  uploadProfileImageAction,
+  deleteProfileImageAction,
+} from "@/lib/auth/image-actions";
+import {
+  uploadCoverImageAction,
+  deleteCoverImageAction,
+} from "@/lib/provider/image-actions";
 
 export const metadata: Metadata = {
   title: `${t("provider.profile.title")} | ${t("brand.name")}`,
@@ -52,6 +61,24 @@ export default async function ProviderProfilePage() {
           )}
         </div>
         <p className="text-sm text-text-muted">{t("provider.profile.verificationNote")}</p>
+        <div className="grid gap-6 md:grid-cols-2">
+          <ImageUpload
+            currentImageUrl={profile?.cover_image_url}
+            aspect="cover"
+            title={t("image.upload.coverTitle")}
+            hint={t("image.upload.coverHint")}
+            uploadAction={uploadCoverImageAction}
+            deleteAction={deleteCoverImageAction}
+          />
+          <ImageUpload
+            currentImageUrl={profile?.profile_image_url}
+            aspect="square"
+            title={t("image.upload.profileTitle")}
+            hint={t("image.upload.profileHint")}
+            uploadAction={uploadProfileImageAction}
+            deleteAction={deleteProfileImageAction}
+          />
+        </div>
         <ProviderProfileForm
           profile={profile}
           timeZoneOptions={timeZoneOptions}
