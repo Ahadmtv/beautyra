@@ -10,6 +10,7 @@ export type ProviderCardView = {
   categoryLabel: string;
   priceIrr: number;
   verified: boolean;
+  avatarUrl: string | null;
 };
 
 export function normalizeProviderDisplayName(value: string | null | undefined): string | null {
@@ -27,5 +28,6 @@ export function toProviderCardView(service: Service): ProviderCardView {
     priceIrr: service.price_irr,
     // The public service list only returns services of active, verified providers.
     verified: true,
+    avatarUrl: service.provider_profile_image_url?.trim() || null,
   };
 }

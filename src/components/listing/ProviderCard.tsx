@@ -56,7 +56,7 @@ export function ProviderCard({ card, delayMs }: { card: ProviderCardView; delayM
       <Box sx={{ display: "flex", width: "100%", minWidth: 0, flexDirection: "column" }}>
         <Box sx={{ position: "relative", display: "flex", minHeight: 112, alignItems: "center", justifyContent: "space-between", overflow: "hidden", px: 2, background: `linear-gradient(125deg, ${first}, ${second})` }}>
           <Box aria-hidden="true" sx={{ position: "absolute", inset: 0, opacity: 0.18, backgroundImage: "url('data:image/svg+xml,%3Csvg viewBox=%270 0 120 120%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Cpath d=%27M22 110c44-21 49-66 58-100M34 80c-20-2-28-16-31-31 19 3 31 12 31 31Zm20-30c-3-21 8-35 23-46 3 21-5 38-23 46Zm1 31c16-16 34-16 52-8-14 16-32 20-52 8Z%27 fill=%27none%27 stroke=%27%230f766e%27 stroke-width=%272%27/%3E%3C/svg%3E')", backgroundPosition: "left center", backgroundRepeat: "no-repeat", backgroundSize: "150px" }} />
-          <Avatar aria-hidden="true" sx={{ zIndex: 1, width: 68, height: 68, border: "3px solid rgba(255,255,255,.9)", bgcolor: accent, background: `linear-gradient(145deg, ${accent}, #172b2a)`, color: "#fff", fontFamily: "inherit", fontSize: 25, fontWeight: 800, boxShadow: "0 5px 14px rgba(23,43,42,.16)" }}>
+          <Avatar aria-hidden="true" src={card.avatarUrl ?? undefined} sx={{ zIndex: 1, width: 68, height: 68, border: "3px solid rgba(255,255,255,.9)", bgcolor: accent, background: `linear-gradient(145deg, ${accent}, #172b2a)`, color: "#fff", fontFamily: "inherit", fontSize: 25, fontWeight: 800, boxShadow: "0 5px 14px rgba(23,43,42,.16)" }}>
             {displayName.slice(0, 1)}
           </Avatar>
         </Box>

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { BookingPanel } from "@/components/service/BookingPanel";
 import { Badge } from "@/components/ui/Badge";
@@ -80,8 +81,26 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
 
         <div className="mt-6 grid gap-8 md:grid-cols-[1fr_20rem] md:items-start">
           <div className="flex min-w-0 flex-col gap-6">
-            <header className="flex gap-4 rounded-md border border-border bg-white p-4 md:p-6">
-              <div className="flex min-w-0 flex-1 flex-col gap-3">
+            <header className="flex items-center gap-4 rounded-md border border-border bg-white p-4 md:p-6">
+              {service.provider_profile_image_url ? (
+                <div className="relative size-14 shrink-0 overflow-hidden rounded-full border border-border">
+                  <Image
+                    src={service.provider_profile_image_url}
+                    alt={providerName ?? t("service.providerFallback")}
+                    fill
+                    unoptimized
+                    className="object-cover"
+                  />
+                </div>
+              ) : (
+                <div
+                  aria-hidden="true"
+                  className="flex size-14 shrink-0 items-center justify-center rounded-full bg-surface text-lg font-bold text-primary border border-border"
+                >
+                  {(providerName ?? t("service.providerFallback")).slice(0, 1)}
+                </div>
+              )}
+              <div className="flex min-w-0 flex-1 flex-col gap-1">
                 <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
                   <p className="min-w-0 text-lg font-semibold text-text">
                     {providerName ?? t("service.providerFallback")}

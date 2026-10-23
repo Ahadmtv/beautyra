@@ -68,9 +68,24 @@ describe("toProviderCardView", () => {
 
     expect(card).not.toHaveProperty("city");
     expect(card).not.toHaveProperty("neighborhood");
-    expect(card).not.toHaveProperty("avatarUrl");
     expect(card).not.toHaveProperty("rating");
     expect(card).not.toHaveProperty("reviewCount");
+  });
+
+  it("sets avatarUrl to null when provider_profile_image_url is absent", () => {
+    const card = toProviderCardView(service);
+    expect(card.avatarUrl).toBeNull();
+  });
+
+  it("sets avatarUrl from provider_profile_image_url when present", () => {
+    const url = "http://localhost:4000/static/img/abc123.jpg";
+    const card = toProviderCardView({ ...service, provider_profile_image_url: url });
+    expect(card.avatarUrl).toBe(url);
+  });
+
+  it("sets avatarUrl to null when provider_profile_image_url is blank", () => {
+    const card = toProviderCardView({ ...service, provider_profile_image_url: "   " });
+    expect(card.avatarUrl).toBeNull();
   });
 });
 

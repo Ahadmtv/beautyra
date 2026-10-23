@@ -12,6 +12,7 @@ const card: ProviderCardView = {
   categoryLabel: "Skin care",
   priceIrr: 500_000,
   verified: true,
+  avatarUrl: null,
 };
 
 describe("parseListingFilters", () => {
