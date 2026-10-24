@@ -23,6 +23,13 @@ export class InvalidCredentialsError extends Error {
   }
 }
 
+export class RefreshInProgressError extends Error {
+  constructor() {
+    super("Refresh rotation is already in progress");
+    this.name = "RefreshInProgressError";
+  }
+}
+
 export interface AuthProvider {
   login(input: LoginInput): Promise<SessionTokens>;
   refresh(refreshToken: string): Promise<SessionTokens | null>;

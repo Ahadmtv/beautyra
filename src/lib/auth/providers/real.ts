@@ -5,7 +5,12 @@ import { ApiError, parseProblem } from "@/lib/api/problem";
 
 import { sessionFromClaims } from "../claims";
 import { decodeJwtPayload, nowSeconds } from "../jwt";
-import { InvalidCredentialsError, type AuthProvider, type SessionTokens } from "../types";
+import {
+  InvalidCredentialsError,
+  RefreshInProgressError,
+  type AuthProvider,
+  type SessionTokens,
+} from "../types";
 
 const tokenPairSchema = z.object({
   access_token: z.string().min(1),
@@ -89,7 +94,11 @@ export const realAuthProvider: AuthProvider = {
       return null;
     }
     if (!response.ok) {
-      throw await parseProblem(response);
+      const problem = await parseProblem(response);
+      if (problem.status === 409 && problem.code === "refresh_in_progress") {
+        throw new RefreshInProgressError();
+      }
+      throw problem;
     }
     return readTokens(response);
   },
