@@ -107,7 +107,7 @@ export interface paths {
         put?: never;
         /**
          * تایید مجدد و چرخش توکن Refresh
-         * @description توکن Refresh ارائه‌شده در یک تراکنش مصرف، لغو و با توکن تازه جایگزین می‌شود؛ نشست تازه ایمیل و نقش‌های جاری کاربر را حفظ می‌کند. استفاده مجدد از توکن چرخیده‌شده به‌عنوان replay شناسایی می‌شود و همه نشست‌های فعال کاربر لغو می‌شوند.
+         * @description توکن Refresh ارائه‌شده در یک تراکنش مصرف، لغو و با توکن تازه جایگزین می‌شود؛ نشست تازه ایمیل و نقش‌های جاری کاربر را حفظ می‌کند. استفاده مجدد از توکن چرخیده‌شده به‌عنوان replay شناسایی می‌شود و همه نشست‌های فعال کاربر لغو می‌شوند. اگر دو درخواست هم‌زمان با یک توکن در حال چرخش باشند، درخواست بازنده با وضعیت 409 و کد refresh_in_progress رد می‌شود و نشست‌های کاربر لغو نمی‌شوند.
          */
         post: {
             parameters: {
@@ -133,6 +133,7 @@ export interface paths {
                 };
                 400: components["responses"]["Problem"];
                 401: components["responses"]["Problem"];
+                409: components["responses"]["Problem"];
                 429: components["responses"]["Problem"];
             };
         };
@@ -2756,7 +2757,7 @@ export interface components {
             payment_method: "none" | "wallet" | "zarinpal";
             /**
              * Format: date-time
-             * @description مهلت پرداخت رزروهای pending_payment؛ پس از آن رزرو فقط در نبود تلاش پرداخت فعال منقضی می‌شود
+             * @description مهلت اولیه پرداخت؛ رزرو پس از این زمان به‌علاوه BOOKING_PAYMENT_EXPIRY_GRACE منقضی می‌شود، حتی اگر تلاش پرداخت حل‌نشده باشد
              */
             payment_expires_at?: string | null;
             /**
