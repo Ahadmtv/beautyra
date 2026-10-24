@@ -37,13 +37,19 @@ export default async function BookingConfirmPage({ params, searchParams }: Confi
   const startAt = firstValue(rawStartAt);
   const scheduleHref = `/book/${service.id}`;
 
-  if (date === undefined || !isIsoDate(date) || startAt === undefined || Number.isNaN(Date.parse(startAt))) {
+  if (
+    date === undefined ||
+    !isIsoDate(date) ||
+    startAt === undefined ||
+    Number.isNaN(Date.parse(startAt))
+  ) {
     redirect(scheduleHref);
   }
 
   const availability = await loadAvailabilityOrNotFound(service.provider_id, service.id, date);
   const slot = availability.slots.find((item) => item.start_at === startAt);
-  const walletAvailableIrr = await loadWalletAvailableOrNull();
+  const walletAvailableIrr =
+    slot === undefined || service.price_irr === 0 ? null : await loadWalletAvailableOrNull();
 
   return (
     <main className="mx-auto w-full max-w-page flex-1 px-4 py-6 md:py-8">
@@ -77,7 +83,10 @@ export default async function BookingConfirmPage({ params, searchParams }: Confi
         <h1 className="text-xl font-bold text-text">{t("booking.confirm.title")}</h1>
 
         {slot === undefined ? (
-          <div role="alert" className="flex flex-col items-start gap-3 rounded-md bg-surface p-4 text-sm text-text">
+          <div
+            role="alert"
+            className="flex flex-col items-start gap-3 rounded-md bg-surface p-4 text-sm text-text"
+          >
             <p>{t("booking.confirm.slotGone")}</p>
             <Link
               href={`${scheduleHref}?date=${availability.date}`}

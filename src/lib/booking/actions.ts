@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { t } from "@/config/messages.fa";
-import { createBooking, getBooking } from "@/lib/api/bookings";
+import { createBooking } from "@/lib/api/bookings";
 import { ApiError, problemMessage } from "@/lib/api/problem";
 import type { Booking } from "@/lib/api/types";
 import { redirectOnUnauthorized } from "@/lib/auth/session";
@@ -25,6 +25,8 @@ export async function createBookingAction(
     return { message: t("booking.confirm.invalid") };
   }
 
+  // The create response already carries the full booking row; re-reading the
+  // booking would only add a redundant upstream request on the critical path.
   let booking: Booking;
   try {
     booking = await createBooking(submission.input, submission.idempotencyKey);
@@ -37,14 +39,6 @@ export async function createBookingAction(
   }
 
   revalidatePath("/dashboard/bookings");
-  try {
-    booking = await getBooking(booking.id);
-  } catch (error) {
-    if (error instanceof ApiError) {
-      return { message: problemMessage(error) };
-    }
-    throw error;
-  }
   if (booking.status === "confirmed") {
     redirect(`/bookings/${booking.id}/success`);
   }
