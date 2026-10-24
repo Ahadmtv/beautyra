@@ -2,6 +2,7 @@ import { Suspense, type ReactNode } from "react";
 import type { Metadata } from "next";
 
 import { HomeCta } from "@/components/home/HomeCta";
+import { HomeSkeleton } from "@/components/home/HomeSkeleton";
 import { HowItWorks } from "@/components/home/HowItWorks";
 import { TrustStrip } from "@/components/home/TrustStrip";
 import { CategoryNav } from "@/components/listing/CategoryNav";
@@ -37,14 +38,17 @@ type HomePageProps = {
 
 export default function HomePage({ searchParams }: HomePageProps) {
   return (
-    <Suspense fallback={<HomeLayout params={new URLSearchParams()} listing={<ServiceCardsSkeleton />} showHomeCta={false} />}>
+    <Suspense fallback={<HomeSkeleton />}>
       <HomeContent searchParams={searchParams} />
     </Suspense>
   );
 }
 
 async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
-  const [params, session] = await Promise.all([searchParams.then(searchParamsFromRecord), getSession()]);
+  const [params, session] = await Promise.all([
+    searchParams.then(searchParamsFromRecord),
+    getSession(),
+  ]);
 
   return (
     <HomeLayout
@@ -59,9 +63,19 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
   );
 }
 
-function HomeLayout({ params, listing, showHomeCta }: { params: URLSearchParams; listing: ReactNode; showHomeCta: boolean }) {
+function HomeLayout({
+  params,
+  listing,
+  showHomeCta,
+}: {
+  params: URLSearchParams;
+  listing: ReactNode;
+  showHomeCta: boolean;
+}) {
   const filters = parseListingFilters(params);
-  const selectedCategoryLabel = SERVICE_CATEGORY_OPTIONS.find((option) => option.value === filters.category)?.label;
+  const selectedCategoryLabel = SERVICE_CATEGORY_OPTIONS.find(
+    (option) => option.value === filters.category,
+  )?.label;
   const hasActiveFilters = Boolean(filters.category || filters.q);
 
   return (
@@ -70,7 +84,10 @@ function HomeLayout({ params, listing, showHomeCta }: { params: URLSearchParams;
       <TrustStrip />
       <main className="mx-auto w-full max-w-page flex-1 px-4 pb-12 pt-10 sm:px-6">
         <div className="mb-5 flex flex-col gap-3 lg:hidden">
-          <MobileCategoryDrawer selectedCategoryLabel={selectedCategoryLabel} hasActiveFilters={hasActiveFilters}>
+          <MobileCategoryDrawer
+            selectedCategoryLabel={selectedCategoryLabel}
+            hasActiveFilters={hasActiveFilters}
+          >
             <CategoryNav params={params} />
           </MobileCategoryDrawer>
         </div>
